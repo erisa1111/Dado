@@ -31,9 +31,9 @@
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React / HTML / CSS / Tailwind (or your choice)
-- **Backend**: PHP / [or your backend framework]
-- **Database**: MySQL / (depending on your setup)
+- **Frontend**: React / HTML / CSS /or Tailwind
+- **Backend**: PHP 
+- **Database**: MySQL 
 - **Authentication**: 
 - **Other Tools**: Git, GitHub
 
