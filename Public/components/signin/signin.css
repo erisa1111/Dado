@@ -102,7 +102,7 @@
 }
 
 #nanny .card-content {
-	background-image: url("../img/cuteroom.png");
+	background-image: url("../../assets/img/cuteroom.png");
     background-size: cover;
     background-position: center;
    
@@ -116,7 +116,7 @@
 }
 
 #parent .card-content {
-	background-image: url("../img/another_room1.png");
+	background-image: url("../../assets/img/another_room1.png");
 	background-size: cover;
     background-position: center;
 
