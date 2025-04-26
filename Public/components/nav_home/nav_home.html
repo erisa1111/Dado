@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updated Navbar</title>
+    <link rel="stylesheet" href="nav_home/nav_home.css">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+        integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="stroke">
+
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass" id="search_icon"></i>
+            <input type="text" placeholder="Search..." id="search-bar">
+            <ul id="suggestion-list"></ul> <!-- This will hold the suggestions -->
+        </div>
+
+
+
+        <div class="links">
+            <ul class="left_nav ubuntu-medium">
+                <li><a href="home.html" class="nav-item" id="home">Home</a></li>
+                <li><a href="notifications.html" class="nav-item" id="notifications">Notifications</a></li>
+                <li><a href="connections.html" class="nav-item" id="connections">Connections</a></li>
+                <li><a href="profile.html" class="nav-item" id="profile">Profile</a></li>
+            </ul>
+        </div>
+        <div class="right_nav">
+            <ul>
+                <li>
+                    <div class="dropdown">
+                        <i class="fa-solid fa-cog" id="settings-icon"></i>
+                        <div class="dropdown-content">
+                            <a href="account_settings.html">Account Settings</a>
+                            <a href="privacy.html">Privacy</a>
+                            <a href="help.html">Help</a>
+                            <a href="../index.html">Log Out</a>
+                        </div>
+                    </div>
+                </li>
+                <li><a href="index.html" class="nav-item" id="logout">Log Out</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <script src="nav_home.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,252 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,700);
+
+html {
+  scroll-behavior: smooth;
+  font-family: Open Sans;
+}
+
+:root {
+  --color-primary: #ef5285;
+  --border-size: 3px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+nav {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin: 0 auto;
+  background-color: white;
+
+  padding: 10px 20px;
+  position: fixed;
+  top: 0px;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.right_nav {
+  width: 33.333%;
+
+  justify-items: end;
+  justify-content: end;
+
+}
+
+.right_nav ul {
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.right_nav li {
+  margin-left: 10px;
+}
+
+.right_nav a {
+  text-decoration: none;
+  color: #bab1b2;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 30px;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.right_nav a:hover {
+  color: rgb(226, 104, 126);
+  background-color: #f9e4e7;
+}
+
+.right_nav a.active {
+  color: #e2687e;
+  background-color: #f9e4e7;
+}
+
+.search-container {
+  width: 33.333%;
+  display: flex;
+  justify-content: center;
+
+
+
+
+}
+
+.left_nav {
+  width: 33.333%;
+  display: flex;
+  list-style-type: none;
+  justify-content: center;
+  padding: 0;
+  gap: 10px;
+
+}
+
+.links {
+  margin-left: 18%;
+
+}
+
+nav a {
+  text-decoration: none;
+  color: #bab1b2;
+  font-size: 16px;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.nav-item {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 30px;
+}
+
+.nav-item:hover {
+  color: #e2687e;
+  background-color: #f9e4e7;
+}
+
+.nav-item.active {
+  color: #e2687e;
+  background-color: #f9e4e7;
+}
+
+#search-bar {
+  border: none;
+  width: 0;
+  display: inline-block;
+  outline: none;
+  border-bottom: 1px solid #e2687e;
+  overflow: hidden;
+  transition: width 0.3s ease-out;
+}
+
+#search-bar:focus {
+  border: none;
+  outline: none;
+  border-bottom: 1px solid #e2687e;
+}
+
+.fa-magnifying-glass {
+  font-size: 23px;
+  color: #e2687e;
+}
+
+.fa-magnifying-glass:hover {
+  transform: scale(1.1);
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+#settings-icon {
+  font-size: 20px;
+  color: #bab1b2;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+}
+
+#settings-icon:hover {
+  color: #e2687e;
+  background-color: #f9e4e7;
+  transform: rotate(90deg);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  border-radius: 5px;
+  min-width: 150px;
+  overflow: hidden;
+}
+
+.dropdown-content a {
+  text-decoration: none;
+  color: #bab1b2;
+  padding: 10px 15px;
+  display: block;
+  border-radius: 0px;
+}
+
+.dropdown-content a:hover {
+  color: #e2687e;
+  background-color: #f9e4e7;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+#suggestion-list {
+  list-style: none;
+  width: 25%;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  /* Position it directly below the search input */
+  top: 100%;
+  /* Align it below the search bar */
+
+
+  max-height: 200px;
+  /* Limit the height */
+  overflow-y: auto;
+  /* Scrollable if suggestions exceed the max height */
+  background-color: #fff;
+  /* Background for the suggestion list */
+  border: 1px solid #e2687e;
+  /* Border around the suggestion list */
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Optional: Shadow for better visibility */
+  display: none;
+  /* Hidden by default, shown when typing */
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  /* Smooth hover effect */
+}
+
+.suggestion-item:hover {
+  background-color: #f5f5f5;
+  /* Highlight suggestion on hover */
+}
+
+.suggestion-item img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.suggestion-item .info h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.suggestion-item .info p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  color: #777;
+}

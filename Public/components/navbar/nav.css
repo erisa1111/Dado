@@ -1,0 +1,167 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,700);
+
+html {
+  scroll-behavior: smooth;
+  font-family: Open Sans;
+}
+
+:root {
+  --color-primary: #ef5285;
+  --border-size: 3px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+nav {
+  display: flex;
+  width: 85%;
+  align-items: center;
+  margin: 0 auto;
+  background-color: #f6f6f6;
+
+  margin-bottom: 100px;
+  border-radius: 50px;
+
+
+
+  position: fixed;
+  top: 10px;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+
+
+
+}
+
+.left_nav {
+  width: 35%;
+  display: flex;
+  list-style-type: none;
+  width: 600px;
+  padding-left: 45px;
+  gap: 45px;
+
+
+}
+
+.right_nav {
+  width: 35%;
+  display: flex;
+  list-style-type: none;
+  width: 600px;
+  justify-content: right;
+  align-items: center;
+
+
+}
+
+.right_nav li {
+  width: 140px;
+  text-align: center;
+  align-items: center;
+
+
+}
+
+
+.logo-div img,
+nav img {
+  width: 60px;
+
+}
+
+
+
+nav a {
+  text-decoration: none;
+  color: #bab1b2;
+  font-size: 16px;
+}
+
+.right_nav a {
+  color: #e2687e;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: #674d51;
+}
+
+
+
+
+nav ul li a,
+nav ul li a:after,
+nav ul li a:before {
+  transition: all 0.5s;
+}
+
+.nav-item2:hover,
+.nav-item2.active {
+  color: #e2687e;
+  padding: 15px;
+  background-color: #f9e4e7;
+  border-radius: 30px;
+
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+
+.dropdown-toggle {
+  background-color: #f6f6f6;
+  color: #e2687e;
+  font-size: 15px;
+  padding: 10px 15px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90px;
+  height: 50px;
+}
+
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  border-radius: 5px;
+  z-index: 1;
+
+}
+
+
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+
+.dropdown-item {
+  padding: 10px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+
+.dropdown-item:hover {
+  background-color: #f9e4e7;
+  color: #674d51;
+}
