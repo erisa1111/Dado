@@ -15,7 +15,7 @@ $role = isset($_GET['role']) ? $_GET['role'] : null;
 
 
     <div class="container">
-    <form action="" method="POST" class="scroll-form">
+    <form action="/signup" method="POST" class="scroll-form">
             <div class="form-section" id="personal-details">
                 <h1>Sign Up</h1>
                 <h3>Personal details</h3>
@@ -43,4 +43,3 @@ $role = isset($_GET['role']) ? $_GET['role'] : null;
 </body>
 
 </html>
-<script src="signup_nanny/signup_n.js"></script>

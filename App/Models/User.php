@@ -5,6 +5,7 @@ namespace App\Models;
 use Config\Database;
 use PDO;
 use PDOException;
+require_once dirname(__DIR__) . '/../Config/Database.php'; // Adjust the path if needed
 
 class User
 {
@@ -19,31 +20,30 @@ class User
     public function createUser($data)
     {
         try {
-            // Prepare the stored procedure call
             $stmt = $this->conn->prepare("CALL CreateUser(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-            // Execute the statement with the given parameters
+    
             $stmt->execute([
                 $data['name'],
                 $data['surname'],
                 $data['email'],
                 $data['username'],
                 $data['phone_number'],
-                $data['password'], // Already hashed in AuthController
+                $data['password'],
                 $data['location'],
                 $data['gender'],
-                $data['user_type'],
-                $data['expected_salary'] !== null ? (float)$data['expected_salary'] : null, // Ensure correct data type
+                $data['role_id'], // CHANGE: pass role_id not user_type
+                $data['expected_salary'] !== null ? (float)$data['expected_salary'] : null,
                 $data['experience'] !== null ? (int)$data['experience'] : null,
                 $data['schedule']
             ]);
-
-            return true; // User successfully created
-
+    
+            return true;
+    
         } catch (PDOException $e) {
             throw new \Exception("Database error: " . $e->getMessage());
         }
     }
+    
     public function getUserByEmail($email)
 {
     try {

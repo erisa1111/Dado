@@ -5,39 +5,38 @@ use App\Controllers\AuthController;
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Include the necessary controller
+// Manually include files
+require_once dirname(__DIR__) . '/App/Models/User.php';
 require_once dirname(__DIR__) . '/App/Controllers/AuthController.php';
 
 // Get the current URL path
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 switch ($request_uri) {
-  
-
+    
     case '/home':
-        // Serve the home page after login
         require __DIR__ . '/views/home.php'; 
         break;
 
     case '/signup':
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            require __DIR__ . '/views/signup.php'; // Sign-up page
+            require __DIR__ . '/views/signup.php'; 
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            (new AuthController())->signup(); // Handle sign-up POST request
+            (new AuthController())->signup();
         }
         break;
 
     case '/login':
+        echo "LOGIN PAGE"; // <-- you should see this if things are correct
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            require __DIR__ . '/views/login.php'; // Login page
+            include __DIR__ . '/views/login.php'; 
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            (new AuthController())->login(); // Handle login POST request
+            (new AuthController())->login(); 
         }
         break;
-
+        
     default:
         header("HTTP/1.0 404 Not Found");
- 
         break;
 }
 ?>

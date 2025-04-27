@@ -25,7 +25,7 @@ async function loadCard() {
     
     const response = await fetch("./components/signin/signin.php");
     const signHtml = await response.text();
-    signPlaceholder.innerHTML = signHtml;
+    //signPlaceholder.innerHTML = signHtml;
 
 
     const signCssLink = document.createElement('link');

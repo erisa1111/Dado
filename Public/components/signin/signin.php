@@ -39,7 +39,7 @@
                     <div class="buttons">
                     <div class="buttons">
     <button class="btn btn_login" onclick="location.href='/views/login.php';"><strong>Log in</strong></button>
-    <button class="btn btn_signup" onclick="location.href='/views/signup_n.php?role=parent';"><strong>Sign up</strong></button>
+    <button class="btn btn_signup" onclick="location.href='/views/signup_p.php?role=parent';"><strong>Sign up</strong></button>
 </div>
 
                 </div>
