@@ -32,6 +32,7 @@ switch ($request_uri) {
             exit();
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (new AuthController())->login(); 
+           
         }
         break;
         

@@ -2,7 +2,9 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use PDO;
 use App\Helpers\Validation;
+require_once dirname(__DIR__) . '/../Config/Database.php';
 
 class AuthController
 {
@@ -65,15 +67,52 @@ class AuthController
 }
 
 
-    public function login()
-    {
-        echo "Login method reached"; // Debugging
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            include __DIR__ . '/../../Public/views/login.php';
-            return;
+public function login()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        include __DIR__ . '/../../Public/views/login.php';
+        return;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        // Use the Config\Database class to get the connection
+        $db = new \Config\Database();  // Notice the backslash before Config if you're using namespaces
+        $conn = $db->connect(); // Get the connection from the Database class
+
+        // Prepare the stored procedure call
+        $sql = "CALL login_user(?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(1, $username, PDO::PARAM_STR);
+        $stmt->bindParam(2, $password, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // Fetch result and check login
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+            // Verify the password using password_verify()
+            if (password_verify($password, $user['password'])) {
+                // Password is correct, start the session
+                session_start();
+                $_SESSION['user_id'] = $user['user_id']; // Store user info in session
+                $_SESSION['username'] = $user['username'];
+
+                // Redirect to the dashboard or home page
+                header('Location: views/home.php'); // Replace with your actual redirect page
+                exit();
+            } else {
+                echo "Invalid username or password!";
+            }
+        } else {
+            echo "Invalid username or password!";
         }
 
-        // Handle POST login
-        // ... your login logic
+        // Close the statement and connection
+        $stmt = null;
+        $conn = null;
     }
+}
 }
