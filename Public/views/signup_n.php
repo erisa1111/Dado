@@ -1,3 +1,6 @@
+<?php
+$role = isset($_GET['role']) ? $_GET['role'] : null;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,9 +12,10 @@
 </head>
 
 <body>
-    <div class="container">
-        <form action="home.php" method="GET" class="scroll-form">
 
+
+    <div class="container">
+    <form action="" method="POST" class="scroll-form">
             <div class="form-section" id="personal-details">
                 <h1>Sign Up</h1>
                 <h3>Personal details</h3>
@@ -22,6 +26,8 @@
             <input type="number" name="expected_salary" placeholder="Avg Wage" required />
             <input type="number" name="experience" placeholder="Experience" required />
             <input type="text" name="schedule" placeholder="Schedule" required />
+            <input type="hidden" name="role" value="nanny">
+
             </div>
 
             <div class="form-section" id="account-details">
@@ -30,7 +36,7 @@
                 <input type="text" name="username" placeholder="Username" required />
                 <input type="text" name="phone_number" placeholder="Phone number" required />
                 <input type="password" name="password" placeholder="Password" required />
-                <button type="submit" onclick="location.href='home.php';">Sign Up</button>
+                <button type="submit" >Sign Up</button>
             </div>
         </form>
     </div>

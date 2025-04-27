@@ -21,9 +21,10 @@
                     <p>Are you looking for a job?</p>
                     <h1>Start your ChildCare <br> career today</h1>
                     <div class="buttons">
-                        <button class="btn btn_login" onclick="location.href='/views/login.php';"><strong>Log in</strong></button>
-                        <button class="btn btn_signup" onclick="location.href='/views/signup_n.php';"><strong>Sign up</strong></button>
-                    </div>
+    <button class="btn btn_login" onclick="location.href='/views/login.php';"><strong>Log in</strong></button>
+    <button class="btn btn_signup" onclick="location.href='/views/signup_n.php?role=nanny';"><strong>Sign up</strong></button>
+</div>
+
                 </div>
             </div>
         </div>
@@ -36,8 +37,11 @@
                     <p>Are you looking for reliable childcare?</p>
                     <h1>Find the Perfect Nanny <br> for Your Kids</h1>
                     <div class="buttons">
-                        <button class="btn btn_login" onclick="location.href='/views/login.php';"><strong>Log in</strong></button>
-                        <button class="btn btn_signup" onclick="location.href='/views/signup_p.php';"><strong>Sign up</strong></button>
+                    <div class="buttons">
+    <button class="btn btn_login" onclick="location.href='/views/login.php';"><strong>Log in</strong></button>
+    <button class="btn btn_signup" onclick="location.href='/views/signup_n.php?role=parent';"><strong>Sign up</strong></button>
+</div>
+
                 </div>
             </div>
         </div>
