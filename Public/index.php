@@ -27,9 +27,9 @@ switch ($request_uri) {
         break;
 
     case '/login':
-        echo "LOGIN PAGE"; // <-- you should see this if things are correct
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             include __DIR__ . '/views/login.php'; 
+            exit();
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (new AuthController())->login(); 
         }
