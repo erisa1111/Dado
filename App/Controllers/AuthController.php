@@ -57,7 +57,7 @@ class AuthController
 
     try {
         $userModel->createUser($data);
-        header('Location: /login');
+        header('Location: views/login.php');
         exit();
     } catch (\Exception $e) {
         echo "Signup failed: " . $e->getMessage();
