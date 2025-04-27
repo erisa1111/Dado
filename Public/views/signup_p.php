@@ -15,18 +15,18 @@
             <div class="form-section" id="personal-details">
                 <h1>Sign Up</h1>
                 <h3>Personal details</h3>
-                <input type="text" placeholder="Name" required />
-                <input type="text" placeholder="Surname" required />
-                <input type="text" placeholder="Location" required />
-                <input type="text" placeholder="Gender" required />
-                <input type="number" placeholder="Nr of kids" required />
+                <input type="text" name="name" placeholder="Name" required />
+                <input type="text" name="surname" placeholder="Surname" required />
+                <input type="text"name="location" placeholder="Location" required />
+                <input type="text" name="gender" placeholder="Gender" required />
             </div>
 
             <div class="form-section" id="account-details">
                 <h3>Account details</h3>
-                <input type="email" placeholder="Email" required />
-                <input type="text" placeholder="Username" required />
-                <input type="password" placeholder="Password" required />
+                <input type="email" name="email" placeholder="Email" required />
+                <input type="text" name="username" placeholder="Username" required />
+                <input type="text" name="phone_number" placeholder="Phone number" required />
+                <input type="password" name="password" placeholder="Password" required />
                 <button type="submit" onclick="location.href='home.php';">Sign Up</button>
             </div>
         </form>
