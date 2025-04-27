@@ -63,7 +63,7 @@ const connections = [
 
 async function loadConnectionCards() {
     const connectionsContainer = document.getElementById("center");
-    const response = await fetch("/components/connections_card/connections_card.html");
+    const response = await fetch("/components/connections_card/connections_card.php");
     const connectionsCardHtml = await response.text();
     connectionsContainer.innerHTML = connectionsCardHtml;
 

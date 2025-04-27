@@ -121,7 +121,7 @@ async function loadNotificationCard() {
         console.error("Placeholder for notifications card not found!");
         return;
     }
-    const response = await fetch("/components/notifications_card/notifications_card.html");
+    const response = await fetch("/components/notifications_card/notifications_card.php");
     const notificationsCardHtml = await response.text();
     notificationsCardPlaceholder.innerHTML = notificationsCardHtml;
     createNotifications(notifications);

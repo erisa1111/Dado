@@ -1,7 +1,7 @@
 
 async function loadNav() {
     const navPlaceholder = document.getElementById("nav-placeholder");
-    const response = await fetch("components/navbar/nav.html"); 
+    const response = await fetch("components/navbar/nav.php"); 
     const navHtml = await response.text();
     navPlaceholder.innerHTML = navHtml;
 

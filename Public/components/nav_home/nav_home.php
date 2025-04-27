@@ -24,10 +24,10 @@
 
         <div class="links">
             <ul class="left_nav ubuntu-medium">
-                <li><a href="home.html" class="nav-item" id="home">Home</a></li>
-                <li><a href="notifications.html" class="nav-item" id="notifications">Notifications</a></li>
-                <li><a href="connections.html" class="nav-item" id="connections">Connections</a></li>
-                <li><a href="profile.html" class="nav-item" id="profile">Profile</a></li>
+                <li><a href="home.php" class="nav-item" id="home">Home</a></li>
+                <li><a href="notifications.php" class="nav-item" id="notifications">Notifications</a></li>
+                <li><a href="connections.php" class="nav-item" id="connections">Connections</a></li>
+                <li><a href="profile.php" class="nav-item" id="profile">Profile</a></li>
             </ul>
         </div>
         <div class="right_nav">

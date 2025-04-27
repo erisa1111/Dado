@@ -27,7 +27,7 @@
 
 
         <ul class="right_nav ubuntu-medium">
-            <li><a href="./views/login.html" class="nav-item2">Log in</a></li>
+            <li><a href="./views/login.php" class="nav-item2">Log in</a></li>
             <li><a href="#sign_up" class="nav-item2">Register today</a></li>
             <li>
                 <a href="#" class="dropdown">

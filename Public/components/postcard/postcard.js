@@ -1,6 +1,6 @@
 async function loadPostCard() {
     const postCardPlaceholder = document.getElementById("center");
-    const response = await fetch("/components/postcard/postcard.html");
+    const response = await fetch("/components/postcard/postcard.php");
     const postCardHtml = await response.text();
     postCardPlaceholder.innerHTML = postCardHtml;
 

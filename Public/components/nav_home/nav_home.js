@@ -1,7 +1,7 @@
 async function loadNav() {
     try {
         const navPlaceholder = document.getElementById("nav-placeholder");
-        const response = await fetch("/components/nav_home/nav_home.html");
+        const response = await fetch("/components/nav_home/nav_home.php");
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

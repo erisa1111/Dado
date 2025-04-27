@@ -13,7 +13,7 @@
     <div class="container" id="container">
 
         <div class="form-container sign-in-container">
-            <form action="home.html" method="GET">
+            <form action="home.php" method="GET">
                 <h1>Log in</h1>
                 <input type="text" placeholder="Username" />
                 <input type="password" placeholder="Password" />

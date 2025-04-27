@@ -10,7 +10,7 @@
 
 <body>
     <div class="container">
-        <form action="home.html" method="GET" class="scroll-form">
+        <form action="home.php" method="GET" class="scroll-form">
 
             <div class="form-section" id="personal-details">
                 <h1>Sign Up</h1>
@@ -28,7 +28,7 @@
                 <input type="email" placeholder="Email" required />
                 <input type="text" placeholder="Username" required />
                 <input type="password" placeholder="Password" required />
-                <button type="submit" onclick="location.href='home.html';">Sign Up</button>
+                <button type="submit" onclick="location.href='home.php';">Sign Up</button>
             </div>
         </form>
     </div>

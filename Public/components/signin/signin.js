@@ -23,7 +23,7 @@ $(document).ready(function() {
 async function loadCard() {
     const signPlaceholder = document.getElementById("sign_up");
     
-    const response = await fetch("./components/signin/signin.html");
+    const response = await fetch("./components/signin/signin.php");
     const signHtml = await response.text();
     signPlaceholder.innerHTML = signHtml;
 
