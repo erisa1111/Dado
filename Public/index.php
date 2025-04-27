@@ -1,3 +1,35 @@
+<?php
+// Debugging: Show errors
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// Include the necessary controller
+require_once __DIR__ . '/../Controllers/AuthController.php';  // Correct path for AuthController
+
+// Get the current URL path
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+echo "Requested URL: $request_uri";  // Debugging: Show the requested URL
+
+// Route the request
+switch ($request_uri) {
+    case '/signup':
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            // Show the signup form
+            require '../Public/views/signup.php';  // Path to signup form
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Process the form submission
+            (new AuthController())->signup();  // Call the signup method in your AuthController
+        }
+        break;
+
+    // Add more routes here as needed
+    default:
+        echo "404 Not Found";
+        break;
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
