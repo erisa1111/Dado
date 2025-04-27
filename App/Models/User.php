@@ -5,6 +5,18 @@ class User {
     private $conn;
     private $table_name = "users"; // your user table
 
+    public function createUser($role_id, $name, $surname, $email, $phone_number, $password_hash, $location){
+        $db = new \App\Config\Database();
+        $conn = $db->getConnection();
+
+        $stmt = $conn->prepare("CALL signup_user(?, ?, ?, ?, ?, ?, ?)");
+
+        $stmt->bind_param("issssss", $role_id, $name, $surname, $email, $phone_number, $password_hash, $location);
+
+        $stmt->execute();
+    }
+
+
     public function __construct() {
         $database = new Database();
         $this->conn = $database->getConnection();
