@@ -1,6 +1,6 @@
 async function loadPostCard() {
     const postCardPlaceholder = document.getElementById("center");
-    const response = await fetch("/Public/components/postcard/postcard.html");
+    const response = await fetch("/components/postcard/postcard.html");
     const postCardHtml = await response.text();
     postCardPlaceholder.innerHTML = postCardHtml;
 
@@ -49,7 +49,7 @@ const handleComment = (post, postElement) => {
 
         const commentProfileImg = document.createElement("img");
         commentProfileImg.classList.add("comment-profile-img");
-        commentProfileImg.src = "/Public/assets/img/profile.jpg";
+        commentProfileImg.src = "/assets/img/profile.jpg";
         commentProfileImg.alt = "User Profile";
 
         const commentContent = document.createElement("div");
@@ -119,21 +119,21 @@ const initializeComments = (postElement) => {
 
 const posts = [
     {
-        profileImg: "/Public/assets/img/dado_profile.webp",
+        profileImg: "/assets/img/dado_profile.webp",
         username: "BabySitter1",
         location: "1d · Prishtine, Kosove",
         content: "Hi! I’m [Your Name], an experienced and caring nanny with [X] years of experience in childcare. I’m passionate about providing a safe, nurturing, and fun environment for children. I enjoy engaging kids in creative activities, helping with homework, and ensuring they feel loved and supported. I’m available for [full-time/part-time] work and can provide references upon request. Looking forward to helping your family!",
-        images: ["/Public/assets/img/Cute-Room.jpg", "/Public/assets/img/another_room1.png"],
+        images: ["/assets/img/Cute-Room.jpg", "/assets/img/another_room1.png"],
         likes: 125,
         comments: 10,
         isLiked: false,
     },
     {
-        profileImg: "/Public/assets/img/profile.jpg",
+        profileImg: "/assets/img/profile.jpg",
         username: "BabySitter2",
         location: "2d · Gjilan, Kosove",
         content: "Looking for experienced babysitters!",
-        images: ["/Public/assets/img/recieve.png"],
+        images: ["/assets/img/recieve.png"],
         likes: 200,
         comments: 15,
         isLiked: false,

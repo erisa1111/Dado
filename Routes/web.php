@@ -8,5 +8,4 @@ $routes = [
 // You can then iterate over $routes to check the request URI
 
 
-
 ?>

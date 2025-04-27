@@ -4,30 +4,34 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Include the necessary controller
-require_once __DIR__ . '/../Controllers/AuthController.php';  // Correct path for AuthController
+require_once dirname(__DIR__) . '/App/Controllers/AuthController.php';
 
 // Get the current URL path
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-echo "Requested URL: $request_uri";  // Debugging: Show the requested URL
 
-// Route the request
 switch ($request_uri) {
+    case '/':
+    case '/index.php': // Add this line
+        // Show the homepage
+        break;
+        
     case '/signup':
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            // Show the signup form
-            require '../Public/views/signup.php';  // Path to signup form
+            require __DIR__ . '/views/signup.php';
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Process the form submission
-            (new AuthController())->signup();  // Call the signup method in your AuthController
+            (new AuthController())->signup();
         }
+        exit;
         break;
 
-    // Add more routes here as needed
     default:
-        echo "404 Not Found";
-        break;
+        header("HTTP/1.0 404 Not Found");
+        require __DIR__ . '/views/404.php';
+        exit;
 }
+
 ?>
+
 
 
 <!DOCTYPE html>
@@ -54,7 +58,7 @@ switch ($request_uri) {
     <main id="about_">
 
         <div class="about_">
-            <img src="/Public/assets/img/main_img.png" alt="">
+            <img src="/assets/img/main_img.png" alt="">
             <div class="main_text">
                 <p class="main_p">Helping families to meet trusted babysitters</p>
                 <div class="search_w">
@@ -81,18 +85,18 @@ switch ($request_uri) {
 
         <div class="features_cards">
             <div class="card">
-                <img src="/Public/assets/img/post.png" alt="">
+                <img src="/assets/img/post.png" alt="">
                 <p>Post your needs</p>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae, beatae!</p>
             </div>
             <div class="card">
-                <img src="/Punlic/assets/img/recieve.png" alt="">
+                <img src="/assets/img/recieve.png" alt="">
                 <p>Receive proposals</p>
                 <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Hic, voluptates!
                 </p>
             </div>
             <div class="card">
-                <img src="/Public/assets/img/select.png" alt="">
+                <img src="/assets/img/select.png" alt="">
                 <p>Select your caregiver</p>
                 <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatem, aspernatur.</p>
             </div>
@@ -107,7 +111,7 @@ switch ($request_uri) {
 
 
     <div class="content" id="reviews_">
-        <img src="/Public/assets/img/22-Tech-Finds-That-Are-Way-More-Useful-Than-What-You-Have-Right-Now.jpg" alt="">
+        <img src="/assets/img/22-Tech-Finds-That-Are-Way-More-Useful-Than-What-You-Have-Right-Now.jpg" alt="">
         <div class="cont_opinions">
             <p id="opinions_p"><strong>What do our <br> customers say?</strong></p>
             <p id="opinions">Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum fugiat numquam nobis
