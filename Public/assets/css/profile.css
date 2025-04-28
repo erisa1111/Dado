@@ -1,33 +1,81 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,700);
 
-body {
-    font-family: Open Sans;
+body{
+  font-family: Open Sans;
+   
+  
 
+}
+main{
+  width: 100vw;
+  margin: 0 auto;
+}
+.container{
+ width: 85%;
+ margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  
+  
 }
 
 .profile_wrapper {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 75%;
+    align-items: center; 
+    width: 80%;
     margin: 0 auto;
-    border: 4px solid #e2687e;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
     border-radius: 30px;
     background-color: #fff;
     overflow: auto;
+ 
+}
+.right_profile{
+  width: 25%;
 
 }
+.recommend, .about, .app {
+  background-color: white;
+  border-radius: 10px;
+  margin-top: 4%;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
 
-.work {
+.about {
+
+  padding: 0;
+}
+.app {
+  height: 7vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+}
+.app a{
+  text-decoration: none;
+  color: #7b7979;
+  font-size: 12px;
+}
+
+.app a:hover{
+  color: #e2687e;
+}
+
+.schedule{
     width: 180px;
 
     background-color: #e2687e;
-
+   
     z-index: 1000000;
     border-radius: 30px;
     text-align: center;
-    padding: 10px;
-
+    padding:10px;
+    
 }
 
 
@@ -35,7 +83,7 @@ body {
     width: 100%;
     height: 500px;
 
-
+    
     background-image: url("../img/Project\ \(8\).jpg");
 
 }
@@ -49,57 +97,52 @@ body {
     background-color: #f9f5f4;
     border-radius: 18px;
     padding: 60px;
-    margin-top: -430px;
+    margin-top: -430px; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-
-.profile_summary {
+.profile_summary{
     margin-top: 40px;
     width: 90%;
     height: auto;
     padding: 20px;
+   
     display: flex;
     justify-content: space-between;
-
+    
 }
-
-.summary {
+.summary{
     width: 70%;
-
-
+    
+   
 }
 
-.summary ul {
+.summary ul{
     margin-bottom: 15px;
 }
-
-.summary p {
+.summary p{
     margin-bottom: 10px;
 
 }
-
-.profile_summary ul {
+.profile_summary ul{
     display: flex;
     list-style-type: none;
     gap: 25px;
     padding-left: 0;
 }
-
-.profile_summary h2 {
+.profile_summary h2{
     font-size: 34px;
 }
-
-.profile_summary a {
+.profile_summary a{
     text-decoration: none;
     cursor: pointer;
     font-weight: bold;
 }
 
 .profile_icons i {
-    font-family: "Font Awesome 6 Brands";
+    font-family: "Font Awesome 6 Brands"; 
     font-style: normal;
     display: inline-block;
     border: 1px solid black;
@@ -113,15 +156,14 @@ body {
     cursor: pointer;
 }
 
-.fa-location-dot {
+.fa-location-dot{
     font-family: "Font Awesome 6 Free";
     font-style: normal;
     display: inline-block;
     width: 20px;
 
 }
-
-.profile_image {
+.profile_image{
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -132,71 +174,60 @@ body {
 
 
 
-#profile_pic {
+#profile_pic{
     width: 170px;
     border-radius: 50%;
 }
-
-.role_experience {
+.role_experience{
     display: flex;
-    width: 40%;
+    width: 75%;
     justify-content: space-between;
-
+   
 }
-
-#role_ {
+#role_{
     font-size: 14px;
     margin-bottom: 0;
 }
 
-#experience_ {
+#experience_{
     font-size: 14px;
     margin-bottom: 0;
 
 }
+#salary{
+    font-size: 14px;
+    margin-bottom: 0;
 
-.profile_info {
+}
+.profile_info{
     width: 70%;
 }
-
-#name {
+#name{
     font-size: 60px;
     margin-bottom: 10px;
     margin-top: 10px;
 }
-
-#role_type {
+#role_type{
     font-size: 30px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
+#experience_years{
+    font-size: 30px;
+   margin-top: 10px;
+   margin-bottom: 10px;
+}
 
-#experience_years {
+
+
+#salary_number{
     font-size: 30px;
     margin-top: 10px;
     margin-bottom: 10px;
-}
-
-.superpower_skills p {
-    font-size: 14px;
-}
-
-.powers {
-    display: flex;
-    margin-top: 10px;
-    margin-bottom: 10px;
 
 }
 
-.powers li {
-    list-style-type: none;
-    padding: 10px;
-    margin-right: 10px;
-    background-color: #e5e4e4;
-    border-radius: 10px;
-}
-
-.summary ul li a {
+.summary ul li a{
     color: gray;
 }
 
@@ -206,30 +237,425 @@ body {
     font-weight: bold;
 }
 
-.content p {
+.content p{
     margin-bottom: 5px;
 }
-
-#title {
-    color: #e2687e;
+#title{
+   color: #e2687e;
 }
 
-.profile_icons i:hover {
+.profile_icons i:hover{
     border-color: #e2687e;
     background-color: #e2687e;
     color: white;
 
 }
 
-.fa-square-check {
-    color: black;
+.fa-square-check{
+    color:black;
     margin-right: 10px;
 }
 
-#edit_profile {
+#edit_profile{
 
     position: absolute;
     top: 170px;
-    right: 270px;
+    right: 470px;
     cursor: pointer;
 }
+.rating-container {
+    display: flex;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    gap: 5px; /* Space between the star and the rating number */
+}
+
+.star {
+    font-size: 28px; /* Adjust size of the star */
+    color: rgb(232, 232, 83); /* Yellow color for the star */
+}
+
+.rating-number {
+    font-size: 15px; /* Adjust size of the rating number */
+    color: #333; /* Dark color for contrast */
+    font-weight: bold;
+}
+.review {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.review-rating {
+    color: gold;
+    font-size: 1.2em;
+}
+
+.post {
+   
+    background-color: #fff;
+    padding-top: 5px;
+    padding-bottom: 7px;width: 450px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+ 
+  .post-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+  }
+
+  .post-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .post-header .details {
+    flex-grow: 1;
+  }
+
+  .post-header .details h4 {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  .post-header .details h4:hover {
+    color:#e2687e ;
+    cursor: pointer;
+  }
+
+
+  .post-header .details p {
+    margin: 2px 0 0;
+    color: #666;
+    font-size: 12px;
+  }
+  .title{
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: white;
+  }
+.title .fa-hands-holding-child{
+  color:#e2687e ;
+  font-size: 20px;
+}
+  .post-content {
+    padding: 15px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .post-images {
+    display: flex;
+    overflow: hidden;
+    width: 95%;
+    gap: 3px;
+    margin: 0 auto;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 20px;
+   
+  }
+
+  .post-images img {
+    width: 49.7%;
+    height: auto;
+    object-fit: cover;
+    
+  }
+
+  .post-footer {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .post-footer #likes,
+  .post-footer #comments {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .post-footer #likes:hover,
+  .post-footer #comments:hover {
+    font-size: 14px;
+    color: #e2687e;
+    cursor: pointer;
+  }
+
+  .post-actions {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    padding: 10px;
+    width: 94%;
+    margin-bottom: 5px;
+    gap: 10px;
+   margin-top: 15px;
+   border-top: 1px solid #e0e0e0;
+   border-bottom: 1px solid #e0e0e0;
+  }
+
+  .fa-heart:hover,
+  .fa-comment:hover{
+    color: #e2687e;
+
+  }
+
+  .post-actions .act {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 5px; 
+    transition: color 0.3s;
+  }
+  
+  .post-actions .act:hover {
+    color: #e2687e; 
+  }
+  
+  .post-actions .act i {
+    font-size: 20px;
+    color: #333;
+  }
+  
+  .post-actions .act:hover i {
+    color: #e2687e; 
+  }
+  
+  
+
+  .post-actions button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .post-actions button:hover {
+    color: #007bff;
+  }
+
+  .post-comment {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+   
+  }
+
+  .post-comment input {
+    width: 93%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+ 
+   
+  }
+
+  .post-comment input:focus {
+    border-color: #e2687e;
+  }
+
+  #submit-comment{
+    width: 30px;
+    height: 30px;
+    font-size: 24px;
+    border: none;
+    background-color: white;
+    cursor: pointer;
+    
+    
+  }
+
+  #submit-comment:hover{
+    color: #e2687e;
+
+  }
+
+.comments-list {
+  margin-top: 15px;
+}
+
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+
+.comment-profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.comment-content {
+  flex-grow: 1;
+}
+
+
+.comment-username {
+  font-weight: bold;
+  color: #333;
+}
+
+
+.comment-text {
+  margin-top: 5px;
+  color: #555;
+  font-size: 14px;
+}
+
+
+.delete-comment {
+  background: none;
+  border: none;
+  color: #e2687e;
+  cursor: pointer;
+  font-size: 12px;
+  transition: color 0.3s;
+  align-self: center;
+}
+
+
+.delete-comment:hover {
+  color: #e2687e;
+}
+
+
+.comments-list.hidden {
+  display: none;
+}
+
+
+.comments-list {
+  margin-top: 15px;
+  display: block;
+  border-top: 1px solid #ddd;
+}
+
+.comments-toggle{
+  border: none;
+  background-color: white;
+  color: #e2687e;
+  padding-left: 10px;
+  cursor: pointer;
+
+}
+.posts_section{
+    display: flex;
+    width: 90%;
+    justify-content: space-between;
+    
+}
+
+#postet{
+  width: 87%;
+  border-bottom: 2px solid #e2687e;
+  color: #e2687e;
+
+}
+
+
+.recommend {
+   
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .recommend h2 {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: #333;
+  }
+  
+  .recommendation {
+    display: flex;
+    align-items: center;
+
+    
+    margin: 0 auto;
+
+    margin-bottom: 16px;
+  }
+  
+  .recommendation .logo img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: 12px;
+  }
+  
+  .recommendation .info h3 {
+    font-size: 14px;
+    margin: 0;
+    color: #333;
+  }
+  
+  .recommendation .info p {
+    font-size: 12px;
+    color: #555;
+  }
+  
+  .follow-btn {
+   margin-right:auto;
+    padding: 6px 12px;
+    background-color: white;
+    
+    color: #e2687e;
+    border: 1px solid #e2687e;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  
+  .follow-btn:hover {
+    background-color: #e2687e;
+    color: white;
+  }
+  
+  .view-all {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #0073b1;
+    text-decoration: none;
+    margin-top: 16px;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+
+  .rec{
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+   
+  }
+  .about img{
+    width: 100%;
+    border-radius: 10px;
+    height: auto;
+    margin-bottom: 0;
+  }
+  

@@ -1,108 +1,213 @@
 document.addEventListener("DOMContentLoaded", () => {
- 
     const content = {
         story: `
         <p>Hi, my name is <span contenteditable="false" id="user-name">[Your Name]</span>, and caring for children has always been a part of my life.</p>
         <p>Growing up in a large family, I was often the go-to babysitter for my younger siblings and cousins, which sparked my passion for working with kids.</p>
         <p>Over the past [X years], I've had the privilege of helping families by providing loving and reliable care to their little ones.</p>
-        <p>I believe every child deserves a safe, happy environment to grow and explore.</p>
-        <p>That's why I strive to create a nurturing atmosphere where kids feel valued, supported, and free to be themselves.</p>
-        <p>Whether it's building block towers, helping with homework, or simply listening to their stories, I aim to bring a sense of warmth and encouragement into their day.</p>
-        <p>In addition to my hands-on experience, I'm certified in [First Aid/CPR/other relevant certifications], and I continuously look for ways to improve my skills to better serve the families I work with.</p>
-        <p>I take pride in being dependable, adaptable, and a positive influence in children's lives.</p>
-        <p>Outside of nannying, I enjoy [your hobbies/interests, e.g., “cooking healthy meals, exploring nature, and reading children's books that spark creativity”].</p>
-        <p>These interests often inspire the activities I share with the kids I care for!</p>
-        <p>I'm excited to meet your family and learn how I can support you in raising happy, confident, and well-rounded children.</p>
         `,
         skills: `
         <p>First Aid & CPR Certified: Trained to handle emergencies and ensure children's safety.</p>
         <p>Organizational Skills: Skilled in planning daily routines, activities, and meals.</p>
-        <p>Effective Communication: Adept at understanding children's needs and maintaining open communication with parents.</p>
-        <p>Creativity: Enjoy crafting engaging activities like art projects, storytelling, and educational games.</p>
-        <p>Adaptability: Capable of managing various age groups and adjusting care to suit individual needs.</p>
-        <p>Patience & Empathy: Creating a warm and supportive environment for children to thrive.</p>
         `,
         experience: `
         <p>Private Nanny for [X Years]</p>
         <p>Provided care for children aged [range] by creating safe, engaging environments and fostering developmental growth.</p>
-        <p>Assisted with homework and school projects.</p>
-        <p>Prepared healthy meals and snacks tailored to dietary needs.</p>
-        <p>Organized fun and educational activities for children, including outdoor play and crafts.</p>
-        <p>Volunteer at [Local Community Center/Program Name]</p>
-        <p>Worked as a caregiver and mentor, assisting with youth programs and events.</p>
-        <p>Supervised groups of children during workshops and play sessions.</p>
-        <p>Supported children with special needs by offering personalized attention.</p>
-        <p>Babysitter for Family & Friends</p>
-        <p>Helped families by providing reliable childcare for events, weekends, and evenings.</p>
-        <p>Established strong relationships with children and parents.</p>
-        <p>Managed bedtime routines and conflict resolution effectively.</p>
         `,
+        reviews: `
+        <h3>Reviews</h3>
+        <div class="review">
+            <p><strong>Jane Doe</strong> - <span class="review-rating">★★★★★</span></p>
+            <p>"Amazing nanny! My kids loved spending time with her and learned so much."</p>
+        </div>
+        <div class="review">
+            <p><strong>John Smith</strong> - <span class="review-rating">★★★★☆</span></p>
+            <p>"Very reliable and great with kids. Highly recommend."</p>
+        </div>
+        `
     };
 
     const titles = {
         story: "My Story",
         skills: "Skills",
-        experience: "Experience"
+        experience: "Experience",
+        reviews: "Reviews"
     };
-
+    
 
     const links = document.querySelectorAll(".summary ul li a");
     const contentDiv = document.getElementById("content");
     const title = document.getElementById("title");
 
-
     links.forEach(link => {
-        link.addEventListener('click', (event) => {
+        link.addEventListener("click", (event) => {
             event.preventDefault();
-            const section = event.target.getAttribute('data-section');
-            contentDiv.innerHTML = content[section];
-            title.textContent = titles[section];
+            const section = event.target.getAttribute("data-section");
+
+            if (content[section]) {
+                contentDiv.innerHTML = content[section];
+                title.textContent = titles[section];
+            } else {
+                console.error(`Section "${section}" does not exist in content object.`);
+            }
         });
     });
+});
+async function loadUserPosts() {
+    const postCardPlaceholder = document.getElementById("post-container");
+    const response = await fetch("postcard/postcard.html");
+    const postCardHtml = await response.text();
+    postCardPlaceholder.innerHTML = postCardHtml;
 
+    // Filter posts for the current user
+    const currentUser = "CurrentUser"; // Replace with logic to fetch the logged-in user's username
+    const userPosts = posts.filter(post => post.username === currentUser);
 
-    const editButton = document.getElementById('edit_profile');
-    const elementsToEdit = document.querySelectorAll('[contenteditable="false"]');
+    createPosts(userPosts);
+}
 
- 
-    editButton.addEventListener("click", () => {
+const toggleCommentsDisplay = (postElement) => {
+    const commentList = postElement.querySelector("#comments-list");
+    const commentsToggleButton = postElement.querySelector(".comments-toggle");
+    const comments = Array.from(commentList.children);
 
-        if (editButton.textContent === "Edit") {
-            elementsToEdit.forEach(element => {
-               
-                element.contentEditable = "true";
-            });
-            editButton.textContent = "Save";
-        } else {
-     
-            updateProfile();
-            elementsToEdit.forEach(element => {
-          
-                element.contentEditable = "false";
-            });
-            editButton.textContent = "Edit";
+    if (commentsToggleButton.textContent === "Show all comments") {
+        comments.forEach((comment) => (comment.style.display = "flex"));
+        commentsToggleButton.textContent = "Show less";
+    } else {
+        comments.forEach((comment, index) => {
+            comment.style.display = index < 2 ? "flex" : "none";
+        });
+        commentsToggleButton.textContent = "Show all comments";
+    }
+};
+
+const handleComment = (post, postElement) => {
+    const commentInput = postElement.querySelector("#comment-input");
+    const commentList = postElement.querySelector("#comments-list");
+    const commentsCount = postElement.querySelector("#comments");
+    const commentsSection = postElement.querySelector(".comments-list");
+
+    const newComment = commentInput.value.trim();
+
+    if (newComment) {
+        const commentElement = document.createElement("div");
+        commentElement.classList.add("comment");
+
+        const commentProfileImg = document.createElement("img");
+        commentProfileImg.classList.add("comment-profile-img");
+        commentProfileImg.src = "../img/profile.jpg";
+        commentProfileImg.alt = "User Profile";
+
+        const commentContent = document.createElement("div");
+        commentContent.classList.add("comment-content");
+
+        const commentUsername = document.createElement("span");
+        commentUsername.classList.add("comment-username");
+        commentUsername.textContent = post.username;
+
+        const commentText = document.createElement("p");
+        commentText.classList.add("comment-text");
+        commentText.textContent = newComment;
+
+        commentContent.appendChild(commentUsername);
+        commentContent.appendChild(commentText);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete-comment");
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => {
+            commentList.removeChild(commentElement);
+            post.comments -= 1;
+            commentsCount.textContent = `${post.comments} Comments`;
+        });
+
+        commentElement.appendChild(commentProfileImg);
+        commentElement.appendChild(commentContent);
+        commentElement.appendChild(deleteButton);
+
+        commentList.appendChild(commentElement);
+        commentInput.value = "";
+        post.comments += 1;
+        commentsCount.textContent = `${post.comments} Comments`;
+
+        if (post.comments === 1) {
+            commentsSection.classList.remove("hidden");
         }
+
+        toggleCommentsDisplay(postElement);
+    }
+};
+
+const initializeComments = (postElement) => {
+    const commentList = postElement.querySelector("#comments-list");
+    const commentsToggleButton = document.createElement("button");
+    commentsToggleButton.classList.add("comments-toggle");
+    commentsToggleButton.textContent = "Show all comments";
+
+    commentList.after(commentsToggleButton);
+
+    commentsToggleButton.addEventListener("click", () => {
+        toggleCommentsDisplay(postElement);
     });
 
-   
-    function updateProfile() {
-        const userNameElement = document.getElementById('user-name');
-        const contentElement = document.getElementById('content');
+    const comments = Array.from(commentList.children);
+    comments.forEach((comment, index) => {
+        comment.style.display = index < 2 ? "flex" : "none";
+    });
+};
 
+const populatePost = (post, templatePost) => {
+    templatePost.querySelector("#profile-img").src = post.profileImg;
+    templatePost.querySelector("#username").textContent = post.username;
+    templatePost.querySelector("#location").textContent = post.location;
 
-        if (userNameElement && contentElement) {
+    const contentElement = templatePost.querySelector("#content");
+    const imagesContainer = templatePost.querySelector("#images");
+    imagesContainer.innerHTML = "";
 
-            const userName = userNameElement.textContent;
-            const storyText = contentElement.textContent;
+    contentElement.textContent = post.content;
 
-         
-            document.getElementById('user-name').textContent = userName;
-            content.story = storyText;  
+    post.images.forEach((imgSrc) => {
+        const img = document.createElement("img");
+        img.src = imgSrc;
+        imagesContainer.appendChild(img);
+    });
 
-           
-            alert('Profile changes have been saved!');
-        } else {
-            console.error("Elements not found!");
-        }
+    const likesElement = templatePost.querySelector("#likes");
+    likesElement.textContent = `${post.likes} likes`;
+    templatePost.querySelector("#comments").textContent = `${post.comments} Comments`;
+
+    const heartButton = templatePost.querySelector(".fa-heart");
+    heartButton.addEventListener("click", () => {
+        toggleLike(post, likesElement, heartButton);
+    });
+
+    const submitCommentButton = templatePost.querySelector("#submit-comment");
+    submitCommentButton.addEventListener("click", () => {
+        handleComment(post, templatePost);
+    });
+
+    initializeComments(templatePost);
+};
+
+const createPosts = (postsData) => {
+    const postContainer = document.getElementById("post-container");
+    const templatePost = document.querySelector(".post");
+
+    if (!postContainer || !templatePost) {
+        console.error("Post container or template not found!");
+        return;
     }
-});
+
+    postsData.forEach((post) => {
+        const newPost = templatePost.cloneNode(true);
+        newPost.style.display = "block";
+        populatePost(post, newPost);
+        postContainer.appendChild(newPost);
+    });
+};
+
+document.addEventListener("DOMContentLoaded", loadUserPosts);
+
+
+
