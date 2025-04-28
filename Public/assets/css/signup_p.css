@@ -65,7 +65,7 @@ input {
     width: 90%;
     border-radius: 5px;
 }
-select.select {
+select {
     margin: 10px 0px;
     background-color: #eee;
     width: 90%;

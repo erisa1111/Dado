@@ -44,20 +44,33 @@ class User
         }
     }
     
-    public function getUserByEmail($email)
-{
-    try {
-        // Prepare the SQL query to get the user by email
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
+    public function getUserByEmail($email){
+        try {
+            // Prepare the SQL query to get the user by email
+            $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
+            $stmt->execute([$email]);
 
-        // Fetch the user data as an associative array
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Fetch the user data as an associative array
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $user ? $user : null; // Return user if found, otherwise null
-    } catch (PDOException $e) {
-        throw new Exception("Database error: " . $e->getMessage());
+            return $user ? $user : null; // Return user if found, otherwise null
+        } catch (PDOException $e) {
+            throw new \Exception("Database error: " . $e->getMessage());
+
+        }
     }
-}
+
+
+    public function getProfile($userId){
+        $stmt = $this->conn->prepare("CALL GetUserProfile(:userId)");
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor(); // Important after a CALL!
+        
+        return $result;
+    }
+
 
 }

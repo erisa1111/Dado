@@ -1,7 +1,28 @@
 <?php
+
+use App\Models\User;
 require_once __DIR__ . '/../Models/User.php';
 
+
 class ProfileController {
+
+    public function showProfile() {
+        session_start();
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: login.php');
+            exit;
+        }
+    
+        $userModel = new User();
+        $userData = $userModel->getProfile($_SESSION['user_id']);
+    
+        if (empty($userData['profile_picture'])) {
+            $userData['profile_picture'] = '/assets/img/default_profile.webp';
+        }
+    
+        require_once __DIR__ . '/views/profile.php';
+    }
+    
 
     public function viewProfile($userId) {
         $userModel = new User();

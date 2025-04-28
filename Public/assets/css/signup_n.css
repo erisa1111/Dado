@@ -52,6 +52,33 @@ body {
     scroll-snap-align: start;
 }
 
+select {
+    margin: 10px 0px;
+    background-color: #eee;
+    width: 90%;
+    border: none;
+    padding: 12px 15px;
+    padding-left: 10px;
+    border-radius: 5px;
+    color: #555;
+}
+
+.select-field {
+    background-color: #eee;
+    border: none;
+    padding: 12px 15px;
+    margin: 10px 0;
+    width: 90%;
+    border-radius: 5px;
+    color: #555; /* normal color for selected text */
+}
+
+/* Make the placeholder option gray */
+.select-field option[value=""] {
+    color: #999;
+}
+
+
 h1 {
     font-weight: bold;
     margin-bottom: 20px;
