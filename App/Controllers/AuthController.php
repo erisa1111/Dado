@@ -2,9 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\User;
-use PDO;
 use App\Helpers\Validation;
-require_once dirname(__DIR__) . '/../Config/Database.php';
 
 class AuthController
 {
@@ -79,25 +77,27 @@ public function login()
         $password = $_POST['password'];
 
         // Use the Config\Database class to get the connection
-        $db = new \Config\Database();  // Notice the backslash before Config if you're using namespaces
-        $conn = $db->connect(); // Get the connection from the Database class
+        $db = new \Config\Database();  
+        $conn = $db->connect(); // Get the PDO connection
 
-        // Prepare the stored procedure call
-        $sql = "CALL login_user(?, ?)";
+        // Prepare the stored procedure call to fetch user by username
+        $sql = "CALL Login_Uer(?)";  // Call the procedure with the username as a parameter
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(1, $username, PDO::PARAM_STR);
-        $stmt->bindParam(2, $password, PDO::PARAM_STR);
+        $stmt->bindParam(1, $username, \PDO::PARAM_STR);
         $stmt->execute();
 
         // Fetch result and check login
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        // Debugging: print out the user array to check if 'password_hash' is included
+        var_dump($user); // or echo '<pre>' . print_r($user, true) . '</pre>';
 
         if ($user) {
-            // Verify the password using password_verify()
-            if (password_verify($password, $user['password'])) {
+            // Check if password_hash exists before verifying
+            if (isset($user['password_hash']) && password_verify($password, $user['password_hash'])) {
                 // Password is correct, start the session
                 session_start();
-                $_SESSION['user_id'] = $user['user_id']; // Store user info in session
+                $_SESSION['user_id'] = $user['id']; // Use 'id' instead of 'user_id'
                 $_SESSION['username'] = $user['username'];
 
                 // Redirect to the dashboard or home page
@@ -105,14 +105,13 @@ public function login()
                 exit();
             } else {
                 echo "Invalid username or password!";
+               // header('Location: views/login.php');
             }
         } else {
             echo "Invalid username or password!";
+           // header('Location: views/login.php');
         }
-
-        // Close the statement and connection
-        $stmt = null;
-        $conn = null;
     }
 }
+
 }

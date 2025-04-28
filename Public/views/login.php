@@ -13,13 +13,14 @@
     <div class="container" id="container">
 
         <div class="form-container sign-in-container">
-            <form action="home.php" method="GET">
-                <h1>Log in</h1>
-                <input type="text" placeholder="Username" />
-                <input type="password" placeholder="Password" />
-
-                <button>Log in</button>
-            </form>
+        <form action="/login" method="POST">
+    <h1>Log in</h1>
+    
+    <input type="text" name="username" placeholder="Username" required />
+    <input type="password" name="password" placeholder="Password" required />
+    
+    <button type="submit">Log in</button>
+</form>
         </div>
 
 
