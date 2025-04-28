@@ -114,4 +114,19 @@ public function login()
     }
 }
 
+
+    public function logout(){
+        // Start the session to access session variables
+        session_start();
+
+        // Destroy the session and unset all session variables
+        session_unset();    // Removes all session variables
+        session_destroy();  // Destroys the session data
+
+        // Redirect to the index page (or the login page)
+        header('Location: index.php');  // Adjust this to your index URL
+        exit();
+    }
+
+
 }

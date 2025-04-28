@@ -213,12 +213,12 @@ main{
     margin-top: 0px;
 }
 #role_type{
-    font-size: 30px;
+    font-size: 20px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
 #experience_years{
-    font-size: 30px;
+    font-size: 20px;
    margin-top: 10px;
    margin-bottom: 10px;
 }
@@ -226,7 +226,7 @@ main{
 
 
 #salary_number{
-    font-size: 30px;
+    font-size: 20px;
     margin-top: 10px;
     margin-bottom: 10px;
 

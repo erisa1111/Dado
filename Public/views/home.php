@@ -1,8 +1,20 @@
 <?php
-session_start();
+session_start(); // Start session to access $_SESSION data
+
+use App\Models\User;
+require_once __DIR__ . '/../../App/Models/User.php'; // Adjust path if needed
+
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
+    echo "No user logged in!";
+    exit();
+}
+
+$userModel = new User();
+$userData = $userModel->getProfile($_SESSION['user_id']);
+
+if (!$userData) {
+    echo "User not found.";
+    exit();
 }
 ?>
 
