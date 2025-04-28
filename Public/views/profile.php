@@ -16,8 +16,6 @@ if (!$userData) {
     echo "User not found.";
     exit();
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -47,10 +45,9 @@ if (!$userData) {
                 <div class="profile_details">
                     <p id="edit_profile">Edit</p>
                     <div class="profile_image">
-                        <img src="../assets/img/main_img.png" alt="Profile Picture" id="profile_pic">
+                        <img src="/assets/img/default_profile.webp" alt="Profile Picture" id="profile_pic">
                         <div class="schedule"></i>Part time</div>
                         <p><i class="fa-solid fa-location-dot"></i><?= htmlspecialchars($userData['location']) ?></p>
-    
                     </div>
                     <div class="profile_info">
                         <div class="rating-container">
