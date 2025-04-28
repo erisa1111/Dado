@@ -1,3 +1,19 @@
+<?php if (isset($userData)) : ?>
+    <h1><?= htmlspecialchars($userData['name']) . ' ' . htmlspecialchars($userData['surname']) ?></h1>
+    <p>Username: <?= htmlspecialchars($userData['username']) ?></p>
+    <p>Email: <?= htmlspecialchars($userData['email']) ?></p>
+    <p>Phone Number: <?= htmlspecialchars($userData['phone_number']) ?></p>
+    <p>Location: <?= htmlspecialchars($userData['location']) ?></p>
+    <p>Gender: <?= htmlspecialchars($userData['gender']) ?></p>
+    <?php if (!empty($userData['profile_picture'])) : ?>
+        <img src="path_to_images/<?= htmlspecialchars($userData['profile_picture']) ?>" alt="Profile Picture" width="150">
+    <?php endif; ?>
+<?php else : ?>
+    <p>User not found.</p>
+<?php endif; ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
