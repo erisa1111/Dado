@@ -1,18 +1,24 @@
-<?php if (isset($userData)) : ?>
-    <h1><?= htmlspecialchars($userData['name']) . ' ' . htmlspecialchars($userData['surname']) ?></h1>
-    <p>Username: <?= htmlspecialchars($userData['username']) ?></p>
-    <p>Email: <?= htmlspecialchars($userData['email']) ?></p>
-    <p>Phone Number: <?= htmlspecialchars($userData['phone_number']) ?></p>
-    <p>Location: <?= htmlspecialchars($userData['location']) ?></p>
-    <p>Gender: <?= htmlspecialchars($userData['gender']) ?></p>
-    <?php if (!empty($userData['profile_picture'])) : ?>
-        <img src="path_to_images/<?= htmlspecialchars($userData['profile_picture']) ?>" alt="Profile Picture" width="150">
-    <?php endif; ?>
-<?php else : ?>
-    <p>User not found.</p>
-<?php endif; ?>
+<?php
+session_start(); // Start session to access $_SESSION data
+
+use App\Models\User;
+require_once __DIR__ . '/../../App/Models/User.php'; // Adjust path if needed
+
+if (!isset($_SESSION['user_id'])) {
+    echo "No user logged in!";
+    exit();
+}
+
+$userModel = new User();
+$userData = $userModel->getProfile($_SESSION['user_id']);
+
+if (!$userData) {
+    echo "User not found.";
+    exit();
+}
 
 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -43,7 +49,7 @@
                     <div class="profile_image">
                         <img src="../assets/img/main_img.png" alt="Profile Picture" id="profile_pic">
                         <div class="schedule"></i>Part time</div>
-                        <p><i class="fa-solid fa-location-dot"></i>Prishtine, Kosove</p>
+                        <p><i class="fa-solid fa-location-dot"></i><?= htmlspecialchars($userData['location']) ?></p>
     
                     </div>
                     <div class="profile_info">
@@ -52,25 +58,27 @@
                             <span class="rating-number">5.0</span>
                         </div>
     
-                        <h3 id="name" contenteditable="false" aria-label="Your full name">Filan Fisteku</h3>
+                        <h5 id="username"> <?= htmlspecialchars($userData['username']) ?></h5>
+                        <h3 id="name" contenteditable="false" aria-label="Your full name"><?= htmlspecialchars($userData['name']) . ' ' . htmlspecialchars($userData['surname']) ?></h3>
                         <div class="profile_icons">
                             <i class="fa-brands fa-twitter"></i>
                             <i class="fa-brands fa-linkedin-in"></i>
                             <i class="fa-brands fa-facebook-f"></i>
                         </div>
+
                         <div class="role_experience">
                             <div class="role">
-                                <p id="role_" aria-label="Current role">Role</p>
-                                <p id="role_type" contenteditable="false" aria-label="Role type">Nanny</p>
+                                <!-- <p id="role_" aria-label="Current role"></p> -->
+                                <p id="role_type" contenteditable="false" aria-label="Role type"><i class="fa-regular fa-user"></i> <?= htmlspecialchars($userData['role_name']) ?></p>
                             </div>
                             <div class="experience">
-                                <p id="experience_" aria-label="Experience">Experience</p>
-                                <p id="experience_years" contenteditable="false" aria-label="Years of experience">10 years
+                                <!-- <p id="experience_" aria-label="Experience">Phone</p> -->
+                                <p id="experience_years" contenteditable="false" aria-label="Years of experience"><i class="fa-solid fa-phone"></i> <?= htmlspecialchars($userData['phone_number']) ?>
                                 </p>
                             </div>
                             <div class="expected_salary">
-                                <p id="salary" aria-label="Expected salary">Expected salary</p>
-                                <p id="salary_number" contenteditable="false" aria-label="Salary">800$ </p>
+                                <!-- <p id="salary" aria-label="Expected salary">Email</p> -->
+                                <p id="salary_number" contenteditable="false" aria-label="Salary"><i class="fa-regular fa-envelope"></i> <?= htmlspecialchars($userData['email']) ?> </p>
                             </div>
                         </div>
                       
