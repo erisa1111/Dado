@@ -42,12 +42,11 @@ if (!$userData) {
                    
                     <img 
                         class="profile-image" 
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s" 
-                        alt="Profile Image"
-                    >
+                        src="/assets/img/default_profile.webp" 
+                        alt="Profile Image">
                     <div class="info">
-                        <h3 class="name">Filan Fisteku</h3>
-                        <p class="status">Status</p>
+                        <h3 class="name"><?= htmlspecialchars($userData['name']) . ' ' . htmlspecialchars($userData['surname']) ?></h3>
+                        <p class="status"><?= htmlspecialchars($userData['username']) ?></p>
                     </div>
                 </div>
         
