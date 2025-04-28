@@ -127,6 +127,6 @@ public function login()
         header('Location: index.php');  // Adjust this to your index URL
         exit();
     }
-
+   
 
 }
