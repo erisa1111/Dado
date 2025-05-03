@@ -1,3 +1,16 @@
+<?php
+
+require_once '/Users/macair/Desktop/dadodado/App/Models/Post.php';
+require_once '/Users/macair/Desktop/dadodado/App/Controllers/PostsController.php';
+require_once '/Users/macair/Desktop/dadodado/Config/Database.php';
+
+// Initialize the controller
+$postController = new App\Controllers\PostsController(); // No arguments for the constructor now
+$posts = $postController->getPosts(); 
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +19,8 @@
     <title>Home Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/home.css">
+
+   <link rel="stylesheet" href="/components/postcard/postcard.css">
     <link rel="stylesheet" href="/components/nav_home/nav_home.css">
 </head>
 <body>
@@ -50,9 +65,56 @@
               </div>
               
         </div>
+  
         <div id="center">
-       
+        <div class="add_post">
+    <p>Add post..</p>
+    <button id="add"><i class="fa-regular fa-square-plus"></i></button>
+  </div>
+            <?php foreach ($posts as $post): ?>
+                <div class="post" id="post-<?php echo $post['id']; ?>">
+                    <div class="post-header">
+                        <img class="profile-img" src="<?php echo htmlspecialchars($post['profile_picture']); ?>" alt="User Profile">
+                        <div class="details">
+                            <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
+                            <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <?php echo htmlspecialchars($post['body']); ?>
+                    </div>
+                    <?php if (!empty($post['image_url'])): ?>
+                        <div class="post-images">
+                            <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Post Image">
+                        </div>
+                    <?php endif; ?>
+                    <div class="post-actions">
+                        <button class="act like-btn" data-post-id="<?php echo $post['id']; ?>">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                        <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
+                            <i class="fa-regular fa-comment"></i>
+                        </button>
+                    </div>
+                    <div class="post-footer">
+                        <div class="likes"><?php echo $post['like_count']; ?> likes</div>
+                        <div class="comments"><?php echo $post['comment_count']; ?> comments</div>
+                    </div>
+                    <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>">
+                        <!-- Comments will be loaded dynamically -->
+                    </div>
+                    <div class="post-comment">
+                        <input type="text" placeholder="Add a comment..." class="comment-input" data-post-id="<?php echo $post['id']; ?>">
+                        <button class="submit-comment" data-post-id="<?php echo $post['id']; ?>">
+                            <i class="fa-regular fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
+    
+
+    
 
 
         <div class="right">
@@ -114,86 +176,7 @@
           <script src="/components/nav_home/nav_home.js"></script>
          <script src="/components/postcard/postcard.js"></script>
 
-         <script>
-document.addEventListener('DOMContentLoaded', function () {
-    fetch('/path-to-PostsController/getPosts')
-        .then(response => response.json())
-        .then(posts => {
-            let centerDiv = document.getElementById('center');
-            posts.forEach(post => {
-                let postCard = document.createElement('div');
-                postCard.classList.add('post-card');
-                postCard.innerHTML = `
-                    <div class="post-header">
-                        <h3>${post.title}</h3>
-                        <p>By ${post.username}</p>
-                    </div>
-                    <div class="post-body">
-                        <p>${post.body}</p>
-                        ${post.image_url ? `<img src="${post.image_url}" alt="Post Image" />` : ''}
-                    </div>
-                    <div class="post-actions">
-                        <button class="like-btn" data-post-id="${post.id}">
-                            <i class="fas fa-thumbs-up"></i> Like <span class="like-count">${post.like_count}</span>
-                        </button>
-                        <button class="comment-btn" data-post-id="${post.id}">
-                            <i class="fas fa-comment"></i> Comment
-                        </button>
-                    </div>
-                `;
-                centerDiv.appendChild(postCard);
-            });
-        })
-        .catch(error => console.error('Error fetching posts:', error));
-});
-
-document.addEventListener('click', function (event) {
-    if (event.target.matches('.like-btn')) {
-        const postId = event.target.getAttribute('data-post-id');
-        
-        fetch('/path-to-PostsController/toggleLike', {
-            method: 'POST',
-            body: JSON.stringify({ post_id: postId }),
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const likeCountElement = event.target.querySelector('.like-count');
-                likeCountElement.textContent = data.like_count;
-            }
-        })
-        .catch(error => console.error('Error toggling like:', error));
-    }
-});
-
-document.addEventListener('submit', function (event) {
-    if (event.target.matches('.comment-form')) {
-        event.preventDefault();
-        
-        const postId = event.target.getAttribute('data-post-id');
-        const commentText = event.target.querySelector('.comment-text').value;
-        
-        fetch('/path-to-PostsController/addComment', {
-            method: 'POST',
-            body: JSON.stringify({ post_id: postId, comment: commentText }),
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Display the new comment dynamically
-                const newComment = data.comment;
-                const commentSection = document.querySelector(`#post-${postId} .comments`);
-                commentSection.innerHTML += `<div class="comment">${newComment.comment}</div>`;
-            }
-        })
-        .catch(error => console.error('Error adding comment:', error));
-    }
-});
-
-
-</script>
+       
 
    
 </body>
@@ -201,4 +184,7 @@ document.addEventListener('submit', function (event) {
 
 
 </html>
+<script src="/assets/js/home.js"></script>
+<script src="/components/js/postcard.js"></script>
+
 

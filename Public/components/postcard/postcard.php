@@ -1,3 +1,5 @@
+<?php
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,10 +13,10 @@
 </head>
 
 <body>
-  <div class="add_post">
+  <!--<div class="add_post">
     <p>Add post..</p>
     <button id="add"><i class="fa-regular fa-square-plus"></i></button>
-  </div>
+  </div>-->
 
   <!-- Modal Structure Hidden -->
   <div id="post-modal" class="modal" style="display: none;">

@@ -1,150 +1,172 @@
 <?php
 namespace App\Controllers;
 
+require_once __DIR__ . '/../../App/Models/Post.php';
+require_once __DIR__ . '/../../Config/Database.php';
+
+use App\Models\Post;
 use Config\Database;
 
 class PostsController
 {
-    private $conn;
+    private $postModel;
 
     public function __construct()
     {
-        $db = new Database();
-        $this->conn = $db->connect();
-    }
-
-    public function createPost()
-    {
-        session_start();
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: /login');
-            exit();
-        }
-
-        $userId = $_SESSION['user_id'];
-        $title = $_POST['title'] ?? '';
-        $body = $_POST['body'] ?? '';
-        $imageUrl = ''; // You'll handle file upload separately
-
-        try {
-            $stmt = $this->conn->prepare("CALL create_post(?, ?, ?, ?)");
-            $stmt->execute([$userId, $title, $body, $imageUrl]);
-            
-            header('Location: /home');
-            exit();
-        } catch (\PDOException $e) {
-            error_log("Error creating post: " . $e->getMessage());
-            $_SESSION['error'] = "Error creating post";
-            header('Location: /home');
-            exit();
-        }
+        $database = new Database();
+        $db = $database->connect();
+        $this->postModel = new Post($db);
     }
 
     public function getPosts()
     {
-        try {
-            $stmt = $this->conn->query("CALL get_all_posts_with_users()");
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            error_log("Error fetching posts: " . $e->getMessage());
-            return [];
+        return $this->postModel->getAll();
+    }
+
+    public function createPost()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Get current user ID from session
+            $userId = $_SESSION['user_id'] ?? null;
+            $title = $_POST['title'] ?? 'New Post'; // Default title if not provided
+            $content = $_POST['content'] ?? '';
+            
+            // Handle image upload
+            $imageUrl = $this->handleImageUpload($_FILES['images'] ?? null);
+
+            $this->postModel->create($userId, $title, $content, $imageUrl);
+            
+            if ($this->isAjaxRequest()) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true]);
+                exit;
+            } else {
+                header('Location: /home');
+                exit;
+            }
         }
     }
 
     public function toggleLike()
     {
-        session_start();
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
-            exit();
-        }
-
-        $postId = $_POST['post_id'] ?? null;
-        $userId = $_SESSION['user_id'];
-
-        if (!$postId) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Post ID is required']);
-            exit();
-        }
-
-        try {
-            // Check if already liked
-            $checkStmt = $this->conn->prepare("SELECT COUNT(*) FROM likes WHERE post_id = ? AND user_id = ?");
-            $checkStmt->execute([$postId, $userId]);
-            $alreadyLiked = $checkStmt->fetchColumn();
-
-            if ($alreadyLiked) {
-                $stmt = $this->conn->prepare("CALL remove_like(?, ?)");
-            } else {
-                $stmt = $this->conn->prepare("CALL add_like(?, ?)");
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $postId = $_POST['post_id'] ?? null;
+            $userId = $_SESSION['user_id'] ?? null;
+            
+            if (!$postId || !$userId) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => 'Invalid request']);
+                exit;
             }
-            
-            $stmt->execute([$postId, $userId]);
-            
-            // Get updated like count
-            $countStmt = $this->conn->prepare("SELECT COUNT(*) FROM likes WHERE post_id = ?");
-            $countStmt->execute([$postId]);
-            $likeCount = $countStmt->fetchColumn();
 
-            echo json_encode(['success' => true, 'liked' => !$alreadyLiked, 'like_count' => $likeCount]);
-        } catch (\PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+            // Check if already liked (you might need to add a method in Post model for this)
+            $isLiked = $this->isPostLiked($postId, $userId);
+            
+            if ($isLiked) {
+                $this->postModel->unlike($postId, $userId);
+                $action = 'unliked';
+            } else {
+                $this->postModel->like($postId, $userId);
+                $action = 'liked';
+            }
+
+            // Get updated like count
+            $likeCount = $this->getLikeCount($postId);
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'action' => $action,
+                'like_count' => $likeCount
+            ]);
+            exit;
         }
     }
 
     public function addComment()
     {
-        session_start();
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
-            exit();
-        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $postId = $_POST['post_id'] ?? null;
+            $userId = $_SESSION['user_id'] ?? null;
+            $comment = $_POST['comment'] ?? '';
+            $parentCommentId = $_POST['parent_comment_id'] ?? null;
 
-        $postId = $_POST['post_id'] ?? null;
-        $userId = $_SESSION['user_id'];
-        $comment = $_POST['comment'] ?? '';
-        $parentCommentId = $_POST['parent_comment_id'] ?? null;
+            if (!$postId || !$userId || empty($comment)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => 'Invalid request']);
+                exit;
+            }
 
-        if (!$postId || empty($comment)) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Post ID and comment are required']);
-            exit();
-        }
+            $this->postModel->comment($postId, $userId, $comment, $parentCommentId);
 
-        try {
-            $stmt = $this->conn->prepare("CALL add_comment(?, ?, ?, ?)");
-            $stmt->execute([$postId, $userId, $comment, $parentCommentId]);
-            
-            // Get the new comment with user info
-            $newCommentStmt = $this->conn->prepare("
-                SELECT c.*, u.name, u.surname, u.profile_picture, u.username 
-                FROM comments c
-                JOIN users u ON c.user_id = u.id
-                WHERE c.id = LAST_INSERT_ID()
-            ");
-            $newCommentStmt->execute();
-            $newComment = $newCommentStmt->fetch(PDO::FETCH_ASSOC);
+            // Get updated comments
+            $comments = $this->postModel->getComments($postId);
 
-            echo json_encode(['success' => true, 'comment' => $newComment]);
-        } catch (\PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'comments' => $comments
+            ]);
+            exit;
         }
     }
 
-    public function getComments($postId)
+    private function isPostLiked($postId, $userId)
     {
-        try {
-            $stmt = $this->conn->prepare("CALL get_comments_for_post(?)");
-            $stmt->execute([$postId]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            error_log("Error fetching comments: " . $e->getMessage());
-            return [];
+        // You might need to implement this method in your Post model
+        // or use a direct query here
+        $database = new Database();
+        $db = $database->connect();
+        $stmt = $db->prepare("SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?");
+        $stmt->execute([$postId, $userId]);
+        return (bool)$stmt->fetch();
+    }
+
+    private function getLikeCount($postId)
+    {
+        $database = new Database();
+        $db = $database->connect();
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM likes WHERE post_id = ?");
+        $stmt->execute([$postId]);
+        $result = $stmt->fetch();
+        return $result['count'];
+    }
+
+    private function handleImageUpload($files)
+    {
+        if (!$files || empty($files['name'][0])) {
+            return null;
         }
+
+        // Handle single or multiple files
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Public/uploads/'; // Absolute server path
+        $publicPath = '/Public/uploads/'; 
+        
+        // Ensure directory exists
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Process each file
+        foreach ($files['tmp_name'] as $key => $tmpName) {
+            $fileName = basename($files['name'][$key]);
+            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $newFileName = uniqid() . '.' . $fileExt;
+            $uploadPath = $uploadDir . $newFileName;
+
+            // Validate and move file
+            if (move_uploaded_file($tmpName, $uploadPath)) {
+                $uploadedImages[] = '/uploads/' . $newFileName;
+            }
+        }
+
+        // Return first image URL or null if no images
+        return !empty($uploadedImages)? $publicPath . $newFileName : null;
+    }
+
+    private function isAjaxRequest()
+    {
+        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
 }
