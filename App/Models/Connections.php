@@ -1,22 +1,68 @@
 <?php
-require_once __DIR__ . '/../Config/Database.php';
+namespace App\Models;
 
-class Connection {
-    private $conn;
-    private $table_name = "connections"; // your table
+use Config\Database;
 
-    public function __construct() {
+class Connections
+{
+    private $db;
+
+    public function __construct()
+    {
         $database = new Database();
-        $this->conn = $database->getConnection();
+        $this->db = $database->connect();
     }
 
-    public function getConnectionsByUserId($userId) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE user_id = :user_id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":user_id", $userId);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    public function getPendingRequests($user_id)
+    {
+        $stmt = $this->db->prepare("CALL GetPendingRequests(?)");
+        $stmt->execute([$user_id]);
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        
+        // Use error_log for debugging instead of echo
+        error_log("Pending requests for user $user_id: " . print_r($result, true));
+        
+        return $result;
     }
-}
-?>
+
+    public function getUserConnections($user_id)
+    {
+        $stmt = $this->db->prepare("CALL GetUserConnections(?)");
+        $stmt->execute([$user_id]);
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        
+        error_log("User connections for $user_id: " . print_r($result, true));
+        
+        return $result;
+    }
+
+    public function acceptConnection($user_one_id, $user_two_id)
+    {
+        $stmt = $this->db->prepare("CALL AcceptConnection(?, ?)");
+        $success = $stmt->execute([$user_one_id, $user_two_id]);
+        
+        error_log("Accept connection between $user_one_id and $user_two_id: " . ($success ? "Success" : "Failure"));
+        
+        return $success;
+    }
+
+    public function deleteConnection($user_one_id, $user_two_id)
+    {
+        $stmt = $this->db->prepare("CALL DeleteConnection(?, ?)");
+        $success = $stmt->execute([$user_one_id, $user_two_id]);
+        
+        error_log("Delete connection between $user_one_id and $user_two_id: " . ($success ? "Success" : "Failure"));
+        
+        return $success;
+    }
+
+    public function createConnection($user_one_id, $user_two_id)
+    {
+        $stmt = $this->db->prepare("CALL CreateConnection(?, ?)");
+        $success = $stmt->execute([$user_one_id, $user_two_id]);
+        
+        error_log("Create connection between $user_one_id and $user_two_id: " . ($success ? "Success" : "Failure"));
+        
+        return $success;
+    }
+}?>

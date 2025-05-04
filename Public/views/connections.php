@@ -1,3 +1,14 @@
+<?php
+session_start();
+require_once __DIR__ . '/../../App/Models/Connections.php';
+require_once __DIR__ . '/../../App/Controllers/ConnectionsController.php';
+require_once __DIR__ . '/../../Config/Database.php';
+// Initialize the controller
+$connectionsController = new App\Controllers\ConnectionsController();
+$connectionsData = $connectionsController->getConnections(); 
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,10 +63,30 @@
               </div>
               
         </div>
-        <div id="center">
+        <div id="qendra">
+  <div class="connection-filters">
+    <button class="filter-btn active" onclick="showConnections('pending')">Pending</button>
+    <button class="filter-btn" onclick="showConnections('accepted')">Accepted</button>
+  </div>
+  <div id="center">
+                <!-- Connections will be loaded here -->
+                <?php foreach ($connectionsData['pending'] as $request): ?>
+                    <div class="connection-card pending" data-user-id="<?= $request['user_one_id'] ?>">
+                        <img src="<?= getUserImage($request['user_one_id']) ?>" alt="Profile" class="connection-img">
+                        <div class="connection-info">
+                            <h4><?= getUserName($request['user_one_id']) ?></h4>
+                            <p>Wants to connect with you</p>
+                        </div>
+                        <div class="connection-actions">
+                            <button class="accept-btn" onclick="handleConnectionAction('accept', <?= $request['user_one_id'] ?>)">Accept</button>
+                            <button class="reject-btn" onclick="handleConnectionAction('delete', <?= $request['user_one_id'] ?>)">Reject</button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+                
+            
+            </div>
         </div>
-
-
         <div class="right">
             <div class="recommend">
               <h2>Add to your feed</h2>
@@ -114,5 +145,6 @@
  
 </body>
 </html>
+
 <script src="../components/nav_home/nav_home.js"></script>
 <script src="../components/connections_card/connections_card.js"></script>
