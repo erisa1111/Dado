@@ -22,9 +22,16 @@ class Post
 
     public function create($userId, $title, $body, $imageUrl = null)
     {
+        /*var_dump($userId, $title, $body, $imageUrl);
         $stmt = $this->db->prepare("CALL create_post(?, ?, ?, ?)");
         $stmt->execute([$userId, $title, $body, $imageUrl]);
-        return true;
+        return true;*/
+        $stmt = $this->db->prepare("CALL create_post(?, ?, ?, ?)");
+    $stmt->execute([$userId, $title, $body, $imageUrl]);
+
+    // Assume your SP does SELECT LAST_INSERT_ID(); after insert
+    $result = $stmt->fetch();
+    return $this->db->lastInsertId(); 
     }
 
     public function like($postId, $userId)

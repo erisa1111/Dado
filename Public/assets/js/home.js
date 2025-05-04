@@ -1,34 +1,51 @@
-document.addEventListener('DOMContentLoaded', function () {
-    fetch('/App/Controllers/PostsController/getPosts')
-        .then(response => response.json())
-        .then(posts => {
-            let centerDiv = document.getElementById('center');
-            posts.forEach(post => {
-                let postCard = document.createElement('div');
-                postCard.classList.add('post-card');
-                postCard.innerHTML = `
-                    <div class="post-header">
-                        <h3>${post.title}</h3>
-                        <p>By ${post.username}</p>
-                    </div>
-                    <div class="post-body">
-                        <p>${post.body}</p>
-                        ${post.image_url ? `<img src="${post.image_url}" alt="Post Image" />` : ''}
-                    </div>
-                    <div class="post-actions">
-                        <button class="like-btn" data-post-id="${post.id}">
-                            <i class="fas fa-thumbs-up"></i> Like <span class="like-count">${post.like_count}</span>
-                        </button>
-                        <button class="comment-btn" data-post-id="${post.id}">
-                            <i class="fas fa-comment"></i> Comment
-                        </button>
-                    </div>
-                `;
-                centerDiv.appendChild(postCard);
-            });
-        })
-        .catch(error => console.error('Error fetching posts:', error));
-});
+initializeModal();
+// Add this to your home.js
+document.getElementById('post-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    const content = document.getElementById('post-content').value;
+    const images = document.getElementById('post-images').files;
+
+    // Basic validation
+    if (!content.trim() && images.length === 0) {
+        alert('Please add content or an image');
+        return;
+    }
+
+    formData.append('content', content);
+    formData.append('title', 'New Post');
+
+    // Append images
+    for (let i = 0; i < images.length; i++) {
+        formData.append('images[]', images[i]);
+    }
+
+    try {
+        const response = await fetch('http://localhost:4000/views/create_post.php', {
+            method: 'POST',
+            body: formData,
+        });
+    
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+    
+        const data = await response.json();
+    
+        if (!data.success) {
+            throw new Error(data.message || "Post creation failed.");
+        }
+    
+        toggleModalVisibility(false);
+        location.reload();
+    
+    } catch (error) {
+        console.error("Post Error:", error);
+        alert(`Error: ${error.message}`);
+    }
+});  
 
 document.addEventListener('click', function (event) {
     if (event.target.matches('.like-btn')) {
@@ -74,23 +91,33 @@ document.addEventListener('submit', function (event) {
         .catch(error => console.error('Error adding comment:', error));
     }
 });
-function initializeModal() {
-    const addButton = document.getElementById("add");
-    const closeButton = document.getElementById("close-modal");
+// Add this function to your home.js
+function toggleModalVisibility(show) {
+    const modal = document.getElementById('post-modal');
+    if (show) {
+        modal.style.display = 'block';
+    } else {
+        modal.style.display = 'none';
+    }
+}
 
-    // Show the modal when the Add button is clicked
-    addButton.addEventListener("click", () => {
+function initializeModal() {
+    const addButton = document.getElementById('add');
+    const closeButton = document.getElementById('close-modal');
+    const modal = document.getElementById('post-modal');
+
+    // Show modal when Add button is clicked
+    addButton.addEventListener('click', () => {
         toggleModalVisibility(true);
     });
 
-    // Hide the modal when the Close button is clicked
-    closeButton.addEventListener("click", () => {
+    // Hide modal when Close button is clicked
+    closeButton.addEventListener('click', () => {
         toggleModalVisibility(false);
     });
 
-    // Optional: Close the modal if the user clicks outside the modal content
-    const modal = document.getElementById("post-modal");
-    modal.addEventListener("click", (event) => {
+    // Close modal when clicking outside
+    modal.addEventListener('click', (event) => {
         if (event.target === modal) {
             toggleModalVisibility(false);
         }

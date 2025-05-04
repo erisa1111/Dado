@@ -13,19 +13,64 @@ class PostsController
 
     public function __construct()
     {
+        session_start(); // Add this line
+
         $database = new Database();
         $db = $database->connect();
         $this->postModel = new Post($db);
+   
     }
+  
 
     public function getPosts()
     {
         return $this->postModel->getAll();
     }
 
-    public function createPost()
+   /* public function createPost($title, $content, $imageUrl)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Ensure session is started
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+    
+            // Get current user ID
+            $userId = $_SESSION['user_id'] ?? null;
+            if (!$userId) {
+                http_response_code(401); // Unauthorized
+                echo json_encode(['error' => 'User not logged in.']);
+                exit;
+            }
+    
+            // Sanitize and assign form inputs
+            $title = htmlspecialchars(trim($_POST['title'] ?? 'New Post'));
+            $content = htmlspecialchars(trim($_POST['content'] ?? ''));
+    
+            // Handle image upload
+            $imageUrl = null;
+            if (isset($_FILES['images']) && $_FILES['images']['error'] === UPLOAD_ERR_OK) {
+                $imageUrl = $this->handleImageUpload($_FILES['images']);
+            }
+    
+            // Save to database
+            $success = $this->postModel->create($userId, $title, $content, $imageUrl);
+    
+            // Respond to request
+            if ($this->isAjaxRequest()) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => $success]);
+                exit;
+            } else {
+                header('Location: /home');
+                exit;
+            }
+        } else {
+            http_response_code(405); // Method not allowed
+            echo "Invalid request method.";
+            exit;
+        }
+        /*if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Get current user ID from session
             $userId = $_SESSION['user_id'] ?? null;
             $title = $_POST['title'] ?? 'New Post'; // Default title if not provided
@@ -44,8 +89,35 @@ class PostsController
                 header('Location: /home');
                 exit;
             }
-        }
+        }*/
+  //  }
+
+  public function createPost($title, $content, $images)
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo "Invalid request method.";
+        exit;
     }
+
+    // Start session if needed
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) {
+        throw new \Exception('User not logged in.');
+    }
+
+    $imageUrl = $this->handleImageUpload($_FILES['images'] ?? null);
+
+    // Call model's create method
+    $postId = $this->postModel->create($userId, $title, $content, $imageUrl);
+
+    return $postId;
+}
+
 
     public function toggleLike()
     {

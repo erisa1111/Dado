@@ -6,185 +6,208 @@ require_once '/Users/macair/Desktop/dadodado/Config/Database.php';
 
 // Initialize the controller
 $postController = new App\Controllers\PostsController(); // No arguments for the constructor now
-$posts = $postController->getPosts(); 
+$posts = $postController->getPosts();
 
 
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/home.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/home.css">
 
-   <link rel="stylesheet" href="/components/postcard/postcard.css">
-    <link rel="stylesheet" href="/components/nav_home/nav_home.css">
+  <link rel="stylesheet" href="/components/postcard/postcard.css">
+  <link rel="stylesheet" href="/components/nav_home/nav_home.css">
 </head>
+
 <body>
-    <header>
-        <div id="nav-placeholder"></div>
-    </header>
-    <br><br><br><br><br><br><br><br>
-    <div class="content">
-        <div class="left">
-            <div class="profile">
-           
-                <div class="photo">
-                   
-                    <img 
-                        class="profile-image" 
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s" 
-                        alt="Profile Image"
-                    >
-                    <div class="info">
-                        <h3 class="name">Filan Fisteku</h3>
-                        <p class="status">Status</p>
-                    </div>
-                </div>
-        
-                <div class="bio">
-                    
-                    <div class="bio-box">
-                        <p>Hello im a nanny and i have specialized in childcare</p>
-                    </div>
-                </div>
-               
-            </div>
-          
-            <div class="recent">
-                <div class="image-container">
-                  <img src="/assets/img/event_dado.webp" alt="Event for Parents and Nannies">
-                  <div class="overlay-text">
-                    <h2>Join Our Parent & Nanny Event</h2>
-                    <button class="register-btn">Register</button>
-                  </div>
-                </div>
-              </div>
-              
+  <header>
+    <div id="nav-placeholder"></div>
+  </header>
+  <br><br><br><br><br><br><br><br>
+  <div class="content">
+    <div class="left">
+      <div class="profile">
+
+        <div class="photo">
+
+          <img class="profile-image"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s"
+            alt="Profile Image">
+          <div class="info">
+            <h3 class="name">Filan Fisteku</h3>
+            <p class="status">Status</p>
+          </div>
         </div>
-  
-        <div id="center">
-        <div class="add_post">
-    <p>Add post..</p>
-    <button id="add"><i class="fa-regular fa-square-plus"></i></button>
-  </div>
-            <?php foreach ($posts as $post): ?>
-                <div class="post" id="post-<?php echo $post['id']; ?>">
-                    <div class="post-header">
-                        <img class="profile-img" src="<?php echo htmlspecialchars($post['profile_picture']); ?>" alt="User Profile">
-                        <div class="details">
-                            <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
-                            <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
-                        </div>
-                    </div>
-                    <div class="post-content">
-                        <?php echo htmlspecialchars($post['body']); ?>
-                    </div>
-                    <?php if (!empty($post['image_url'])): ?>
-                        <div class="post-images">
-                            <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Post Image">
-                        </div>
-                    <?php endif; ?>
-                    <div class="post-actions">
-                        <button class="act like-btn" data-post-id="<?php echo $post['id']; ?>">
-                            <i class="fa-regular fa-heart"></i>
-                        </button>
-                        <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
-                            <i class="fa-regular fa-comment"></i>
-                        </button>
-                    </div>
-                    <div class="post-footer">
-                        <div class="likes"><?php echo $post['like_count']; ?> likes</div>
-                        <div class="comments"><?php echo $post['comment_count']; ?> comments</div>
-                    </div>
-                    <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>">
-                        <!-- Comments will be loaded dynamically -->
-                    </div>
-                    <div class="post-comment">
-                        <input type="text" placeholder="Add a comment..." class="comment-input" data-post-id="<?php echo $post['id']; ?>">
-                        <button class="submit-comment" data-post-id="<?php echo $post['id']; ?>">
-                            <i class="fa-regular fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+
+        <div class="bio">
+
+          <div class="bio-box">
+            <p>Hello im a nanny and i have specialized in childcare</p>
+          </div>
         </div>
-    
 
-    
+      </div>
 
+      <div class="recent">
+        <div class="image-container">
+          <img src="/assets/img/event_dado.webp" alt="Event for Parents and Nannies">
+          <div class="overlay-text">
+            <h2>Join Our Parent & Nanny Event</h2>
+            <button class="register-btn">Register</button>
+          </div>
+        </div>
+      </div>
 
-        <div class="right">
-            <div class="recommend">
-              <h2>Add to your feed</h2>
-              
-              <div class="recommendation">
-                <div class="logo">
-                  <img src="https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ=" alt="Nanny 1" />
-                </div>
-                <div class="rec">
-                  <div class="info">
-                    <h3>Nanny 1</h3>
-                    <p>Experienced caregiver</p>
-                  </div>
-                  <button class="follow-btn">+ Follow</button>
-                </div>
-              </div>
-              
-              <div class="recommendation">
-                <div class="logo">
-                  <img src="https://media.istockphoto.com/id/1386479313/photo/happy-millennial-afro-american-business-woman-posing-isolated-on-white.jpg?s=612x612&w=0&k=20&c=8ssXDNTp1XAPan8Bg6mJRwG7EXHshFO5o0v9SIj96nY=" alt="Parent 1" />
-                </div>
-                <div class="rec">
-                  <div class="info">
-                    <h3>Parent 1</h3>
-                    <p>Looking for a caring nanny</p>
-                  </div>
-                  <button class="follow-btn">+ Follow</button>
-                </div>
-              </div>
-              
-              <div class="recommendation">
-                <div class="logo">
-                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&s" alt="Nanny 2" />
-                </div>
-                <div class="rec">
-                  <div class="info">
-                    <h3>Nanny 2</h3>
-                    <p>Passionate about child development activities.</p>
-                  </div>
-                  <button class="follow-btn">+ Follow</button>
-                </div>
-              </div>
-          
-              <a href="#" class="view-all">View all recommendations →</a>
-            </div>
-            
-            <div class="about">
-              <img src="/assets/img/find_dado.webp" alt="">
-            </div>
-            
-            <div class="app">
-              <h6>Try Dado on your Mobile →</h6>
-              <a href="#">Dado</a>
+    </div>
+
+    <div id="center">
+      <div class="add_post">
+        <p>Add post..</p>
+        <button id="add"><i class="fa-regular fa-square-plus"></i></button>
+      </div>
+
+      <div id="post-modal" class="modal" style="display: none;">
+
+        <div class="modal-content">
+          <button id="close-modal" class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+          <h2>Create Your Post</h2>
+          <form id="post-form">
+            <label for="post-content">Post Content</label>
+            <textarea id="post-content" placeholder="Write something..."></textarea>
+            <br>
+            <label for="post-images" class="add_image"><i class="fa-solid fa-image"></i></label>
+            <input type="file" id="post-images" accept="image/*" multiple />
+
+            <div id="image-preview"></div>
+            <button type="submit">Submit Post</button>
+          </form>
+
+        </div>
+      </div>
+
+      <?php foreach ($posts as $post): ?>
+        <div class="post" id="post-<?php echo $post['id']; ?>">
+          <div class="post-header">
+          <img class="profile-img" src="<?php echo htmlspecialchars($post['profile_picture'] ?? '/assets/img/dado_profile.webp'); ?>" alt="User Profile">            <div class="details">
+              <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
+              <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
             </div>
           </div>
-          
-          <script src="/components/nav_home/nav_home.js"></script>
-         <script src="/components/postcard/postcard.js"></script>
+          <div class="post-content">
+            <?php echo htmlspecialchars($post['body']); ?>
+          </div>
+          <?php if (!empty($post['image_url'])): ?>
+            <div class="post-images">
+              <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Post Image">
+            </div>
+          <?php endif; ?>
+          <div class="post-actions">
+            <button class="act like-btn" data-post-id="<?php echo $post['id']; ?>">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
+              <i class="fa-regular fa-comment"></i>
+            </button>
+          </div>
+          <div class="post-footer">
+            <div class="likes"><?php echo $post['like_count']; ?> likes</div>
+            <div class="comments"><?php echo $post['comment_count']; ?> comments</div>
+          </div>
+          <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>">
+            <!-- Comments will be loaded dynamically -->
+          </div>
+          <div class="post-comment">
+            <input type="text" placeholder="Add a comment..." class="comment-input"
+              data-post-id="<?php echo $post['id']; ?>">
+            <button class="submit-comment" data-post-id="<?php echo $post['id']; ?>">
+              <i class="fa-regular fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
 
-       
 
-   
+
+
+
+    <div class="right">
+      <div class="recommend">
+        <h2>Add to your feed</h2>
+
+        <div class="recommendation">
+          <div class="logo">
+            <img
+              src="https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ="
+              alt="Nanny 1" />
+          </div>
+          <div class="rec">
+            <div class="info">
+              <h3>Nanny 1</h3>
+              <p>Experienced caregiver</p>
+            </div>
+            <button class="follow-btn">+ Follow</button>
+          </div>
+        </div>
+
+        <div class="recommendation">
+          <div class="logo">
+            <img
+              src="https://media.istockphoto.com/id/1386479313/photo/happy-millennial-afro-american-business-woman-posing-isolated-on-white.jpg?s=612x612&w=0&k=20&c=8ssXDNTp1XAPan8Bg6mJRwG7EXHshFO5o0v9SIj96nY="
+              alt="Parent 1" />
+          </div>
+          <div class="rec">
+            <div class="info">
+              <h3>Parent 1</h3>
+              <p>Looking for a caring nanny</p>
+            </div>
+            <button class="follow-btn">+ Follow</button>
+          </div>
+        </div>
+
+        <div class="recommendation">
+          <div class="logo">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&s"
+              alt="Nanny 2" />
+          </div>
+          <div class="rec">
+            <div class="info">
+              <h3>Nanny 2</h3>
+              <p>Passionate about child development activities.</p>
+            </div>
+            <button class="follow-btn">+ Follow</button>
+          </div>
+        </div>
+
+        <a href="#" class="view-all">View all recommendations →</a>
+      </div>
+
+      <div class="about">
+        <img src="/assets/img/find_dado.webp" alt="">
+      </div>
+
+      <div class="app">
+        <h6>Try Dado on your Mobile →</h6>
+        <a href="#">Dado</a>
+      </div>
+    </div>
+
+    <script src="/components/nav_home/nav_home.js"></script>
+    <script src="/components/postcard/postcard.js"></script>
+    <script src="/assets/js/home.js"></script>
+
+
+
+
 </body>
 
 
 
 </html>
-<script src="/assets/js/home.js"></script>
-<script src="/components/js/postcard.js"></script>
-
 

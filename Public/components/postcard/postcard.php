@@ -18,26 +18,7 @@
     <button id="add"><i class="fa-regular fa-square-plus"></i></button>
   </div>-->
 
-  <!-- Modal Structure Hidden -->
-  <div id="post-modal" class="modal" style="display: none;">
-
-    <div class="modal-content">
-      <button id="close-modal" class="close-modal"><i class="fa-solid fa-xmark"></i></button>
-      <h2>Create Your Post</h2>
-      <form id="post-form">
-        <label for="post-content">Post Content</label>
-        <textarea id="post-content" placeholder="Write something..."></textarea>
-        <br>
-        <label for="post-images" class="add_image"><i class="fa-solid fa-image"></i></label>
-        <input type="file" id="post-images" accept="image/*" multiple />
-
-        <div id="image-preview"></div>
-        <button type="submit">Submit Post</button>
-      </form>
-
-    </div>
-  </div>
-
+ 
 
 
   <div id="post-container"></div>
