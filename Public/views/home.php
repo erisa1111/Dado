@@ -1,8 +1,7 @@
 <?php
-
-require_once '/Users/macair/Desktop/dadodado/App/Models/Post.php';
-require_once '/Users/macair/Desktop/dadodado/App/Controllers/PostsController.php';
-require_once '/Users/macair/Desktop/dadodado/Config/Database.php';
+require_once __DIR__ . '/../../App/Models/Post.php';
+require_once __DIR__ . '/../../App/Controllers/PostsController.php';
+require_once __DIR__ . '/../../Config/Database.php';
 
 // Initialize the controller
 $postController = new App\Controllers\PostsController(); // No arguments for the constructor now
