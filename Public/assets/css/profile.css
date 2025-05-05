@@ -93,10 +93,10 @@ main{
 .profile_details {
     width: 90%;
     height: 550px;
-
+    gap: 30px;
     background-color: #f9f5f4;
     border-radius: 18px;
-    padding: 60px;
+    padding: 40px;
     margin-top: -430px; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -180,6 +180,7 @@ main{
 }
 .role_experience{
     display: flex;
+    flex-direction: column;
     width: 75%;
     justify-content: space-between;
    
@@ -202,26 +203,28 @@ main{
 .profile_info{
     width: 70%;
 }
+#username{
+  color: #333;
+  font-size: 15px;
+}
 #name{
-    font-size: 60px;
+    font-size: 50px;
     margin-bottom: 10px;
-    margin-top: 10px;
+    margin-top: 0px;
 }
 #role_type{
-    font-size: 30px;
+    font-size: 20px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
 #experience_years{
-    font-size: 30px;
+    font-size: 20px;
    margin-top: 10px;
    margin-bottom: 10px;
 }
 
-
-
 #salary_number{
-    font-size: 30px;
+    font-size: 20px;
     margin-top: 10px;
     margin-bottom: 10px;
 

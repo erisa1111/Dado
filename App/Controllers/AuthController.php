@@ -1,5 +1,6 @@
 <?php
 namespace App\Controllers;
+require_once __DIR__ . '/../Helpers/Validation.php';
 
 use App\Models\User;
 use App\Helpers\Validation;
@@ -54,6 +55,22 @@ class AuthController
         'experience' => $experience,
         'schedule' => $schedule,
     ];
+
+    $validationResult = Validation::validateSignupData($data);
+
+    // If validation fails, show the error message
+    if ($validationResult !== true) {
+        echo "<div class='error-message'>" . $validationResult . "</div>";
+
+        // Include the correct signup form based on the user type
+        // if ($user_type == 'nanny') {
+        //     include __DIR__ . '/index.php'; // Nanny signup form
+        // } else {
+        //     include __DIR__ . '/index.php'; // Parent signup form
+        // }
+
+        return; // Stop further execution
+    }
 
     try {
         $userModel->createUser($data);
@@ -113,5 +130,20 @@ public function login()
         }
     }
 }
+
+
+    public function logout(){
+        // Start the session to access session variables
+        session_start();
+
+        // Destroy the session and unset all session variables
+        session_unset();    // Removes all session variables
+        session_destroy();  // Destroys the session data
+
+        // Redirect to the index page (or the login page)
+        header('Location: index.php');  // Adjust this to your index URL
+        exit();
+    }
+   
 
 }

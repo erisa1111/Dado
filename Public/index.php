@@ -1,5 +1,6 @@
 <?php
 use App\Controllers\AuthController;
+use App\Controllers\LogOutController;
 
 // Debugging: Show errors
 ini_set('display_errors', 1);
@@ -8,7 +9,8 @@ error_reporting(E_ALL);
 // Manually include files
 require_once dirname(__DIR__) . '/App/Models/User.php';
 require_once dirname(__DIR__) . '/App/Controllers/AuthController.php';
-require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php';
+
+require_once dirname(__DIR__) . '/App/Controllers/LogOutController.php';
 
 // Get the current URL path
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -37,10 +39,9 @@ switch ($request_uri) {
         }
         break;
 
-    
         case '/logout':
             require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php'; // make sure it's included
-            (new \App\Controllers\LogoutController())->logout();
+            (new LogOutController())->logout();
             break;    
         
     default:

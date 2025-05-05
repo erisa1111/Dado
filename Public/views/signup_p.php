@@ -26,7 +26,11 @@ $role = isset($_GET['role']) ? $_GET['role'] : null;
                 <input type="text" name="name" placeholder="Name" required />
                 <input type="text" name="surname" placeholder="Surname" required />
                 <input type="text"name="location" placeholder="Location" required />
-                <input type="text" name="gender" placeholder="Gender" required />
+                <select name="gender" required>
+    <option value="">Select Gender</option>
+    <option value="F">Female</option>
+    <option value="M">Male</option>
+</select>
                 <input type="hidden" name="role" value="parent">
 
 
