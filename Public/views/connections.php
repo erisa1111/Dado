@@ -1,13 +1,22 @@
 <?php
 session_start();
+$user_id = $_SESSION['user_id'] ?? null;
+
+error_log("User ID from session: " . $user_id);
+
+if (!$user_id) {
+    echo "User not logged in.";
+    exit;
+}
 require_once __DIR__ . '/../../App/Models/Connections.php';
 require_once __DIR__ . '/../../App/Controllers/ConnectionsController.php';
 require_once __DIR__ . '/../../Config/Database.php';
 // Initialize the controller
+$connectionsModel = new \App\Models\Connections();
 $connectionsController = new App\Controllers\ConnectionsController();
-$connectionsData = $connectionsController->getConnections(); 
-
-
+//$connections = $connectionsController->getConnections(); 
+$allConnections = $connectionsController->getConnections($user_id);
+error_log("All connections: " . print_r($allConnections, true));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,23 +78,27 @@ $connectionsData = $connectionsController->getConnections();
     <button class="filter-btn" onclick="showConnections('accepted')">Accepted</button>
   </div>
   <div id="center">
-                <!-- Connections will be loaded here -->
-                <?php foreach ($connectionsData['pending'] as $request): ?>
-                    <div class="connection-card pending" data-user-id="<?= $request['user_one_id'] ?>">
-                        <img src="<?= getUserImage($request['user_one_id']) ?>" alt="Profile" class="connection-img">
-                        <div class="connection-info">
-                            <h4><?= getUserName($request['user_one_id']) ?></h4>
-                            <p>Wants to connect with you</p>
-                        </div>
-                        <div class="connection-actions">
-                            <button class="accept-btn" onclick="handleConnectionAction('accept', <?= $request['user_one_id'] ?>)">Accept</button>
-                            <button class="reject-btn" onclick="handleConnectionAction('delete', <?= $request['user_one_id'] ?>)">Reject</button>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-                
-            
-            </div>
+  <?php if (empty($allConnections)): ?>
+    <p>No connections found.</p>
+    <p>User ID from session: <?= htmlspecialchars($user_id) ?></p> <!-- DEBUG LINE -->
+<?php else: ?>
+  <div id="connections-list">
+    <?php foreach ($allConnections as $connection): 
+        // Optional: implement logic to get user image from DB if available
+        $profile_image = 'https://w7.pngwing.com/pngs/584/113/png-transparent-pink-user-icon.png'; // Placeholder
+
+        // Extract and pass variables
+        $sender_name = $connection['sender_name'] ?? 'Unknown';
+        $sender_surname = $connection['sender_surname'] ?? '';
+        $message = $connection['message'] ?? 'Sent you a connection request';
+        $status = $connection['status'];
+        $created_at = $connection['created_at'];
+
+        include __DIR__ . '/../components/connections_card/connections_card.php';
+    endforeach; ?>
+</div>
+    <?php endif; ?>
+</div>
         </div>
         <div class="right">
             <div class="recommend">

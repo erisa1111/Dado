@@ -2,76 +2,113 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    border: 1px solid #ccc;
     border-radius: 8px;
-    padding: 10px;
-
-    margin-bottom: 15px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
     background-color: #fff;
-    position: relative;
-}
-
-.connection-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.connection-image {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.connection-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.connection-username {
-    font-weight: bold;
-    margin: 0;
-}
-
-.connection-action {
-    color: #555;
-    margin: 5px 0 0 0;
-}
-
-.connection-buttons {
-    display: flex;
-    gap: 15px;
-}
-
-.accept-icon,
-.decline-icon {
-    display: inline-block;
-    font-size: 18px;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 1;
-    width: 40px;
-    height: 40px;
-    background-color: #ddd;
-    color: #fff;
-    transition: background-color 0.3s ease;
-}
-
-.accept-icon:hover,
-.accept-icon.selected {
-    background-color: #e2687e;
-}
-
-.decline-icon:hover,
-.decline-icon.selected {
-    background-color: #e2687e;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: auto;
+    min-height: 60px; /* Reduced height */
 }
 
 .connection_wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    gap: 10px;
+}
+
+.connection-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.connection-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.connection-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex-grow: 1;
+}
+
+.connection-username {
+    font-weight: bold;
+    margin: 0;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.connection-action,
+.connection-status,
+.connection-time {
+    margin: 2px 0;
+    font-size: 12px;
+    color: #555;
+}
+
+.connection-status {
+    display: inline-block;
+}
+
+.connection-time {
+    font-size: 11px;
+    color: #888;
+}
+
+.connection-buttons {
+    display: flex;
+    gap: 8px;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.accept-icon,
+.decline-icon {
+    font-size: 16px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 1;
+    width: 32px;
+    height: 32px;
+    background-color: #f0f0f0;
+    color: #555;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accept-icon:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.decline-icon:hover {
+    background-color: #f44336;
+    color: white;
+}
+
+/* For the connections list container */
+#connections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
 }

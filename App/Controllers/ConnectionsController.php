@@ -16,13 +16,8 @@ class ConnectionsController
         $this->connectionsModel = new Connections($db);
     }
 
-    public function getConnections()
-    {
-        $userId = $_SESSION['user_id'];
-        return [
-            'pending' => $this->connectionsModel->getPendingRequests($userId),
-            'accepted' => $this->connectionsModel->getUserConnections($userId)
-        ];
+    public function getConnections($user_id) {
+        return $this->connectionsModel->getAllConnections($user_id);
     }
 
     public function getConnectionsApi()
@@ -31,6 +26,15 @@ class ConnectionsController
         header('Content-Type: application/json');
         echo json_encode($this->getConnections());
         exit;
+    }
+
+    public function getAllUserConnections($user_id)
+    {
+        $allConnections = $this->connectionsModel->getAllConnections($user_id);
+
+        // Optionally return as JSON if it's for an API
+        header('Content-Type: application/json');
+        echo json_encode($allConnections);
     }
 
     public function handleConnectionAction()
