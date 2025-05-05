@@ -1,3 +1,23 @@
+<?php
+session_start();
+$user_id = $_SESSION['user_id'] ?? null;
+
+error_log("User ID from session: " . $user_id);
+
+if (!$user_id) {
+    echo "User not logged in.";
+    exit;
+}
+require_once __DIR__ . '/../../App/Models/Connections.php';
+require_once __DIR__ . '/../../App/Controllers/ConnectionsController.php';
+require_once __DIR__ . '/../../Config/Database.php';
+// Initialize the controller
+$connectionsModel = new \App\Models\Connections();
+$connectionsController = new App\Controllers\ConnectionsController();
+//$connections = $connectionsController->getConnections(); 
+$allConnections = $connectionsController->getConnections($user_id);
+error_log("All connections: " . print_r($allConnections, true));
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,10 +72,34 @@
               </div>
               
         </div>
-        <div id="center">
+        <div id="qendra">
+  <div class="connection-filters">
+    <button class="filter-btn active" onclick="showConnections('pending')">Pending</button>
+    <button class="filter-btn" onclick="showConnections('accepted')">Accepted</button>
+  </div>
+  <div id="center">
+  <?php if (empty($allConnections)): ?>
+    <p>No connections found.</p>
+    <p>User ID from session: <?= htmlspecialchars($user_id) ?></p> <!-- DEBUG LINE -->
+<?php else: ?>
+  <div id="connections-list">
+    <?php foreach ($allConnections as $connection): 
+        // Optional: implement logic to get user image from DB if available
+        $profile_image = 'https://w7.pngwing.com/pngs/584/113/png-transparent-pink-user-icon.png'; // Placeholder
+
+        // Extract and pass variables
+        $sender_name = $connection['sender_name'] ?? 'Unknown';
+        $sender_surname = $connection['sender_surname'] ?? '';
+        $message = $connection['message'] ?? 'Sent you a connection request';
+        $status = $connection['status'];
+        $created_at = $connection['created_at'];
+
+        include __DIR__ . '/../components/connections_card/connections_card.php';
+    endforeach; ?>
+</div>
+    <?php endif; ?>
+</div>
         </div>
-
-
         <div class="right">
             <div class="recommend">
               <h2>Add to your feed</h2>
@@ -114,5 +158,6 @@
  
 </body>
 </html>
+
 <script src="../components/nav_home/nav_home.js"></script>
 <script src="../components/connections_card/connections_card.js"></script>
