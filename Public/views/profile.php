@@ -46,7 +46,6 @@ if (!$userData) {
                     <p id="edit_profile">Edit</p>
                     <div class="profile_image">
                         <img src="/assets/img/default_profile.webp" alt="Profile Picture" id="profile_pic">
-                        <div class="schedule"></i>Part time</div>
                         <p><i class="fa-solid fa-location-dot"></i><?= htmlspecialchars($userData['location']) ?></p>
                     </div>
                     <div class="profile_info">
@@ -77,6 +76,11 @@ if (!$userData) {
                                 <!-- <p id="salary" aria-label="Expected salary">Email</p> -->
                                 <p id="salary_number" contenteditable="false" aria-label="Salary"><i class="fa-regular fa-envelope"></i> <?= htmlspecialchars($userData['email']) ?> </p>
                             </div>
+                        </div>
+
+                        <div class="profile-buttons">
+                            <button class="follow-btn" style="margin: 0;">Edit Profile</button>
+                            <button class="follow-btn">Connect</button>
                         </div>
                       
     
