@@ -62,7 +62,8 @@
 // ];
 
 // Base URL for connection actions
-const CONNECTIONS_AJAX_URL = '/App/Controllers/ConnectionsController/handleConnectionAction';
+//const CONNECTIONS_AJAX_URL = '/App/Controllers/ConnectionsController/handleConnectionAction';
+const CONNECTIONS_AJAX_URL = '/connections-action.php';
 const CONNECTIONS_API_URL = '/App/Controllers/ConnectionsController/getConnectionsApi';
 
 // Main initialization
@@ -209,8 +210,8 @@ const showToast = (message, type = 'success') => {
 const setupEventListeners = () => {
     // Delegated event listener for connection actions
     document.addEventListener('click', (event) => {
-        const acceptBtn = event.target.closest('.accept-icon');
-        const declineBtn = event.target.closest('.decline-icon');
+        const acceptBtn = event.target.closest('.accept-text');
+        const declineBtn = event.target.closest('.decline-text');
         
         if (acceptBtn || declineBtn) {
             const connectionCard = event.target.closest('.connection-card');
@@ -219,13 +220,17 @@ const setupEventListeners = () => {
             if (acceptBtn) {
                 handleConnectionAction('accept', userId);
             } else if (declineBtn) {
+                console.log('Declining connection for userId:', userId); // Log the userId
+    
                 if (confirm('Are you sure you want to decline this connection?')) {
-                    handleConnectionAction('delete', userId);
+                    handleConnectionAction('decline', userId);
                 }
             }
         }
     });
 };
+
+
 
 // Helper function to get user image (implement based on your app)
 const getUserImage = (userId) => {
