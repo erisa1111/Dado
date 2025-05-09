@@ -28,8 +28,8 @@
         <?php if ($status === 'pending'): ?>
         <div class="connection-buttons">
             
-    <span class="accept-text" data-connection-id="<?= $connection_id ?>">Accept</span>
-             <span class="decline-text" data-connection-id="<?= $connection_id ?>">Decline</span>
+        <span class="accept-text" data-connection-id="<?= $connection_id ?>">Accept</span>
+        <span class="decline-text" data-connection-id="<?= $connection_id ?>">Decline</span>
             <!-- <i class="fas fa-check accept-icon" title="Accept" data-connection-id="<?= $connection_id ?>"></i>
             <i class="fas fa-times decline-icon" title="Decline" data-connection-id="<?= $connection_id ?>"></i> -->
 

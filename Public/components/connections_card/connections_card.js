@@ -62,8 +62,10 @@
 // ];
 
 // Base URL for connection actions
-//const CONNECTIONS_AJAX_URL = '/App/Controllers/ConnectionsController/handleConnectionAction';
 const CONNECTIONS_AJAX_URL = '/connections-action.php';
+//const CONNECTIONS_AJAX_URL = '/App/Controllers/ConnectionsController/handleConnectionAction';
+
+
 const CONNECTIONS_API_URL = '/App/Controllers/ConnectionsController/getConnectionsApi';
 
 // Main initialization
@@ -160,6 +162,7 @@ const showEmptyState = () => {
 // Handle connection actions (accept/decline)
 const handleConnectionAction = async (action, userId) => {
     try {
+        console.log('Sending request...');
         const response = await fetch(CONNECTIONS_AJAX_URL, {
             method: 'POST',
             headers: {
@@ -171,9 +174,23 @@ const handleConnectionAction = async (action, userId) => {
                 user_one_id: userId
             })
         });
-        
-        const data = await response.json();
-        
+    
+        console.log('Waiting for response...');
+    
+        // Read the raw response first
+        const responseText = await response.text();
+        console.log('Raw response:', responseText);
+    
+        // Try to parse as JSON
+        let data;
+        try {
+            data = JSON.parse(responseText);
+            console.log('Parsed JSON:', data);
+        } catch (e) {
+            console.error('Response is not valid JSON');
+            return;
+        }
+    
         if (data.success) {
             // Remove the connection card from UI
             document.querySelector(`.connection-card[data-user-id="${userId}"]`)?.remove();
