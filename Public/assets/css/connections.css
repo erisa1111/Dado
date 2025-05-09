@@ -367,23 +367,23 @@ body {
   display: flex;
   /*justify-content: center;*/
   margin-left: 3%;
-  gap: 10px;
-  margin-bottom: 5px;
+  /*gap: 10px;*/
+  /*margin-bottom: 2px;*/
 }
 .filter-btn {
-  padding: 6px 12px;
+  /*padding: 6px 5px;*/
   font-size: 14px;
-  border: 1px solid #e2687e;
-  background-color: white;
-  color: #e2687e;
-  border-radius: 20px;
+ /* border: 1px solid #e2687e;*/
+ /* background-color: white;*/
+  color: #251f20;
+  /*border-radius: 20px;*/
   cursor: pointer;
   transition: 0.3s ease;
 }
 .filter-btn:hover,
 .filter-btn.active {
-  background-color: #e2687e;
-  color: white;
+  /*background-color: #e2687e;*/
+  color: #e2687e;
 }
 #qendra {
   display: flex;

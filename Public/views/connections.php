@@ -1,5 +1,34 @@
 <?php
+error_reporting(0);
 session_start();
+// Enable full error reporting temporarily
+while (ob_get_level()) ob_end_clean();
+
+// Disable error display
+error_reporting(0);
+ini_set('display_errors', 0);
+
+// Session handling
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+// AJAX handler
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+    try {
+        require_once __DIR__ . '/../../App/Controllers/ConnectionsController.php';
+        require_once __DIR__ . '/../../Config/Database.php';
+        
+        $controller = new App\Controllers\ConnectionsController();
+        $controller->handleConnectionAction();
+        exit;
+        
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Server error']);
+        exit;
+    }
+}
 $user_id = $_SESSION['user_id'] ?? null;
 
 error_log("User ID from session: " . $user_id);
@@ -74,8 +103,9 @@ error_log("All connections: " . print_r($allConnections, true));
         </div>
         <div id="qendra">
   <div class="connection-filters">
-    <button class="filter-btn active" onclick="showConnections('pending')">Pending</button>
-    <button class="filter-btn" onclick="showConnections('accepted')">Accepted</button>
+    <!-- <button class="filter-btn active" onclick="showConnections('pending')">Pending</button> -->
+    <span class="filter-btn" onclick="showConnections('All Connections')">All Connections</span>
+
   </div>
   <div id="center">
   <?php if (empty($allConnections)): ?>
