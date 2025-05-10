@@ -160,7 +160,7 @@ const showEmptyState = () => {
 };
 
 // Handle connection actions (accept/decline)
-const handleConnectionAction = async (action, userId) => {
+const handleConnectionAction = async (action, userId, card) => {
     try {
         console.log('Sending request...');
         const response = await fetch(CONNECTIONS_AJAX_URL, {
@@ -191,17 +191,35 @@ const handleConnectionAction = async (action, userId) => {
             return;
         }
     
+        console.log('Response data:', data);
         if (data.success) {
-            // Remove the connection card from UI
-            document.querySelector(`.connection-card[data-user-id="${userId}"]`)?.remove();
-            
-            // Show success message
-            showToast(`${action === 'accept' ? 'Accepted' : 'Declined'} connection successfully`);
-            
-            // Check if any connections left
-            if (document.querySelectorAll('.connection-card').length === 0) {
-                showEmptyState();
+            console.log('Action successful:', data);
+      
+          
+
+            if (action === 'accept') {
+                // Update status in card to "Accepted"
+                const statusElement = card.querySelector('.connection-status');
+                if (statusElement) {
+                    statusElement.textContent = 'Accepted';
+                    statusElement.style.color = 'green'; 
+                }
+                const buttonsContainer = card.querySelector('.connection-buttons');
+               if (buttonsContainer) {
+               buttonsContainer.remove(); // Remove accept/decline buttons
+      }
+            } else if (action === 'decline') {
+                // Remove the card
+                card?.remove();
+
+                if (document.querySelectorAll('.connection-card').length === 0) {
+                    showEmptyState();
+                }
             }
+
+            
+          //      confirm(`${action === 'accept' ? 'Accepted' : 'Declined'} connection successfully`);
+           
         } else {
             throw new Error(data.message || 'Action failed');
         }
@@ -225,28 +243,29 @@ const showToast = (message, type = 'success') => {
 
 // Set up event listeners
 const setupEventListeners = () => {
-    // Delegated event listener for connection actions
     document.addEventListener('click', (event) => {
         const acceptBtn = event.target.closest('.accept-text');
         const declineBtn = event.target.closest('.decline-text');
-        
+
         if (acceptBtn || declineBtn) {
             const connectionCard = event.target.closest('.connection-card');
-            const userId = connectionCard.dataset.userId;
-            
+            const userId = connectionCard?.dataset.userId;
+
+            if (!userId || !connectionCard) return;
+
             if (acceptBtn) {
-                handleConnectionAction('accept', userId);
+                console.log('Accepting connection for userId:', userId);
+                handleConnectionAction('accept', userId, connectionCard);
             } else if (declineBtn) {
-                console.log('Declining connection for userId:', userId); // Log the userId
-    
+                console.log('Declining connection for userId:', userId);
+
                 if (confirm('Are you sure you want to decline this connection?')) {
-                    handleConnectionAction('decline', userId);
+                    handleConnectionAction('decline', userId, connectionCard);
                 }
             }
         }
     });
 };
-
 
 
 // Helper function to get user image (implement based on your app)
