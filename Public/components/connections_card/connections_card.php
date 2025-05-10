@@ -17,7 +17,13 @@
                  alt="<?= htmlspecialchars($sender_name . ' ' . $sender_surname) ?> profile">
             <div class="connection-details">
                 <p class="connection-username"><?= htmlspecialchars($sender_name . ' ' . $sender_surname) ?></p>
-                <p class="connection-action"><?= htmlspecialchars($message ?? 'sent you a connect request') ?></p>
+                <p class="connection-action">
+                    <?php if ($status === 'pending'): ?>
+                        <?= htmlspecialchars($message ?? 'sent you a connection request') ?>
+                    <?php else: ?>
+                        You are now connected
+                    <?php endif; ?>
+                </p>
                 <div>
                     <span class="connection-status" style="color: <?= $status === 'pending' ? 'orange' : 'green' ?>;">
                         <?= ucfirst(htmlspecialchars($status)) ?>
@@ -28,14 +34,17 @@
         </div>
         <?php if ($status === 'pending'): ?>
         <div class="connection-buttons">
-            
-        <span class="accept-text" data-connection-id="<?= $connection_id ?>">Accept</span>
-        <span class="decline-text" data-connection-id="<?= $connection_id ?>">Decline</span>
-            <!-- <i class="fas fa-check accept-icon" title="Accept" data-connection-id="<?= $connection_id ?>"></i>
-            <i class="fas fa-times decline-icon" title="Decline" data-connection-id="<?= $connection_id ?>"></i> -->
-
-
-
+            <span class="accept-text" data-connection-id="<?= $connection_id ?>">Accept</span>
+            <span class="decline-text" data-connection-id="<?= $connection_id ?>">Decline</span>
+        </div>
+        <?php else: ?>
+        <div class="connection-actions">
+            <div class="connection-menu">
+                <i class="fas fa-ellipsis-v connection-menu-icon"></i>
+                <div class="connection-menu-content">
+                    <span class="remove-connection">Remove connection</span>
+                </div>
+            </div>
         </div>
         <?php endif; ?>
     </div>

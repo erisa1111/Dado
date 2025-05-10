@@ -117,3 +117,48 @@
     /*background-color:#2e7d32*/
     color: #e2687e;
 }
+
+.connection-actions {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.connection-menu {
+    cursor: pointer;
+    padding: 8px;
+    position: relative;
+}
+
+.connection-menu-icon {
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.connection-menu-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 4px;
+    padding: 8px 0;
+}
+
+.connection-menu-content span {
+    color: #333;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+.connection-menu-content span:hover {
+    background-color: #f5f5f5;
+}
+
+.connection-menu:hover .connection-menu-content {
+    display: block;
+}

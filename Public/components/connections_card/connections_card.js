@@ -206,9 +206,14 @@ const handleConnectionAction = async (action,senderId, recipientId, card) => {
             if (action === 'accept') {
                 // Update status in card to "Accepted"
                 const statusElement = card.querySelector('.connection-status');
+                const MsgElement = card.querySelector('.connection-action');
                 if (statusElement) {
                     statusElement.textContent = 'Accepted';
                     statusElement.style.color = 'green'; 
+                    
+                }
+                if(MsgElement) {
+                    MsgElement.textContent = 'You are now connected';
                 }
                 const buttonsContainer = card.querySelector('.connection-buttons');
                if (buttonsContainer) {
@@ -252,8 +257,9 @@ const setupEventListeners = () => {
     document.addEventListener('click', (event) => {
         const acceptBtn = event.target.closest('.accept-text');
         const declineBtn = event.target.closest('.decline-text');
+        const removeBtn = event.target.closest('.remove-connection');
 
-        if (acceptBtn || declineBtn) {
+        if (acceptBtn || declineBtn || removeBtn) {
             const connectionCard = event.target.closest('.connection-card');
             const senderId = connectionCard?.dataset.senderId;
             const recipientId = connectionCard?.dataset.recipientId;
@@ -262,7 +268,7 @@ const setupEventListeners = () => {
             // Validate IDs
             if (!senderId || !recipientId || !currentUserId) return;
             
-            // Security check - ensure current user is involved in this connection
+            // Security check
             if (recipientId !== currentUserId && senderId !== currentUserId) {
                 console.error('Unauthorized action on this connection');
                 return;
@@ -271,9 +277,10 @@ const setupEventListeners = () => {
             if (acceptBtn) {
                 console.log('Accepting connection between', senderId, 'and', recipientId);
                 handleConnectionAction('accept', senderId, recipientId, connectionCard);
-            } else if (declineBtn) {
-                console.log('Declining connection between', senderId, 'and', recipientId);
-                if (confirm('Are you sure you want to decline this connection?')) {
+            } else if (declineBtn || removeBtn) {
+                const action = declineBtn ? 'decline' : 'remove';
+                console.log(`${action} connection between`, senderId, 'and', recipientId);
+                if (confirm(`Are you sure you want to ${action} this connection?`)) {
                     handleConnectionAction('decline', senderId, recipientId, connectionCard);
                 }
             }
