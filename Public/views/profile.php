@@ -9,13 +9,18 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$loggedInUserId = $_SESSION['user_id'];
+$viewingUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : $loggedInUserId;
+$isOwnProfile = ($loggedInUserId === $viewingUserId);
+
 $userModel = new User();
-$userData = $userModel->getProfile($_SESSION['user_id']);
+$userData = $userModel->getProfile($viewingUserId);
 
 if (!$userData) {
     echo "User not found.";
     exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -79,13 +84,27 @@ if (!$userData) {
                         </div>
 
                         <div class="profile-buttons">
-                            <button class="follow-btn" style="margin: 0;">Edit Profile</button>
-                            <button class="follow-btn">Connect</button>
+                            <?php if ($isOwnProfile): ?>
+                                <button class="follow-btn" style="margin: 0;">Edit Profile</button>
+                            <?php else: ?>
+                                <button class="follow-btn">Connect</button>
+                                <button class="follow-btn">Follow</button>
+                            <?php endif; ?>
                         </div>
+
                       
     
                     </div>
                 </div>
+
+                <?php if ($userData['role_name'] === 'Nanny'): ?>
+                    <div class="nanny-card">
+                        <h3>Welcome, Nanny!</h3>
+                        <p>This section is only visible to users with the Nanny role.</p>
+                        <!-- Add more Nanny-specific content here -->
+                    </div>
+                <?php endif; ?>
+
     
                 <div class="profile_summary">
                     <h2 id="title">My Story</h2>
