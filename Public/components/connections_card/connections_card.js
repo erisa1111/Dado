@@ -68,6 +68,9 @@ const CONNECTIONS_AJAX_URL = '/connections-action.php';
 
 const CONNECTIONS_API_URL = '/App/Controllers/ConnectionsController/getConnectionsApi';
 
+
+
+
 // Main initialization
 const initializeConnections = () => {
     setupEventListeners();
@@ -160,8 +163,9 @@ const showEmptyState = () => {
 };
 
 // Handle connection actions (accept/decline)
-const handleConnectionAction = async (action, userId, card) => {
+const handleConnectionAction = async (action,senderId, recipientId, card) => {
     try {
+         //const CURRENT_USER_ID = document.getElementById('current-user-id').dataset.userId;
         console.log('Sending request...');
         const response = await fetch(CONNECTIONS_AJAX_URL, {
             method: 'POST',
@@ -171,7 +175,9 @@ const handleConnectionAction = async (action, userId, card) => {
             },
             body: JSON.stringify({
                 action: action,
-                user_one_id: userId
+                user_one_id: senderId,
+                user_two_id: recipientId
+                
             })
         });
     
@@ -249,26 +255,34 @@ const setupEventListeners = () => {
 
         if (acceptBtn || declineBtn) {
             const connectionCard = event.target.closest('.connection-card');
-            const userId = connectionCard?.dataset.userId;
+            const senderId = connectionCard?.dataset.senderId;
+            const recipientId = connectionCard?.dataset.recipientId;
+            const currentUserId = document.getElementById('current-user-id').dataset.userId;
 
-            if (!userId || !connectionCard) return;
+            // Validate IDs
+            if (!senderId || !recipientId || !currentUserId) return;
+            
+            // Security check - ensure current user is involved in this connection
+            if (recipientId !== currentUserId && senderId !== currentUserId) {
+                console.error('Unauthorized action on this connection');
+                return;
+            }
 
             if (acceptBtn) {
-                console.log('Accepting connection for userId:', userId);
-                handleConnectionAction('accept', userId, connectionCard);
+                console.log('Accepting connection between', senderId, 'and', recipientId);
+                handleConnectionAction('accept', senderId, recipientId, connectionCard);
             } else if (declineBtn) {
-                console.log('Declining connection for userId:', userId);
-
+                console.log('Declining connection between', senderId, 'and', recipientId);
                 if (confirm('Are you sure you want to decline this connection?')) {
-                    handleConnectionAction('decline', userId, connectionCard);
+                    handleConnectionAction('decline', senderId, recipientId, connectionCard);
                 }
             }
         }
     });
 };
 
-
-// Helper function to get user image (implement based on your app)
+// Helper fun
+// ction to get user image (implement based on your app)
 const getUserImage = (userId) => {
     // You'll need to implement this based on how you get user images
     return `/path/to/user/images/${userId}.jpg`;

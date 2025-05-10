@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<div class="connection-card" data-user-id="<?= htmlspecialchars($user_id) ?>">
+<div class="connection-card" data-sender-id="<?= $connection['user_one_id'] ?>"
+     data-recipient-id="<?= $connection['user_two_id'] ?>">
     <div class="connection_wrapper">
         <div class="connection-header">
             <img class="connection-image"

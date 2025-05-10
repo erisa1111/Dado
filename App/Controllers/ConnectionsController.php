@@ -50,7 +50,7 @@ class ConnectionsController
         $action = $input['action'] ?? null;
         $userOneId = $input['user_one_id'] ?? null;
         $userTwoId = $input['user_two_id'] ?? $userId;
-
+        
         switch ($action) {
             case 'accept':
                 $success = $this->connectionsModel->acceptConnection($userOneId, $userTwoId);

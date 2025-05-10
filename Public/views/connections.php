@@ -79,12 +79,13 @@ error_log("All connections: " . print_r($allConnections, true));
               
         </div>
         <div id="qendra">
+          
   <div class="connection-filters">
-    <!-- <button class="filter-btn active" onclick="showConnections('pending')">Pending</button> -->
-    <span class="filter-btn" onclick="showConnections('All Connections')">All Connections</span>
-
-  </div>
+    <span class="filter-btn active" data-filter="accepted">Connected</span>
+    <span class="filter-btn" data-filter="pending">Pending Requests</span>
+</div>
   <div id="center">
+    <div id="current-user-id" data-user-id="<?= htmlspecialchars($_SESSION['user_id']) ?>"></div>
   <?php if (empty($allConnections)): ?>
     <p>No connections found.</p>
     <p>User ID from session: <?= htmlspecialchars($user_id) ?></p> <!-- DEBUG LINE -->
