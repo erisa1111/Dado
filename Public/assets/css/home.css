@@ -361,3 +361,18 @@ body {
   border-color: white;
   color: #e2687e;
 }
+#submit-comment {
+  width: 30px;
+  height: 30px;
+  font-size: 24px;
+  border: none;
+  background-color: white;
+  cursor: pointer;
+
+
+}
+
+#submit-comment:hover {
+  color: #e2687e;
+
+}

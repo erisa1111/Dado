@@ -1,3 +1,4 @@
+/*const API_BASE = '/views';
 const initializePostForm = () => {
     const postForm = document.getElementById('post-form');
     const postImagesInput = document.getElementById('post-images');
@@ -76,12 +77,72 @@ newLink.rel = 'stylesheet';
 newLink.href = '/components/postcard/postcard.css';
 document.head.appendChild(newLink);
 
-// Base URL for all AJAX requests
-const AJAX_URL = '/App/Controllers/PostsController';
 
+document.addEventListener('click', async function (e) {
+    if (e.target.closest('.fa-heart')) {
+      const postElement = e.target.closest('.post');
+      const postId = postElement.dataset.postId;
+  
+      const response = await fetch('/like-toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId })
+      });
+  
+      const result = await response.json();
+      if (result.success) {
+        const likesDiv = postElement.querySelector('#likes');
+        likesDiv.textContent = `${result.like_count} likes`;
+  
+        // Toggle heart icon style
+        e.target.classList.toggle('fa-regular');
+        e.target.classList.toggle('fa-solid');
+      }
+    }
+  });
+  
+
+  document.addEventListener('click', async function (e) {
+    if (e.target.id === 'submit-comment') {
+      const postElement = e.target.closest('.post');
+      const postId = postElement.dataset.postId;  // Ensure this is correctly set
+      const commentInput = postElement.querySelector('.comment-input'); // Adjust selector
+      const commentText = commentInput.value.trim();
+  
+      if (commentText === '') return;
+  
+      const response = await fetch('/add-comment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId, comment: commentText })
+      });
+  
+      const result = await response.json();
+      if (result.success) {
+        const commentsList = postElement.querySelector('#comments-list');
+        commentsList.innerHTML = ''; // Clear and re-render comments
+        result.comments.forEach(c => {
+          commentsList.innerHTML += `
+            <div class="comment">
+              <img class="comment-profile-img" src="/img/dado_profile.webp">
+              <div class="comment-content">
+                <span class="comment-username">${c.username}</span>
+                <p class="comment-text">${c.comment}</p>
+              </div>
+            </div>`;
+        });
+  
+        // Clear input
+        commentInput.value = '';
+        postElement.querySelector('#comments').textContent = `${result.comments.length} Comments`;
+      }
+    }
+  });*/
+  
+/*
 const handleLike = async (postId, likeButton) => {
     try {
-        const response = await fetch(`${AJAX_URL}/toggleLike`, {
+        const response = await fetch('/views/like_post.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,7 +151,8 @@ const handleLike = async (postId, likeButton) => {
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.error || 'Failed to toggle like');
         }
         
         const data = await response.json();
@@ -112,15 +174,16 @@ const handleLike = async (postId, likeButton) => {
         }
     } catch (error) {
         console.error('Like error:', error);
-        alert('Failed to toggle like');
+        alert(error.message || 'Failed to toggle like');
     }
 };
+
 const handleCommentSubmission = async (postId, commentInput) => {
     const commentText = commentInput.value.trim();
     if (!commentText) return;
 
     try {
-        const response = await fetch(`${AJAX_URL}/addComment`, {
+        const response = await fetch('/views/comment_post.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -132,7 +195,8 @@ const handleCommentSubmission = async (postId, commentInput) => {
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.error || 'Failed to add comment');
         }
         
         const data = await response.json();
@@ -162,16 +226,24 @@ const handleCommentSubmission = async (postId, commentInput) => {
         }
     } catch (error) {
         console.error('Comment error:', error);
-        alert('Failed to add comment');
+        alert(error.message || 'Failed to add comment');
     }
-};
-// Update your event listener
+}; *//*
+
+// Combined event listener for both likes and comments
 document.addEventListener('click', async (event) => {
     // Like button handler
-    if (event.target.closest('.like-btn') || event.target.closest('.act')?.classList.contains('like-btn')) {
+    if (event.target.closest('.like-btn') || 
+       (event.target.classList.contains('fa-heart') && event.target.closest('.act')) ){
+        
         const likeButton = event.target.closest('.like-btn') || event.target.closest('.act');
         const postId = likeButton.dataset.postId;
         
+        if (!postId) {
+            console.error('Post ID not found for like button');
+            return;
+        }
+
         try {
             const response = await fetch('/App/Controllers/PostsController/toggleLike', {
                 method: 'POST',
@@ -180,6 +252,10 @@ document.addEventListener('click', async (event) => {
                 },
                 body: JSON.stringify({ post_id: postId })
             });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             
             const data = await response.json();
             
@@ -196,34 +272,35 @@ document.addEventListener('click', async (event) => {
                     heartIcon.classList.replace('fa-solid', 'fa-regular');
                     heartIcon.style.color = '';
                 }
+            } else {
+                console.error('Like failed:', data.error);
+                alert(data.error || 'Failed to toggle like');
             }
         } catch (error) {
             console.error('Like error:', error);
-            alert('Failed to toggle like');
+            alert('Failed to toggle like. Please try again.');
         }
     }
-});
-
-// Add Enter key support for comment input
-document.addEventListener('keypress', (event) => {
-    if (event.target.classList.contains('comment-input') && event.key === 'Enter') {
-        const commentInput = event.target;
-        const postId = commentInput.dataset.postId;
-        console.log('Enter pressed for comment on post:', postId);
-        handleCommentSubmission(postId, commentInput);
-    }
-});
-// Update your comment submission handler
-document.addEventListener('click', async (event) => {
+    
     // Comment submission handler
-    if (event.target.closest('.submit-comment') || event.target.closest('#submit-comment')) {
-        const submitButton = event.target.closest('.submit-comment') || event.target.closest('#submit-comment');
+    else if (event.target.closest('#submit-comment') || 
+             (event.target.classList.contains('fa-paper-plane') && event.target.closest('.post-comment'))) {
+        
+        const submitButton = event.target.closest('#submit-comment') || event.target.closest('.post-comment');
         const postId = submitButton.dataset.postId;
         const commentInput = submitButton.closest('.post-comment').querySelector('.comment-input') || 
                            submitButton.closest('.post-comment').querySelector('#comment-input');
         
+        if (!postId) {
+            console.error('Post ID not found for comment submission');
+            return;
+        }
+
         const commentText = commentInput.value.trim();
-        if (!commentText) return;
+        if (!commentText) {
+            alert('Please enter a comment');
+            return;
+        }
         
         try {
             const response = await fetch('/App/Controllers/PostsController/addComment', {
@@ -236,6 +313,10 @@ document.addEventListener('click', async (event) => {
                     comment: commentText 
                 })
             });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             
             const data = await response.json();
             
@@ -260,13 +341,36 @@ document.addEventListener('click', async (event) => {
                     `;
                     commentsList.appendChild(commentElement);
                 });
+            } else {
+                console.error('Comment failed:', data.error);
+                alert(data.error || 'Failed to add comment');
             }
         } catch (error) {
             console.error('Comment error:', error);
-            alert('Failed to add comment');
+            alert('Failed to add comment. Please try again.');
         }
     }
 });
+
+// Enter key support for comment input
+document.addEventListener('keypress', (event) => {
+    if (event.target.classList.contains('comment-input') && event.key === 'Enter') {
+        const commentInput = event.target;
+        const postId = commentInput.dataset.postId;
+        
+        if (!postId) {
+            console.error('Post ID not found for comment input');
+            return;
+        }
+
+        const submitButton = document.querySelector(`#submit-comment[data-post-id="${postId}"]`);
+        if (submitButton) {
+            submitButton.click(); // Trigger the click event on the submit button
+        } else {
+            console.error('Submit button not found for post:', postId);
+        }
+    }
+});*/
 
 // [Rest of your existing code]
 

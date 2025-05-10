@@ -1,5 +1,6 @@
 <?php
 namespace App\Controllers;
+use Exception; 
 
 require_once __DIR__ . '/../../App/Models/Post.php';
 require_once __DIR__ . '/../../Config/Database.php';
@@ -10,14 +11,15 @@ use Config\Database;
 class PostsController
 {
     private $postModel;
+    private $db;
 
     public function __construct()
     {
         session_start(); // Add this line
 
         $database = new Database();
-        $db = $database->connect();
-        $this->postModel = new Post($db);
+       $this->db = $database->connect();
+        $this->postModel = new Post($this->db);
    
     }
   
@@ -118,70 +120,96 @@ class PostsController
     return $postId;
 }
 
+public function toggleLike()
+{
+    try {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $postId = $input['post_id'] ?? null;
+        
+        $userId = $_SESSION['user_id'] ?? null;
 
-    public function toggleLike()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $postId = $_POST['post_id'] ?? null;
-            $userId = $_SESSION['user_id'] ?? null;
-            
-            if (!$postId || !$userId) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'error' => 'Invalid request']);
-                exit;
-            }
-
-            // Check if already liked (you might need to add a method in Post model for this)
-            $isLiked = $this->isPostLiked($postId, $userId);
-            
-            if ($isLiked) {
-                $this->postModel->unlike($postId, $userId);
-                $action = 'unliked';
-            } else {
-                $this->postModel->like($postId, $userId);
-                $action = 'liked';
-            }
-
-            // Get updated like count
-            $likeCount = $this->getLikeCount($postId);
-
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'action' => $action,
-                'like_count' => $likeCount
+        if (!$postId || !$userId) {
+            return json_encode([
+                'success' => false,
+                'message' => 'Invalid data'
             ]);
+        }
+
+        // Your existing like logic here...
+        $isLiked = $this->isPostLiked($postId, $userId);
+
+        if ($isLiked) {
+            $stmt = $this->db->prepare("DELETE FROM likes WHERE post_id = ? AND user_id = ?");
+            $stmt->execute([$postId, $userId]);
+        } else {
+            $stmt = $this->db->prepare("INSERT INTO likes (post_id, user_id) VALUES (?, ?)");
+            $stmt->execute([$postId, $userId]);
+        }
+
+        $likeCount = $this->getLikeCount($postId);
+
+        return json_encode([
+            'success' => true,
+            'like_count' => $likeCount,
+            'is_liked' => !$isLiked
+        ]);
+
+    } catch (Exception $e) {
+        return json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+}
+public function addComment()
+{
+    header('Content-Type: application/json');
+    
+    try {
+        // Get the raw POST data
+        $rawData = file_get_contents("php://input");
+        parse_str($rawData, $data);
+        
+        $postId = $data['post_id'] ?? null;
+        $commentText = $data['comment'] ?? '';
+        
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $userId = $_SESSION['user_id'] ?? null;
+        $username = $_SESSION['username'] ?? 'Anonymous';
+
+        if (!$postId || !$commentText || !$userId) {
+            echo json_encode(['success' => false, 'message' => 'Invalid data']);
             exit;
         }
+
+        $stmt = $this->db->prepare("INSERT INTO comments (post_id, user_id, body) VALUES (?, ?, ?)");
+        $stmt->execute([$postId, $userId, $commentText]);
+
+        // Get updated comment count
+        $commentCount = $this->getCommentCount($postId);
+
+        echo json_encode([
+            'success' => true,
+            'comment_count' => $commentCount,
+            'username' => $username
+        ]);
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
     }
-
-    public function addComment()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $postId = $_POST['post_id'] ?? null;
-            $userId = $_SESSION['user_id'] ?? null;
-            $comment = $_POST['comment'] ?? '';
-            $parentCommentId = $_POST['parent_comment_id'] ?? null;
-
-            if (!$postId || !$userId || empty($comment)) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'error' => 'Invalid request']);
-                exit;
-            }
-
-            $this->postModel->comment($postId, $userId, $comment, $parentCommentId);
-
-            // Get updated comments
-            $comments = $this->postModel->getComments($postId);
-
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'comments' => $comments
-            ]);
-            exit;
-        }
-    }
+}
+private function getCommentCount($postId)
+{
+    $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM comments WHERE post_id = ?");
+    $stmt->execute([$postId]);
+    $result = $stmt->fetch();
+    return $result['count'];
+}
 
     private function isPostLiked($postId, $userId)
     {

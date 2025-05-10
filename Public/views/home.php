@@ -123,9 +123,14 @@ $posts = $postController->getPosts();
             <!-- Comments will be loaded dynamically -->
           </div>
           <div class="post-comment">
-            <input type="text" placeholder="Add a comment..." class="comment-input"
-              data-post-id="<?php echo $post['id']; ?>">
-            <button class="submit-comment" data-post-id="<?php echo $post['id']; ?>">
+          <input
+  type="text"
+  id="comment-<?php echo $post['id']; ?>"
+  name="comment"
+  placeholder="Add a comment..."
+  class="comment-input"
+  data-post-id="<?php echo $post['id']; ?>">
+            <button id="submit-comment" data-post-id="<?php echo $post['id']; ?>">
               <i class="fa-regular fa-paper-plane"></i>
             </button>
           </div>

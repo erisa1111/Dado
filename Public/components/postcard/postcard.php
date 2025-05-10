@@ -20,7 +20,7 @@
 
  
 
-
+<!--
   <div id="post-container"></div>
 
 
@@ -66,7 +66,7 @@
 
   </div>
 
-  <script src="/components/postcard/postcard.js"></script>
+  <script src="/components/postcard/postcard.js"></script>-->
 </body>
 
 </html>
