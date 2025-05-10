@@ -48,7 +48,6 @@ if (!$userData) {
                 
     
                 <div class="profile_details">
-                    <p id="edit_profile">Edit</p>
                     <div class="profile_image">
                         <img src="/assets/img/default_profile.webp" alt="Profile Picture" id="profile_pic">
                         <p><i class="fa-solid fa-location-dot"></i><?= htmlspecialchars($userData['location']) ?></p>
@@ -87,9 +86,9 @@ if (!$userData) {
                             <?php if ($isOwnProfile): ?>
                                 <button class="follow-btn" style="margin: 0;">Edit Profile</button>
                             <?php else: ?>
-                                <button class="follow-btn">Connect</button>
-                                <button class="follow-btn">Follow</button>
+                                <button class="follow-btn" style="margin: 0;">Connect</button>
                             <?php endif; ?>
+                            <button class="follow-btn">Share</button>
                         </div>
 
                       

@@ -266,7 +266,7 @@ main{
   align-items: center;
   gap: 10px;
   margin-top: 20px;
-  justify-content:end;
+  /* justify-content:end; */
 }
 
 #edit_profile{
