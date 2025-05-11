@@ -58,6 +58,30 @@ function toggleModalVisibility(show) {
         modal.style.display = 'none';
     }
 }
+document.getElementById('post-images').addEventListener('change', function (event) {
+    const previewContainer = document.getElementById('image-preview');
+    previewContainer.innerHTML = ''; // Clear previous previews
+
+    const files = event.target.files;
+
+    if (files.length === 0) {
+        previewContainer.innerHTML = '<p>No images selected</p>';
+        return;
+    }
+
+    Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image/')) return; // Only images
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
 
 function initializeModal() {
     const addButton = document.getElementById('add');
@@ -148,55 +172,72 @@ function closeAllMenus() {
 }
 
 // Edit Post Handler
+let currentEditPostId = null;
+let currentDeletePostId = null;
+
 async function handleEditPost(e) {
-    const postId = e.target.closest('.edit-post').dataset.postId;
-    const postDiv = e.target.closest('.post');
-    const postContent = postDiv.querySelector('.post-content');
-    const currentContent = postContent.textContent.trim();
+  const postDiv = e.target.closest('.post');
+  currentEditPostId = e.target.closest('.edit-post').dataset.postId;
+  const postContent = postDiv.querySelector('.post-content').textContent.trim();
 
-    const newContent = prompt("Edit your post:", currentContent);
-    if (newContent && newContent !== currentContent) {
-        try {
-            const response = await fetch('http://localhost:4000/views/handle_post.php?action=editPost', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ post_id: postId, content: newContent })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        } catch (err) {
-            alert('Error editing post');
-        }
-    }
+  document.getElementById('editContent').value = postContent;
+  document.getElementById('editModal').style.display = 'flex';
 }
 
-// Delete Post Handler
 async function handleDeletePost(e) {
-    const postId = e.target.closest('.delete-post').dataset.postId;
-    if (confirm("Are you sure you want to delete this post?")) {
-        try {
-            const response = await fetch('http://localhost:4000/views/handle_post.php?action=deletePost', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ post_id: postId })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        } catch (err) {
-            alert('Error deleting post');
-        }
-    }
+  currentDeletePostId = e.target.closest('.delete-post').dataset.postId;
+  document.getElementById('deleteModal').style.display = 'flex';
 }
+
+document.getElementById('saveEdit').addEventListener('click', async () => {
+  const newContent = document.getElementById('editContent').value;
+  const imageFile = document.getElementById('editImage').files[0];
+
+  const formData = new FormData();
+  formData.append('post_id', currentEditPostId);
+  formData.append('content', newContent);
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
+
+  try {
+    const response = await fetch('http://localhost:4000/views/handle_post.php?action=editPost', {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert('Error updating post');
+  }
+});
+
+
+// Confirm Delete
+document.getElementById('confirmDelete').addEventListener('click', async () => {
+  const response = await fetch('http://localhost:4000/views/handle_post.php?action=deletePost', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ post_id: currentDeletePostId })
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    location.reload();
+  } else {
+    alert(data.message);
+  }
+});
+
+// Cancel or close modals
+document.getElementById('editClose').onclick = () => document.getElementById('editModal').style.display = 'none';
+document.getElementById('deleteClose').onclick = () => document.getElementById('deleteModal').style.display = 'none';
+document.getElementById('cancelDelete').onclick = () => document.getElementById('deleteModal').style.display = 'none';
 
 
 document.addEventListener('DOMContentLoaded', function() {

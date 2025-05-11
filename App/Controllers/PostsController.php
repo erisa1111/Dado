@@ -29,10 +29,15 @@ class PostsController
         return $this->postModel->getAll();
     }
 
-        public function editPost($postId, $content) {
-  
-        return $this->postModel->updatePost($postId, $content);
+  public function editPost($postId, $content, $imageUrl = null) {
+    $stmt = $this->db->prepare("CALL update_post(:post_id, :new_content, :new_image)");
+    $stmt->bindParam(':post_id', $postId);
+    $stmt->bindParam(':new_content', $content);
+    $stmt->bindParam(':new_image', $imageUrl);
+    return $stmt->execute();
 }
+
+
 
 public function deletePost($postId) {
    
@@ -118,7 +123,7 @@ public function deletePost($postId) {
 
     $userId = $_SESSION['user_id'] ?? null;
     if (!$userId) {
-        throw new \Exception('User not logged in.');
+        throw new Exception('User not logged in.');
     }
 
     $imageUrl = $this->handleImageUpload($_FILES['images'] ?? null);

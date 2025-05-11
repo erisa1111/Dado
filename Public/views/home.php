@@ -155,6 +155,28 @@ $posts = $postController->getPosts();
           </div>
           </div>
           <?php endforeach; ?>
+
+          <!-- Edit Post Modal -->
+<div id="editModal" class="modal2" style="display:none;">
+  <div class="modal2-content">
+    <span class="close" id="editClose">&times;</span>
+    <h3>Edit Post</h3>
+    <textarea id="editContent"></textarea>
+    <input type="file" id="editImage">
+    <button id="saveEdit">Save Changes</button>
+  </div>
+</div>
+
+<!-- Delete Post Modal -->
+<div id="deleteModal" class="modal2" style="display:none;">
+  <div class="modal2-content">
+    <span class="close" id="deleteClose">&times;</span>
+    <h3>Are you sure you want to delete this post?</h3>
+    <button id="confirmDelete">Yes, Delete</button>
+    <button id="cancelDelete">Cancel</button>
+  </div>
+</div>
+
           </div>
 
 

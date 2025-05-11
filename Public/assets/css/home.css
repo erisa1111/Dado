@@ -563,10 +563,258 @@ body {
 }
 
 .comment-actions button.delete-comment,
-.post-act button.delete-comment {
-    color: #e74c3c;
+.post-act button.delete-post {
+    color: #e2687e;
 }
 
 #time-act{
   display: flex;
 }
+
+/* Modal Container */
+.modal2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* dark semi-transparent backdrop */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Modal Content */
+.modal2-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: fadeInUp 0.4s ease;
+    text-align: center;
+}
+
+/* Close Button */
+.modal2-content .close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.modal2-content .close:hover {
+    color: #e2687e;
+}
+
+/* Heading */
+.modal2-content h3 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Textarea & Input */
+.modal2-content textarea,
+.modal2-content input[type="file"] {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 14px;
+}
+
+/* Buttons */
+.modal2-content button{
+    background: #e2687e;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+    transition: background 0.3s ease, transform 0.2s;
+}
+
+.modal2-content button:hover {
+    background: #e2687e;
+    transform: scale(1.05);
+}
+
+#cancelDelete {
+    background: #aaa;
+}
+
+#cancelDelete:hover {
+    background: #888;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* General Modal Backdrop */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content Box */
+.modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin: 0 auto;
+    margin-top: 50px;
+    animation: fadeInUp 0.4s ease;
+}
+
+/* Close Modal Button */
+.close-modal {
+  position: absolute;
+  background-color:rgba(255, 255, 255, 0.95) ;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #333;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: #e2687e;
+}
+
+/* Form Elements */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-content h2 {
+    margin-bottom: 15px;
+    font-size: 22px;
+    color: #333;
+}
+
+.modal-content label {
+    font-weight: 500;
+    color: #555;
+}
+
+.modal-content textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    resize: vertical;
+    font-size: 14px;
+}
+
+/* Image upload label as button */
+.add_image {
+    text-align: center;
+    width: 200px;
+    margin: 0 auto;
+    display: inline-block;
+    background: #f0f0f0;
+    color: #555;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease, transform 0.2s;
+}
+
+.add_image:hover {
+    background: #e0e0e0;
+    transform: scale(1.05);
+}
+
+#post-images {
+    display: none; /* hide the real input */
+}
+
+#image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#image-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Submit Button */
+.modal-content button[type="submit"] {
+    background: #e2687e;
+    color: white;
+    padding: 10px;
+    width: 100px;
+    border-radius: 8px;
+    margin: 0 auto;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease, transform 0.2s;
+}
+
+.modal-content button[type="submit"]:hover {
+    background: #e2687e;
+    transform: scale(1.05);
+}
+
+/* Reusable fadeInUp animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
