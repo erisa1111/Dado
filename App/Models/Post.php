@@ -58,4 +58,17 @@ class Post
         $stmt->execute([$postId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+        public function updatePost($postId, $content) {
+        $stmt = $this->db->prepare("CALL update_post(:post_id, :content)");
+        $stmt->bindParam(':post_id', $postId);
+        $stmt->bindParam(':content', $content);
+        return $stmt->execute();
+    }
+
+    public function deletePost($postId) {
+        $stmt = $this->db->prepare("CALL delete_post(:post_id)");
+        $stmt->bindParam(':post_id', $postId);
+        return $stmt->execute();
+    }
+
 }

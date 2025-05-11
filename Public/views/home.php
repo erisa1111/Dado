@@ -96,12 +96,29 @@ $posts = $postController->getPosts();
       <?php foreach ($posts as $post): ?>
         <div class="post" id="post-<?php echo $post['id']; ?>">
           <div class="post-header">
-          <img class="profile-img" src="<?php echo htmlspecialchars($post['profile_picture'] ?? '/assets/img/dado_profile.webp'); ?>" alt="User Profile">            <div class="details">
+            <img class="profile-img"
+              src="<?php echo htmlspecialchars($post['profile_picture'] ?? '/assets/img/dado_profile.webp'); ?>"
+              alt="User Profile">
+            <div class="details">
               <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
               <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
             </div>
+            <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['user_id']): ?>
+              <div class="post-menu-wrapper">
+                <button type="button" class="post-menu-toggle">⋮</button>
+                <div class="post-act">
+                  <button type="button" class="edit-post" data-post-id="<?php echo $post['id']; ?>">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button type="button"class="delete-post" data-post-id="<?php echo $post['id']; ?>">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </div>
+              </div>
+            <?php endif; ?>
+        
           </div>
-          <div class="post-content">
+          <div class="post-content" >
             <?php echo htmlspecialchars($post['body']); ?>
           </div>
           <?php if (!empty($post['image_url'])): ?>

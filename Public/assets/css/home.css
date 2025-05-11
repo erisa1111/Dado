@@ -508,12 +508,14 @@ body {
 
 
 /* Comment Menu Styles */
-.comment-menu-wrapper {
+.comment-menu-wrapper,
+.post-menu-wrapper {
     position: relative;
     margin-left: auto; /* Push to the right */
 }
 
-.comment-menu-toggle {
+.comment-menu-toggle,
+.post-menu-toggle {
  
     background: none;
     border: none;
@@ -523,7 +525,8 @@ body {
     padding: 0 5px;
 }
 
-.comment-actions {
+.comment-actions,
+.post-act {
   display: none;
     position: absolute;
     right: 0;
@@ -532,11 +535,12 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 10;
+    z-index: 1000;
     min-width: 100px;
 }
 
-.comment-actions button {
+.comment-actions button,
+.post-act button{
     display: block;
     width: 100%;
     text-align: left;
@@ -548,15 +552,18 @@ body {
     font-size: 0.9em;
 }
 
-.comment-actions button:hover {
+.comment-actions button:hover,
+.post-act button:hover {
     background: #f5f5f5;
 }
 
-.comment-actions button i {
+.comment-actions button i,
+.post-act button i {
     margin-right: 5px;
 }
 
-.comment-actions button.delete-comment {
+.comment-actions button.delete-comment,
+.post-act button.delete-comment {
     color: #e74c3c;
 }
 

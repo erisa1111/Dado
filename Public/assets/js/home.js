@@ -1,9 +1,6 @@
 initializeModal();
 
 
-
-
-// Add this to your home.js
 document.getElementById('post-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -84,6 +81,122 @@ function initializeModal() {
         }
     });
 }
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    
+    setupPostHandlers();
+});
+
+function setupPostHandlers() {
+    // Event delegation for post actions
+    document.addEventListener('click', async function(e) {
+        // Post menu toggle
+        if (e.target.classList.contains('post-menu-toggle')) {
+            handlePostMenuToggle(e);
+            return;
+        }
+
+        // Edit post
+        const editBtn = e.target.closest('.edit-post');
+        if (editBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            await handleEditPost(e);
+            return;
+        }
+
+        // Delete post
+        const deleteBtn = e.target.closest('.delete-post');
+        if (deleteBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            await handleDeletePost(e);
+            return;
+        }
+
+        // Close menus when clicking outside
+        if (!e.target.closest('.post-menu-wrapper')) {
+            closeAllMenus();
+        }
+    });
+}
+
+// Handle Post Menu Toggle
+function handlePostMenuToggle(e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const postDiv = e.target.closest('.post');
+    const actionsMenu = postDiv.querySelector('.post-act');
+
+    // Close other menus
+    document.querySelectorAll('.post-act').forEach(menu => {
+        if (menu !== actionsMenu) {
+            menu.style.display = 'none';
+        }
+    });
+
+    // Toggle current menu
+    actionsMenu.style.display = actionsMenu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Close all menus
+function closeAllMenus() {
+    document.querySelectorAll('.post-act').forEach(menu => {
+        menu.style.display = 'none';
+    });
+}
+
+// Edit Post Handler
+async function handleEditPost(e) {
+    const postId = e.target.closest('.edit-post').dataset.postId;
+    const postDiv = e.target.closest('.post');
+    const postContent = postDiv.querySelector('.post-content');
+    const currentContent = postContent.textContent.trim();
+
+    const newContent = prompt("Edit your post:", currentContent);
+    if (newContent && newContent !== currentContent) {
+        try {
+            const response = await fetch('http://localhost:4000/views/handle_post.php?action=editPost', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ post_id: postId, content: newContent })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            alert('Error editing post');
+        }
+    }
+}
+
+// Delete Post Handler
+async function handleDeletePost(e) {
+    const postId = e.target.closest('.delete-post').dataset.postId;
+    if (confirm("Are you sure you want to delete this post?")) {
+        try {
+            const response = await fetch('http://localhost:4000/views/handle_post.php?action=deletePost', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ post_id: postId })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            alert('Error deleting post');
+        }
+    }
+}
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -163,275 +276,14 @@ async function toggleLike(postId) {
         alert('Failed to update like. Please try again.');
     }
 }
-/*
-async function addComment(postId, commentText) {
-    if (!commentText.trim()) return;
-    
-    const input = document.getElementById(`comment-${postId}`);
-    input.disabled = true;
-    
-    try {
-        const response = await fetch('/controllers/PostsController.php?action=addComment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                post_id: postId,
-                comment: commentText 
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Update comment count
-            const countElement = document.querySelector(`#post-${postId} .comments`);
-            if (countElement) {
-                countElement.textContent = `${data.comment_count} comments`;
-            }
-            
-            // Add new comment to list if visible
-            const commentsList = document.getElementById(`comments-list-${postId}`);
-            if (commentsList && commentsList.style.display !== 'none') {
-                if (commentsList.querySelector('.no-comments')) {
-                    commentsList.innerHTML = '';
-                }
-                commentsList.appendChild(createCommentElement(data.comment));
-            }
-            
-            input.value = '';
-        }
-    } catch (error) {
-        console.error('Error adding comment:', error);
-    } finally {
-        input.disabled = false;
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('post-menu-toggle')) {
+        const menu = e.target.nextElementSibling;
+        menu.classList.toggle('visible');
     }
-}
-
-function createCommentElement(comment) {
-    const commentDiv = document.createElement('div');
-    commentDiv.className = 'comment';
-    commentDiv.id = `comment-${comment.id}`;
-    
-    commentDiv.innerHTML = `
-        <div class="comment-header">
-            <img src="${comment.profile_picture || '/assets/img/default-profile.png'}" 
-                 alt="${comment.username}" class="comment-profile-pic">
-            <strong>${comment.username}</strong>
-            <span class="comment-time">${formatCommentTime(comment.created_at)}</span>
-            <div class="comment-actions">
-                <button class="edit-comment" data-comment-id="${comment.id}">Edit</button>
-                <button class="delete-comment" data-comment-id="${comment.id}">Delete</button>
-            </div>
-        </div>
-        <div class="comment-body">${comment.body}</div>
-    `;
-    
-    return commentDiv;
-}
-
-function formatCommentTime(timestamp) {
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Only load comments when a post is clicked or expanded
-    document.querySelectorAll('.post').forEach(post => {
-        post.addEventListener('click', function(e) {
-            // Check if click is on the post content (not a button/link)
-            if (e.target.tagName === 'DIV' || e.target.classList.contains('post-content')) {
-                const postId = this.id.split('-')[1];
-                loadComments(postId);
-            }
-        });
-    });
 });
 
-// Simplified comment loading
-async function loadComments(postId) {
-    const commentsList = document.getElementById(`comments-list-${postId}`);
-    if (!commentsList) return;
-    
-    // Show loading state
-    commentsList.innerHTML = '<div class="loading-comments">Loading comments...</div>';
-    
-    try {
-        const response = await fetch(`/controllers/PostsController.php?action=getCommentsForPost&post_id=${postId}`);
-        const data = await response.json();
-        
-        if (data.comments && data.comments.length > 0) {
-            commentsList.innerHTML = '';
-            data.comments.forEach(comment => {
-                commentsList.appendChild(createCommentElement(comment));
-            });
-        } else {
-            commentsList.innerHTML = '<div class="no-comments">No comments yet</div>';
-        }
-    } catch (error) {
-        console.error(`Error loading comments:`, error);
-        commentsList.innerHTML = '<div class="comments-error">Could not load comments</div>';
-    }
-}
 
-async function handleDeleteComment(event) {
-    const commentId = event.target.getAttribute('data-comment-id');
-    if (!confirm('Are you sure you want to delete this comment?')) return;
-    
-    try {
-        const response = await fetch('/controllers/PostsController.php?action=deleteComment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ comment_id: commentId })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Remove the comment from the UI
-            document.getElementById(`comment-${commentId}`).remove();
-            
-            // Update comment count
-            const commentElement = document.getElementById(`comment-${commentId}`);
-            const postId = commentElement.closest('.post').id.split('-')[1];
-            updateCommentCount(postId);
-        } else {
-            alert('Failed to delete comment: ' + data.message);
-        }
-    } catch (error) {
-        console.error('Error deleting comment:', error);
-        alert('An error occurred while deleting the comment');
-    }
-}
-
-async function handleEditComment(event) {
-    const commentId = event.target.getAttribute('data-comment-id');
-    const commentElement = document.getElementById(`comment-${commentId}`);
-    const commentBody = commentElement.querySelector('.comment-body');
-    const currentText = commentBody.textContent;
-    
-    // Create an input field with the current text
-    const input = document.createElement('textarea');
-    input.value = currentText;
-    commentBody.innerHTML = '';
-    commentBody.appendChild(input);
-    input.focus();
-    
-    // Add save and cancel buttons
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save';
-    saveButton.className = 'save-edit';
-    
-    const cancelButton = document.createElement('button');
-    cancelButton.textContent = 'Cancel';
-    cancelButton.className = 'cancel-edit';
-    
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'edit-buttons';
-    buttonContainer.appendChild(saveButton);
-    buttonContainer.appendChild(cancelButton);
-    
-    commentBody.appendChild(buttonContainer);
-    
-    // Handle save
-    saveButton.addEventListener('click', async () => {
-        const newText = input.value.trim();
-        if (!newText) {
-            alert('Comment cannot be empty');
-            return;
-        }
-        
-        try {
-            const response = await fetch('/controllers/PostsController.php?action=updateComment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    comment_id: commentId,
-                    new_comment: newText
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Update the comment in the UI
-                commentBody.innerHTML = newText;
-            } else {
-                alert('Failed to update comment: ' + data.message);
-                commentBody.innerHTML = currentText;
-            }
-        } catch (error) {
-            console.error('Error updating comment:', error);
-            alert('An error occurred while updating the comment');
-            commentBody.innerHTML = currentText;
-        }
-    });
-    
-    // Handle cancel
-    cancelButton.addEventListener('click', () => {
-        commentBody.innerHTML = currentText;
-    });
-}
-
-async function updateCommentCount(postId) {
-    try {
-        const response = await fetch(`/controllers/PostsController.php?action=getCommentCount&post_id=${postId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            const postElement = document.getElementById(`post-${postId}`);
-            const commentsCountElement = postElement.querySelector('.comments');
-            commentsCountElement.textContent = `${data.count} comments`;
-        }
-    } catch (error) {
-        console.error('Error updating comment count:', error);
-    }
-}*/
-
-
-/*
-function loadComments(postId) {
-    const commentsList = document.getElementById(`comments-list-${postId}`);
-    if (!commentsList) return;
-    
-    // Show loading state
-    commentsList.innerHTML = '<div class="loading-comments">Loading comments...</div>';
-    
-    fetch(`http://localhost:4000/views/get_comments.php?post_id=${postId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                commentsList.innerHTML = '';  // Clear existing comments
-
-                if (data.comments && data.comments.length > 0) {
-                    data.comments.forEach(comment => {
-                        const div = document.createElement('div');
-                        div.classList.add('comment');
-                        div.innerHTML = `
-                            <strong>${comment.name} ${comment.surname}</strong> (${comment.username}):<br>
-                            ${comment.body} <br>
-                            <small>Posted on ${comment.created_at}</small>
-                        `;
-                        commentsList.appendChild(div);
-                    });
-                } else {
-                    commentsList.innerHTML = '<div class="no-comments">No comments yet</div>';
-                }
-            } else {
-                console.error('Failed to load comments:', data.message);
-                commentsList.innerHTML = '<div class="comments-error">Could not load comments</div>';
-            }
-        })
-        .catch(error => {
-            console.error('Fetch error:', error);
-            commentsList.innerHTML = '<div class="comments-error">Error loading comments</div>';
-        });
-}*/
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize comment functionality for all posts
@@ -573,6 +425,7 @@ function createCommentElement(comment) {
     `;
 
     if (comment.user_id == currentUserId) {
+
         const toggleBtn = commentDiv.querySelector('.comment-menu-toggle');
         const actionsMenu = commentDiv.querySelector('.comment-actions');
         

@@ -29,6 +29,15 @@ class PostsController
         return $this->postModel->getAll();
     }
 
+        public function editPost($postId, $content) {
+  
+        return $this->postModel->updatePost($postId, $content);
+}
+
+public function deletePost($postId) {
+   
+    return $this->postModel->deletePost($postId);
+}
    /* public function createPost($title, $content, $imageUrl)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -161,151 +170,7 @@ public function toggleLike()
         ]);
     }
 }
-/*
-public function addComment()
-{
-    header('Content-Type: application/json');
-    
-    try {
-        $data = json_decode(file_get_contents("php://input"), true);
 
-        $postId = $data['post_id'] ?? null;
-        $commentText = $data['comment'] ?? '';
-        $parentCommentId = $data['parent_comment_id'] ?? null;
-        
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        $userId = $_SESSION['user_id'] ?? null;
-        $username = $_SESSION['username'] ?? 'Anonymous';
-
-        if (!$postId || !$commentText || !$userId) {
-            echo json_encode(['success' => false, 'message' => 'Invalid data']);
-            exit;
-        }
-
-        $stmt = $this->db->prepare("CALL add_comment(?, ?, ?, ?)");
-        $stmt->execute([$postId, $userId, $commentText, $parentCommentId]);
-        $result = $stmt->fetch();
-        $commentId = $result['comment_id'];
-
-        // Get the full comment data to return
-        $comment = $this->getCommentById($commentId);
-
-        // Get updated comment count
-        $commentCount = $this->getCommentCount($postId);
-
-        echo json_encode([
-            'success' => true,
-            'comment' => $comment,
-            'comment_count' => $commentCount,
-            'username' => $username
-        ]);
-    } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-}
-
-public function deleteComment()
-{
-    header('Content-Type: application/json');
-    
-    try {
-        $data = json_decode(file_get_contents("php://input"), true);
-        $commentId = $data['comment_id'] ?? null;
-        
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        $userId = $_SESSION['user_id'] ?? null;
-
-        if (!$commentId || !$userId) {
-            echo json_encode(['success' => false, 'message' => 'Invalid data']);
-            exit;
-        }
-
-        $stmt = $this->db->prepare("CALL delete_comment(?, ?)");
-        $stmt->execute([$commentId, $userId]);
-        $result = $stmt->fetch();
-        
-        if ($result['affected_rows'] > 0) {
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Comment not found or not authorized']);
-        }
-    } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-}
-
-public function updateComment()
-{
-    header('Content-Type: application/json');
-    
-    try {
-        $data = json_decode(file_get_contents("php://input"), true);
-        $commentId = $data['comment_id'] ?? null;
-        $newComment = $data['new_comment'] ?? '';
-        
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        $userId = $_SESSION['user_id'] ?? null;
-
-        if (!$commentId || !$newComment || !$userId) {
-            echo json_encode(['success' => false, 'message' => 'Invalid data']);
-            exit;
-        }
-
-        $stmt = $this->db->prepare("CALL update_comment(?, ?, ?)");
-        $stmt->execute([$commentId, $userId, $newComment]);
-        $result = $stmt->fetch();
-        
-        if ($result['affected_rows'] > 0) {
-            // Get the updated comment
-            $comment = $this->getCommentById($commentId);
-            echo json_encode(['success' => true, 'comment' => $comment]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Comment not found or not authorized']);
-        }
-    } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-}
-
-private function getCommentById($commentId)
-{
-    $stmt = $this->db->prepare("
-        SELECT c.*, u.username, u.profile_picture 
-        FROM comments c
-        JOIN users u ON c.user_id = u.id
-        WHERE c.id = ?
-    ");
-    $stmt->execute([$commentId]);
-    return $stmt->fetch(\PDO::FETCH_ASSOC);
-}
-
-
-private function getCommentCount($postId)
-{
-    $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM comments WHERE post_id = ?");
-    $stmt->execute([$postId]);
-    $result = $stmt->fetch();
-    return $result['count'];
-}
-*/
     private function isPostLiked($postId, $userId)
     {
         // You might need to implement this method in your Post model
@@ -422,5 +287,7 @@ public function getCommentsForPost($postId)
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
+
+
 }
 
