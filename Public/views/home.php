@@ -26,23 +26,6 @@ if (!$userData) {
 
 ?>
 
-require_once __DIR__ . '/../../App/Models/User.php'; // Adjust path if needed
-if (!isset($_SESSION['user_id'])) {
-    echo "No user logged in!";
-    header('Location: login.php');
-    exit();
-}
-$userModel = new User();
-$userData = $userModel->getProfile($_SESSION['user_id']);
-if (!$userData) {
-    echo "User not found.";
-    exit();
-}
-
-
-?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
