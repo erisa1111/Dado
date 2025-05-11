@@ -71,27 +71,40 @@ class User
         
         return $result;
     }
-
     public function updateProfile($userId, $data){
         try {
-            $stmt = $this->conn->prepare("CALL UpdateUserProfile(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            // Prepare the SQL query
+            $query = "UPDATE users SET 
+                        username = :username, 
+                        name = :name, 
+                        surname = :surname, 
+                        location = :location, 
+                        phone_number = :phone_number, 
+                        email = :email, 
+                        bio = :bio, 
+                        profile_picture = :profile_picture
+                      WHERE id = :user_id";
 
-            $stmt->execute([
-                $userId,
-                $data['username'],
-                $data['name'],
-                $data['surname'],
-                $data['location'],
-                $data['phone'],
-                $data['email'],
-                $data['bio'],
-                $data['profile_picture'] ?? null  // Pass null if not updating picture
-            ]);
+            $stmt = $this->conn->prepare($query);
+
+            // Bind the values to the placeholders
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->bindParam(':username', $data['username'], PDO::PARAM_STR);
+            $stmt->bindParam(':name', $data['name'], PDO::PARAM_STR);
+            $stmt->bindParam(':surname', $data['surname'], PDO::PARAM_STR);
+            $stmt->bindParam(':location', $data['location'], PDO::PARAM_STR);
+            $stmt->bindParam(':phone_number', $data['phone_number'], PDO::PARAM_STR);
+            $stmt->bindParam(':email', $data['email'], PDO::PARAM_STR);
+            $stmt->bindParam(':bio', $data['bio'], PDO::PARAM_STR);
+            $stmt->bindParam(':profile_picture', $data['profile_picture'], PDO::PARAM_STR);
+
+            // Execute the query
+            $stmt->execute();
 
             return true;
         } catch (PDOException $e) {
             throw new \Exception("Profile update failed: " . $e->getMessage());
-        }   
+        }
     }
 
 

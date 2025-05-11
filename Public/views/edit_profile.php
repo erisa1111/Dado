@@ -13,16 +13,8 @@ if (!isset($_SESSION['user_id'])) {
 $userModel = new User();
 $userId = $_SESSION['user_id'];
 
-// Get current user data for form pre-fill
-$user = $userModel->getProfile($userId);
-
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Debugging: Check form submission data
-    var_dump($_POST); // Debugging POST data
-    var_dump($_FILES); // Debugging FILES data
-
-    // Get form data
     $username = $_POST['username'] ?? '';
     $name = $_POST['name'] ?? '';
     $surname = $_POST['surname'] ?? '';
@@ -31,12 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $bio = $_POST['bio'] ?? '';
 
-    // Debugging: Check if the bio and phone number are being correctly captured
-    var_dump($bio);
-    var_dump($phone);
-
-    // Keep the current profile picture if no new one is uploaded
-    $profilePicturePath = $user['profile_picture'];
+    // Default profile picture to current one if not uploaded
+    $profilePicturePath = $_POST['current_profile_picture'] ?? null;
 
     // Handle profile picture upload
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -61,11 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Debugging: Ensure the final values are set properly
-    var_dump($profilePicturePath);  // Check the profile picture path
-
     try {
-        // Update the user profile in the database
+        // Call the update method from User model
         $userModel->updateProfile($userId, [
             'username' => $username,
             'name' => $name,
@@ -74,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'phone_number' => $phone,
             'email' => $email,
             'bio' => $bio,
-            'profile_picture' => $profilePicturePath
+            'profile_picture' => $profilePicturePath ?? null
         ]);
 
         $_SESSION['success'] = 'Profile updated successfully!';
@@ -84,6 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Failed to update profile: ' . $e->getMessage();
     }
 }
+
+// Get current user data for form pre-fill
+$user = $userModel->getProfile($userId);
+
 ?>
 
 <!DOCTYPE html>
@@ -96,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Edit Profile</h1>
 
     <?php if (isset($error)) echo '<p style="color:red;">' . $error . '</p>'; ?>
-    <?php if (isset($_SESSION['success'])) echo '<p style="color:green;">' . $_SESSION['success'] . '</p>'; ?>
 
     <form method="POST" enctype="multipart/form-data">
         <label>Username:</label><br>
@@ -120,11 +108,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label>Bio:</label><br>
         <textarea name="bio" rows="4"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea><br><br>
 
+
         <label>Profile Picture:</label><br>
         <input type="file" name="profile_picture"><br><br>
 
         <?php if (!empty($user['profile_picture'])): ?>
             <img src="<?= htmlspecialchars('../' . $user['profile_picture']) ?>" alt="Current Profile Picture" style="max-width: 150px;"><br><br>
+            <input type="hidden" name="current_profile_picture" value="<?= htmlspecialchars($user['profile_picture']) ?>">
         <?php endif; ?>
 
         <button type="submit">Update Profile</button>
