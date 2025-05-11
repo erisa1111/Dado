@@ -448,6 +448,33 @@ body {
     font-style: italic;
 }
 
+button.save-edit,
+button.cancel-edit{
+ 
+   background: #e2687e;
+    color: white;
+    padding: 7px 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    margin: 5px;
+    transition: background 0.3s ease, transform 0.2s;
+}
+button.cancel-edit{
+  background: #aaa;
+}
+button.cancel-edit:hover{
+  background: #888;
+
+}
+button.save-edit:hover,
+button.cancel-edit:hover{
+
+    transform: scale(1.05);
+}
+
+
 
 
 
