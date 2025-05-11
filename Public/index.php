@@ -9,6 +9,7 @@ error_reporting(E_ALL);
 // Manually include files
 require_once dirname(__DIR__) . '/App/Models/User.php';
 require_once dirname(__DIR__) . '/App/Controllers/AuthController.php';
+
 require_once dirname(__DIR__) . '/App/Controllers/LogOutController.php';
 
 // Get the current URL path
@@ -37,6 +38,7 @@ switch ($request_uri) {
            
         }
         break;
+
         case '/logout':
             require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php'; // make sure it's included
             (new LogOutController())->logout();
@@ -46,7 +48,11 @@ switch ($request_uri) {
         header("HTTP/1.0 404 Not Found");
         break;
 }
+
+
 ?>
+
+
 
 
 

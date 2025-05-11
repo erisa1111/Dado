@@ -1,23 +1,33 @@
 <?php
 session_start(); // Start session to access $_SESSION data
-
 use App\Models\User;
-require_once __DIR__ . '/../../App/Models/User.php'; // Adjust path if needed
 
+require_once __DIR__ . '/../../App/Models/Post.php';
+require_once __DIR__ . '/../../App/Controllers/PostsController.php';
+require_once __DIR__ . '/../../Config/Database.php';
+
+// Initialize the controller
+$postController = new App\Controllers\PostsController(); // No arguments for the constructor now
+$posts = $postController->getPosts(); 
+
+require_once __DIR__ . '/../../App/Models/User.php'; // Adjust path if needed
 if (!isset($_SESSION['user_id'])) {
     echo "No user logged in!";
     header('Location: login.php');
     exit();
 }
-
 $userModel = new User();
 $userData = $userModel->getProfile($_SESSION['user_id']);
-
 if (!$userData) {
     echo "User not found.";
     exit();
 }
+
+
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,6 +37,8 @@ if (!$userData) {
     <title>Home Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/home.css">
+
+   <link rel="stylesheet" href="/components/postcard/postcard.css">
     <link rel="stylesheet" href="/components/nav_home/nav_home.css">
 </head>
 <body>
@@ -70,8 +82,56 @@ if (!$userData) {
               </div>
               
         </div>
+  
         <div id="center">
+        <div class="add_post">
+    <p>Add post..</p>
+    <button id="add"><i class="fa-regular fa-square-plus"></i></button>
+  </div>
+            <?php foreach ($posts as $post): ?>
+                <div class="post" id="post-<?php echo $post['id']; ?>">
+                    <div class="post-header">
+                        <img class="profile-img" src="<?php echo htmlspecialchars($post['profile_picture']); ?>" alt="User Profile">
+                        <div class="details">
+                            <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
+                            <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <?php echo htmlspecialchars($post['body']); ?>
+                    </div>
+                    <?php if (!empty($post['image_url'])): ?>
+                        <div class="post-images">
+                            <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Post Image">
+                        </div>
+                    <?php endif; ?>
+                    <div class="post-actions">
+                        <button class="act like-btn" data-post-id="<?php echo $post['id']; ?>">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                        <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
+                            <i class="fa-regular fa-comment"></i>
+                        </button>
+                    </div>
+                    <div class="post-footer">
+                        <div class="likes"><?php echo $post['like_count']; ?> likes</div>
+                        <div class="comments"><?php echo $post['comment_count']; ?> comments</div>
+                    </div>
+                    <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>">
+                        <!-- Comments will be loaded dynamically -->
+                    </div>
+                    <div class="post-comment">
+                        <input type="text" placeholder="Add a comment..." class="comment-input" data-post-id="<?php echo $post['id']; ?>">
+                        <button class="submit-comment" data-post-id="<?php echo $post['id']; ?>">
+                            <i class="fa-regular fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
+    
+
+    
 
 
         <div class="right">
@@ -131,8 +191,17 @@ if (!$userData) {
           </div>
           
           <script src="/components/nav_home/nav_home.js"></script>
-          <script src="/components/postcard/postcard.js"></script>
+         <script src="/components/postcard/postcard.js"></script>
+
+       
+
    
 </body>
+
+
+
 </html>
+<script src="/assets/js/home.js"></script>
+<script src="/components/js/postcard.js"></script>
+
 
