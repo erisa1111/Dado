@@ -23,8 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $bio = $_POST['bio'] ?? '';
 
-    // Default profile picture to current one if not uploaded
-    $profilePicturePath = $_POST['current_profile_picture'] ?? null;
+    $profilePicturePath = $_POST['current_profile_picture'] ?? null; // Keep current profile picture if no new one is uploaded
 
     // Handle profile picture upload
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -42,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $targetPath = $uploadDir . '/' . $newFilename;
 
             if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetPath)) {
-                $profilePicturePath = 'assets/uploads/pfps/' . $newFilename;
+                $profilePicturePath = 'assets/uploads/pfps/' . $newFilename; // Update profile picture path
             }
         } else {
             echo "<p style='color:red;'>Invalid image format. Only JPG, PNG, GIF allowed.</p>";
@@ -50,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // Call the update method from User model
         $userModel->updateProfile($userId, [
             'username' => $username,
             'name' => $name,
@@ -59,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'phone_number' => $phone,
             'email' => $email,
             'bio' => $bio,
-            'profile_picture' => $profilePicturePath ?? null
+            'profile_picture' => $profilePicturePath
         ]);
 
         $_SESSION['success'] = 'Profile updated successfully!';
@@ -80,44 +78,131 @@ $user = $userModel->getProfile($userId);
 <head>
     <meta charset="UTF-8">
     <title>Edit Profile</title>
+    <link rel="stylesheet" href="path_to_your_styles.css"> <!-- External CSS file -->
+    <style>
+        /* Same styling as before */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container input,
+        .form-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .form-container label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+
+        .form-container textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-container button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .form-container button:hover {
+            background-color: #45a049;
+        }
+
+        .profile_image {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile_image img {
+            max-width: 150px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .form-container input[type="file"] {
+            padding: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <h1>Edit Profile</h1>
 
-    <?php if (isset($error)) echo '<p style="color:red;">' . $error . '</p>'; ?>
+    <?php if (isset($error)) echo '<p class="error-message">' . $error . '</p>'; ?>
 
-    <form method="POST" enctype="multipart/form-data">
-        <label>Username:</label><br>
-        <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>"><br><br>
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="profile_image">
+                <?php if (!empty($user['profile_picture'])): ?>
+                    <img src="<?= htmlspecialchars('../' . $user['profile_picture']) ?>" alt="Current Profile Picture">
+                <?php endif; ?>
+                <p><strong>Current Profile Picture</strong></p>
+            </div>
 
-        <label>Name:</label><br>
-        <input type="text" name="name" value="<?= htmlspecialchars($user['name']) ?>"><br><br>
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" value="<?= htmlspecialchars($user['username']) ?>" required>
 
-        <label>Surname:</label><br>
-        <input type="text" name="surname" value="<?= htmlspecialchars($user['surname']) ?>"><br><br>
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" value="<?= htmlspecialchars($user['name']) ?>" required>
 
-        <label>Location:</label><br>
-        <input type="text" name="location" value="<?= htmlspecialchars($user['location']) ?>"><br><br>
+            <label for="surname">Surname:</label>
+            <input type="text" name="surname" id="surname" value="<?= htmlspecialchars($user['surname']) ?>" required>
 
-        <label>Phone Number:</label><br>
-        <input type="text" name="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>"><br><br>
+            <label for="location">Location:</label>
+            <input type="text" name="location" id="location" value="<?= htmlspecialchars($user['location']) ?>" required>
 
-        <label>Email:</label><br>
-        <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>"><br><br>
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" name="phone_number" id="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>" required>
 
-        <label>Bio:</label><br>
-        <textarea name="bio" rows="4"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea><br><br>
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" value="<?= htmlspecialchars($user['email']) ?>" required>
 
+            <label for="bio">Bio:</label>
+            <textarea name="bio" id="bio" rows="4"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
 
-        <label>Profile Picture:</label><br>
-        <input type="file" name="profile_picture"><br><br>
+            <label for="profile_picture">Profile Picture:</label>
+            <input type="file" name="profile_picture" id="profile_picture">
 
-        <?php if (!empty($user['profile_picture'])): ?>
-            <img src="<?= htmlspecialchars('../' . $user['profile_picture']) ?>" alt="Current Profile Picture" style="max-width: 150px;"><br><br>
-            <input type="hidden" name="current_profile_picture" value="<?= htmlspecialchars($user['profile_picture']) ?>">
-        <?php endif; ?>
+            <!-- Hidden field to preserve the current profile picture -->
+            <input type="hidden" name="current_profile_picture" value="<?= htmlspecialchars($user['profile_picture'] ?? '') ?>">
 
-        <button type="submit">Update Profile</button>
-    </form>
+            <button type="submit">Update Profile</button>
+        </form>
+    </div>
 </body>
 </html>
