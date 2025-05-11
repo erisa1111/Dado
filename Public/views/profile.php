@@ -3,6 +3,10 @@ session_start(); // Start session to access $_SESSION data
 
 use App\Models\User;
 require_once __DIR__ . '/../../App/Models/User.php'; // Adjust path if needed
+require_once __DIR__ . '/../../App/Models/Connections.php';
+require_once __DIR__ . '/../../App/Controllers/ConnectionsController.php';
+$connectionsModel = new \App\Models\Connections();
+$connectionsController = new App\Controllers\ConnectionsController();
 
 if (!isset($_SESSION['user_id'])) {
     echo "No user logged in!";
@@ -84,9 +88,10 @@ if (!$userData) {
 
                         <div class="profile-buttons">
                             <?php if ($isOwnProfile): ?>
+                                
                                 <button class="follow-btn" style="margin: 0;">Edit Profile</button>
                             <?php else: ?>
-                                <button class="follow-btn" style="margin: 0;">Connect</button>
+                                <button class="follow-btn" style="margin: 0;" data-recipient-id="<?= $viewingUserId ?>">Connect</button>
                             <?php endif; ?>
                             <button class="follow-btn">Share</button>
                         </div>
@@ -298,9 +303,65 @@ if (!$userData) {
                 </div>
             </div>
         </div>
+
     </main>
+     <!-- Add this hidden element to store the current user's ID -->
+    <div id="current-user-id" data-user-id="<?= $loggedInUserId ?>" style="display: none;"></div>
+
     <script src="../components/nav_home/nav_home.js"></script>
     <script src="../assets/js/profile.js"></script>
+    <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    const connectButtons = document.querySelectorAll('.follow-btn[data-recipient-id]');
+
+    connectButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+            console.log('Connect button clicked');
+            const recipientId = this.getAttribute('data-recipient-id');
+            const senderId = document.getElementById('current-user-id').getAttribute('data-user-id');  // Make sure this is in your HTML
+            console.log('Sender ID:', senderId);
+            console.log('Recipient ID:', recipientId);
+            if (senderId === recipientId) {
+                alert('You cannot connect with yourself.');
+                return;
+            }
+
+            // Send connection request
+            try {
+                console.log('Sending connection request...');
+                const response = await fetch('/handle_connection.php',  {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({
+                        user_one_id: senderId,
+                        user_two_id: recipientId
+                    })
+                });
+                console.log('Response status:', response.status);
+                console.log('Response received:', response);
+                console.log('if u dont get nothing, the data awayt response.json is not working');
+                const data = await response.json();
+                console.log(data); 
+
+                if (data.success) {
+                    alert('Connection request sent successfully!');
+                    this.disabled = true;  // Disable the "Connect" button
+                    this.innerHTML = 'Request Sent';
+                } else {
+                    alert('Failed to send connection request: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error sending connection request:', error);
+                alert('An error occurred while sending the connection request.');
+            }
+        });
+    });
+});
+    </script>
 </body>
 
 </html>

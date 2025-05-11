@@ -59,15 +59,19 @@ class ConnectionsController
                 $success = $this->connectionsModel->deleteConnection($userOneId, $userTwoId);
                 break;
             case 'create':
-                $success = $this->connectionsModel->createConnection($userOneId, $userTwoId);
+                 $response = $this->connectionsModel->sendConnectionRequest($userOneId, $userTwoId);
+                 $success = $response['success'] ?? false;
                 break;
             default:
-                $success = false;
+                 $response = ['success' => false, 'message' => 'Invalid action'];
         }
 
         if ($this->isAjaxRequest()) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => $success]);
+           echo json_encode([
+                'success' => $success,
+                'message' => $response['message'] ?? 'Unknown result'
+            ]);
             exit;
         } else {
             header('Location: /connections');
@@ -75,7 +79,33 @@ class ConnectionsController
         }
     }
 }
+public function handleSendConnectionRequest() {
+    // Get raw input
+    $data = json_decode(file_get_contents('php://input'), true);
 
+    if (!isset($data['user_one_id'], $data['user_two_id'])) {
+        echo json_encode(['success' => false, 'message' => 'Missing required data']);
+        return;
+    }
+
+    $userOneId = $data['user_one_id'];
+    $userTwoId = $data['user_two_id'];
+
+    if ($userOneId === $userTwoId) {
+        echo json_encode(['success' => false, 'message' => 'You cannot connect with yourself']);
+        return;
+    }
+
+    // You had this commented out — make sure it's defined!
+    $connectionModel = new \App\Models\Connections();
+    $result = $connectionModel->sendConnectionRequest($userOneId, $userTwoId);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Connection request sent']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to send connection request']);
+    }
+}
     private function isAjaxRequest()
     {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 

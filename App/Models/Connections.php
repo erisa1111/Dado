@@ -86,4 +86,15 @@ public function getAllConnections($user_id)
         
         return $success;
     }
+
+    public function sendConnectionRequest($sender_id, $receiver_id)
+{
+    $stmt = $this->db->prepare("CALL send_connection_request(?, ?)");
+    $stmt->execute([$sender_id, $receiver_id]);
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    error_log("Send connection request from $sender_id to $receiver_id: " . print_r($result, true));
+
+    return $result;
+}
 }

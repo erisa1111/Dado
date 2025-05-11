@@ -19,3 +19,12 @@ $userConnections = $connections->getUserConnections(24);
 echo "<pre>";
 print_r($userConnections);
 echo "</pre>";
+
+$sender_id = 24;
+$receiver_id = 25; // Replace with a valid user ID in your DB
+
+echo "<h2>Testing sendConnectionRequest($sender_id, $receiver_id)</h2>";
+$response = $connections->sendConnectionRequest($sender_id, $receiver_id);
+echo "<pre>";
+print_r($response);
+echo "</pre>";
