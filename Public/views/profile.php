@@ -49,7 +49,12 @@ if (!$userData) {
     
                 <div class="profile_details">
                     <div class="profile_image">
-                        <img src="/assets/img/default_profile.webp" alt="Profile Picture" id="profile_pic">
+                            <?php
+                                $profilePic = !empty($userData['profile_picture']) 
+                                    ? '/' . $userData['profile_picture'] 
+                                    : '/assets/img/default_profile.webp';
+                            ?>
+                            <img src="<?= htmlspecialchars($profilePic) ?>" alt="Profile Picture" id="profile_pic">
                         <p><i class="fa-solid fa-location-dot"></i><?= htmlspecialchars($userData['location']) ?></p>
                     </div>
                     <div class="profile_info">
@@ -84,7 +89,7 @@ if (!$userData) {
 
                         <div class="profile-buttons">
                             <?php if ($isOwnProfile): ?>
-                                <button class="follow-btn" style="margin: 0;">Edit Profile</button>
+                                <a href="edit_profile.php" class="follow-btn" style="margin: 0; text-decoration: none; display: inline-block;">Edit Profile</a>
                             <?php else: ?>
                                 <button class="follow-btn" style="margin: 0;">Connect</button>
                             <?php endif; ?>

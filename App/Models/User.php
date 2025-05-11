@@ -72,5 +72,28 @@ class User
         return $result;
     }
 
+    public function updateProfile($userId, $data){
+        try {
+            $stmt = $this->conn->prepare("CALL UpdateUserProfile(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+            $stmt->execute([
+                $userId,
+                $data['username'],
+                $data['name'],
+                $data['surname'],
+                $data['location'],
+                $data['phone'],
+                $data['email'],
+                $data['bio'],
+                $data['profile_picture'] ?? null  // Pass null if not updating picture
+            ]);
+
+            return true;
+        } catch (PDOException $e) {
+            throw new \Exception("Profile update failed: " . $e->getMessage());
+        }   
+    }
+
+
 
 }
