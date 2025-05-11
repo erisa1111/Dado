@@ -1,26 +1,23 @@
 <?php
 header('Content-Type: application/json');
-require_once '/Users/macair/Desktop/dadodado/App/Controllers/PostsController.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+if (ob_get_length()) ob_clean();
+
+require_once '/Users/macair/Desktop/dadodado/App/Controllers/CommentsController.php';
 
 try {
     session_start();
-    
-    // Get JSON input
-    $input = json_decode(file_get_contents('php://input'), true);
-    if (!$input) {
-        throw new Exception('Invalid input data');
-    }
 
-    $postId = $input['post_id'] ?? null;
-    $comment = $input['comment'] ?? null;
-    
-    if (!$postId || !$comment) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!$input || !isset($input['post_id']) || !isset($input['comment'])) {
         throw new Exception('Post ID and comment are required');
     }
 
-    $controller = new App\Controllers\PostsController();
-    $controller->addComment();
-    
+    $controller = new App\Controllers\CommentsController();
+    $controller->addComment(); 
+
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode([

@@ -23,6 +23,7 @@ $posts = $postController->getPosts();
 
   <link rel="stylesheet" href="/components/postcard/postcard.css">
   <link rel="stylesheet" href="/components/nav_home/nav_home.css">
+
 </head>
 
 <body>
@@ -33,6 +34,7 @@ $posts = $postController->getPosts();
   <div class="content">
     <div class="left">
       <div class="profile">
+
 
         <div class="photo">
 
@@ -119,24 +121,24 @@ $posts = $postController->getPosts();
             <div class="likes"><?php echo $post['like_count']; ?> likes</div>
             <div class="comments"><?php echo $post['comment_count']; ?> comments</div>
           </div>
-          <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>">
-            <!-- Comments will be loaded dynamically -->
+          
+
+          <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>" style="display:none">
+            <div class="no-comments">No comments yet</div>
           </div>
           <div class="post-comment">
           <input
   type="text"
-  id="comment-<?php echo $post['id']; ?>"
-  name="comment"
-  placeholder="Add a comment..."
-  class="comment-input"
-  data-post-id="<?php echo $post['id']; ?>">
+  id="comment-<?php echo $post['id']; ?>" name="comment" placeholder="Add a comment..."
+              class="comment-input" data-post-id="<?php echo $post['id']; ?>">
             <button id="submit-comment" data-post-id="<?php echo $post['id']; ?>">
               <i class="fa-regular fa-paper-plane"></i>
             </button>
+            <div id="current-user-id" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
           </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
+          </div>
+          <?php endforeach; ?>
+          </div>
 
 
 
