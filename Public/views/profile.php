@@ -9,13 +9,18 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$loggedInUserId = $_SESSION['user_id'];
+$viewingUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : $loggedInUserId;
+$isOwnProfile = ($loggedInUserId === $viewingUserId);
+
 $userModel = new User();
-$userData = $userModel->getProfile($_SESSION['user_id']);
+$userData = $userModel->getProfile($viewingUserId);
 
 if (!$userData) {
     echo "User not found.";
     exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -43,10 +48,8 @@ if (!$userData) {
                 
     
                 <div class="profile_details">
-                    <p id="edit_profile">Edit</p>
                     <div class="profile_image">
                         <img src="/assets/img/default_profile.webp" alt="Profile Picture" id="profile_pic">
-                        <div class="schedule"></i>Part time</div>
                         <p><i class="fa-solid fa-location-dot"></i><?= htmlspecialchars($userData['location']) ?></p>
                     </div>
                     <div class="profile_info">
@@ -78,10 +81,29 @@ if (!$userData) {
                                 <p id="salary_number" contenteditable="false" aria-label="Salary"><i class="fa-regular fa-envelope"></i> <?= htmlspecialchars($userData['email']) ?> </p>
                             </div>
                         </div>
+
+                        <div class="profile-buttons">
+                            <?php if ($isOwnProfile): ?>
+                                <button class="follow-btn" style="margin: 0;">Edit Profile</button>
+                            <?php else: ?>
+                                <button class="follow-btn" style="margin: 0;">Connect</button>
+                            <?php endif; ?>
+                            <button class="follow-btn">Share</button>
+                        </div>
+
                       
     
                     </div>
                 </div>
+
+                <?php if ($userData['role_name'] === 'Nanny'): ?>
+                    <div class="nanny-card">
+                        <h3>Welcome, Nanny!</h3>
+                        <p>This section is only visible to users with the Nanny role.</p>
+                        <!-- Add more Nanny-specific content here -->
+                    </div>
+                <?php endif; ?>
+
     
                 <div class="profile_summary">
                     <h2 id="title">My Story</h2>

@@ -259,6 +259,16 @@ main{
     margin-right: 10px;
 }
 
+
+.profile-buttons{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  /* justify-content:end; */
+}
+
 #edit_profile{
 
     position: absolute;
@@ -619,7 +629,7 @@ main{
   }
   
   .follow-btn {
-   margin-right:auto;
+    margin-right:auto;
     padding: 6px 12px;
     background-color: white;
     
