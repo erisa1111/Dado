@@ -609,47 +609,49 @@ function formatCommentTime(timestamp) {
 }
 
 async function handleDeleteComment(commentId, postId) {
-  if (!confirm('Are you sure you want to delete this comment?')) return;
-  
-  try {
-    const response = await fetch('/../../App/Controllers/CommentsController.php?action=deleteComment', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ comment_id: commentId })
-    });
+    if (!confirm('Are you sure you want to delete this comment?')) return;
     
-    const data = await response.json();
-    
-    if (data.success) {
-      // Remove comment from UI
-      document.getElementById(`comment-${commentId}`)?.remove();
-      
-      // Update comment count
-      const commentsCount = document.querySelector(`#post-${postId} .comments`);
-      if (commentsCount) {
-        const newCount = parseInt(commentsCount.textContent) - 1;
-        commentsCount.textContent = `${newCount} comments`;
-      }
-      
-      // If no comments left, show "no comments" message
-      const commentsList = document.getElementById(`comments-list-${postId}`);
-      if (commentsList && commentsList.children.length === 0) {
-        commentsList.innerHTML = '<div class="no-comments">No comments yet</div>';
-      }
+    const currentUserId = document.getElementById('current-user-id')?.dataset?.userId;
+    if (!currentUserId) {
+        alert('You must be logged in to delete comments');
+        return;
     }
-  } catch (error) {
-    console.error('Error deleting comment:', error);
-  }
-}
 
+    try {
+        const response = await fetch('http://localhost:4000/views/handle_comment.php?action=deleteComment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                comment_id: commentId,
+                user_id: currentUserId 
+            })
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById(`comment-${commentId}`)?.remove();
+            // Update comment count, etc.
+        } else {
+            alert(data.message || 'Failed to delete comment');
+        }
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        alert('Error deleting comment. Check console for details.');
+    }
+}
 async function handleEditComment(commentId) {
     const commentElement = document.getElementById(`comment-${commentId}`);
     const commentBody = commentElement.querySelector('.comment-body');
     const currentText = commentBody.textContent;
-    
-    // Create edit interface
+    const currentUserId = document.getElementById('current-user-id')?.dataset?.userId;
+
+    if (!currentUserId) {
+        alert('You must be logged in to edit comments');
+        return;
+    }
+
     commentBody.innerHTML = `
         <textarea class="edit-comment-input">${currentText}</textarea>
         <div class="edit-comment-buttons">
@@ -657,40 +659,41 @@ async function handleEditComment(commentId) {
             <button class="cancel-edit">Cancel</button>
         </div>
     `;
-    
+
     const textarea = commentBody.querySelector('.edit-comment-input');
     textarea.focus();
-    
-    // Handle save
+
     commentBody.querySelector('.save-edit').addEventListener('click', async () => {
         const newText = textarea.value.trim();
         if (!newText) return;
-        
+
         try {
-            const response = await fetch('/../../App/Controllers/CommentsController.php?action=updateComment', {
+            const response = await fetch('http://localhost:4000/views/handle_comment.php?action=updateComment', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     comment_id: commentId,
-                    new_comment: newText
+                    new_comment: newText,
+                    user_id: currentUserId
                 })
             });
-            
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const data = await response.json();
-            
+
             if (data.success) {
-                // Update comment in UI
                 commentBody.innerHTML = newText;
+            } else {
+                alert(data.message || 'Failed to update comment');
+                commentBody.innerHTML = currentText;
             }
         } catch (error) {
             console.error('Error updating comment:', error);
+            alert('Error updating comment. Check console for details.');
             commentBody.innerHTML = currentText;
         }
     });
-    
-    // Handle cancel
+
     commentBody.querySelector('.cancel-edit').addEventListener('click', () => {
         commentBody.innerHTML = currentText;
     });
