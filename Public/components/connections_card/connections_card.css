@@ -77,33 +77,9 @@
     flex-shrink: 0;
 }
 
-.accept-icon,
-.decline-icon {
-    font-size: 16px;
-    padding: 8px;
-    cursor: pointer;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 1;
-    width: 32px;
-    height: 32px;
-    background-color: #f0f0f0;
-    color: #555;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
-.accept-icon:hover {
-    background-color: #4CAF50;
-    color: white;
-}
 
-.decline-icon:hover {
-    background-color: #f44336;
-    color: white;
-}
+
 
 /* For the connections list container */
 #connections-list {
@@ -111,4 +87,78 @@
     flex-direction: column;
     gap: 8px;
     width: 100%;
+}
+
+
+.accept-text,
+.decline-text {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
+}
+/*.accept-text {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #2e7d32;
+}*/
+.accept-text:hover {
+    /*background-color: #2e7d32;*/
+    color:#2e7d32;
+}
+/* .decline-text {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #c62828;
+} */
+.decline-text:hover {
+    /*background-color:#2e7d32*/
+    color: #e2687e;
+}
+
+.connection-actions {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.connection-menu {
+    cursor: pointer;
+    padding: 8px;
+    position: relative;
+}
+
+.connection-menu-icon {
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.connection-menu-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 4px;
+    padding: 8px 0;
+}
+
+.connection-menu-content span {
+    color: #333;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+.connection-menu-content span:hover {
+    background-color: #f5f5f5;
+}
+
+.connection-menu:hover .connection-menu-content {
+    display: block;
 }

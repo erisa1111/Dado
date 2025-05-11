@@ -62,8 +62,14 @@
 // ];
 
 // Base URL for connection actions
-const CONNECTIONS_AJAX_URL = '/App/Controllers/ConnectionsController/handleConnectionAction';
+const CONNECTIONS_AJAX_URL = '/connections-action.php';
+//const CONNECTIONS_AJAX_URL = '/App/Controllers/ConnectionsController/handleConnectionAction';
+
+
 const CONNECTIONS_API_URL = '/App/Controllers/ConnectionsController/getConnectionsApi';
+
+
+
 
 // Main initialization
 const initializeConnections = () => {
@@ -157,8 +163,10 @@ const showEmptyState = () => {
 };
 
 // Handle connection actions (accept/decline)
-const handleConnectionAction = async (action, userId) => {
+const handleConnectionAction = async (action,senderId, recipientId, card) => {
     try {
+         //const CURRENT_USER_ID = document.getElementById('current-user-id').dataset.userId;
+        console.log('Sending request...');
         const response = await fetch(CONNECTIONS_AJAX_URL, {
             method: 'POST',
             headers: {
@@ -167,23 +175,62 @@ const handleConnectionAction = async (action, userId) => {
             },
             body: JSON.stringify({
                 action: action,
-                user_one_id: userId
+                user_one_id: senderId,
+                user_two_id: recipientId
+                
             })
         });
-        
-        const data = await response.json();
-        
+    
+        console.log('Waiting for response...');
+    
+        // Read the raw response first
+        const responseText = await response.text();
+        console.log('Raw response:', responseText);
+    
+        // Try to parse as JSON
+        let data;
+        try {
+            data = JSON.parse(responseText);
+            console.log('Parsed JSON:', data);
+        } catch (e) {
+            console.error('Response is not valid JSON');
+            return;
+        }
+    
+        console.log('Response data:', data);
         if (data.success) {
-            // Remove the connection card from UI
-            document.querySelector(`.connection-card[data-user-id="${userId}"]`)?.remove();
-            
-            // Show success message
-            showToast(`${action === 'accept' ? 'Accepted' : 'Declined'} connection successfully`);
-            
-            // Check if any connections left
-            if (document.querySelectorAll('.connection-card').length === 0) {
-                showEmptyState();
+            console.log('Action successful:', data);
+      
+          
+
+            if (action === 'accept') {
+                // Update status in card to "Accepted"
+                const statusElement = card.querySelector('.connection-status');
+                const MsgElement = card.querySelector('.connection-action');
+                if (statusElement) {
+                    statusElement.textContent = 'Accepted';
+                    statusElement.style.color = 'green'; 
+                    
+                }
+                if(MsgElement) {
+                    MsgElement.textContent = 'You are now connected';
+                }
+                const buttonsContainer = card.querySelector('.connection-buttons');
+               if (buttonsContainer) {
+               buttonsContainer.remove(); // Remove accept/decline buttons
+      }
+            } else if (action === 'decline') {
+                // Remove the card
+                card?.remove();
+
+                if (document.querySelectorAll('.connection-card').length === 0) {
+                    showEmptyState();
+                }
             }
+
+            
+          //      confirm(`${action === 'accept' ? 'Accepted' : 'Declined'} connection successfully`);
+           
         } else {
             throw new Error(data.message || 'Action failed');
         }
@@ -207,27 +254,42 @@ const showToast = (message, type = 'success') => {
 
 // Set up event listeners
 const setupEventListeners = () => {
-    // Delegated event listener for connection actions
     document.addEventListener('click', (event) => {
-        const acceptBtn = event.target.closest('.accept-icon');
-        const declineBtn = event.target.closest('.decline-icon');
-        
-        if (acceptBtn || declineBtn) {
+        const acceptBtn = event.target.closest('.accept-text');
+        const declineBtn = event.target.closest('.decline-text');
+        const removeBtn = event.target.closest('.remove-connection');
+
+        if (acceptBtn || declineBtn || removeBtn) {
             const connectionCard = event.target.closest('.connection-card');
-            const userId = connectionCard.dataset.userId;
+            const senderId = connectionCard?.dataset.senderId;
+            const recipientId = connectionCard?.dataset.recipientId;
+            const currentUserId = document.getElementById('current-user-id').dataset.userId;
+
+            // Validate IDs
+            if (!senderId || !recipientId || !currentUserId) return;
             
+            // Security check
+            if (recipientId !== currentUserId && senderId !== currentUserId) {
+                console.error('Unauthorized action on this connection');
+                return;
+            }
+
             if (acceptBtn) {
-                handleConnectionAction('accept', userId);
-            } else if (declineBtn) {
-                if (confirm('Are you sure you want to decline this connection?')) {
-                    handleConnectionAction('delete', userId);
+                console.log('Accepting connection between', senderId, 'and', recipientId);
+                handleConnectionAction('accept', senderId, recipientId, connectionCard);
+            } else if (declineBtn || removeBtn) {
+                const action = declineBtn ? 'decline' : 'remove';
+                console.log(`${action} connection between`, senderId, 'and', recipientId);
+                if (confirm(`Are you sure you want to ${action} this connection?`)) {
+                    handleConnectionAction('decline', senderId, recipientId, connectionCard);
                 }
             }
         }
     });
 };
 
-// Helper function to get user image (implement based on your app)
+// Helper fun
+// ction to get user image (implement based on your app)
 const getUserImage = (userId) => {
     // You'll need to implement this based on how you get user images
     return `/path/to/user/images/${userId}.jpg`;

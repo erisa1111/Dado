@@ -38,43 +38,43 @@ class ConnectionsController
     }
 
     public function handleConnectionAction()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $userId = $_SESSION['user_id'] ?? null;
-            if (!$userId) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-                exit;
-            }
-            $action = $_POST['action'] ?? null;
-            $userOneId = $_POST['user_one_id'] ?? null;
-            $userTwoId = $_POST['user_two_id'] ?? $userId;
-            switch ($action) {
-                case 'accept':
-                    $success = $this->connectionsModel->acceptConnection($userOneId, $userTwoId);
-                    break;
-                case 'delete':
-                    $success = $this->connectionsModel->deleteConnection($userOneId, $userTwoId);
-                    break;
-                case 'create':
-                    $success = $this->connectionsModel->createConnection($userOneId, $userTwoId);
-                    break;
-                default:
-                    $success = false;
-            }
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $userId = $_SESSION['user_id'] ?? null;
+        if (!$userId) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+            exit;
+        }
+        $input = json_decode(file_get_contents('php://input'), true);
+        $action = $input['action'] ?? null;
+        $userOneId = $input['user_one_id'] ?? null;
+        $userTwoId = $input['user_two_id'] ?? $userId;
+        
+        switch ($action) {
+            case 'accept':
+                $success = $this->connectionsModel->acceptConnection($userOneId, $userTwoId);
+                break;
+            case 'decline':
+                $success = $this->connectionsModel->deleteConnection($userOneId, $userTwoId);
+                break;
+            case 'create':
+                $success = $this->connectionsModel->createConnection($userOneId, $userTwoId);
+                break;
+            default:
+                $success = false;
+        }
 
-            // Handle the AJAX request here
-            if ($this->isAjaxRequest()) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => $success]);
-                exit;
-            } else {
-                // For non-AJAX requests, perform a redirect
-                header('Location: /connections');
-                exit;
-            }
+        if ($this->isAjaxRequest()) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => $success]);
+            exit;
+        } else {
+            header('Location: /connections');
+            exit;
         }
     }
+}
 
     private function isAjaxRequest()
     {
@@ -82,4 +82,4 @@ class ConnectionsController
                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
 }
-?>
+

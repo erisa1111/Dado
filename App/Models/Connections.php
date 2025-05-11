@@ -86,39 +86,4 @@ public function getAllConnections($user_id)
         
         return $success;
     }
-}?>
-
-
-<!-- public function acceptConnection($user_one_id, $user_two_id)
-    {
-        $stmt = $this->db->prepare("CALL AcceptConnection(?, ?)");
-        $success = $stmt->execute([$user_one_id, $user_two_id]);
-        
-        // Log for debugging
-        error_log("Accept connection between $user_one_id and $user_two_id: " . ($success ? "Success" : "Failure"));
-        
-        return $success;
-    }
-
-    public function deleteConnection($user_one_id, $user_two_id)
-    {
-        $stmt = $this->db->prepare("CALL DeleteConnection(?, ?)");
-        $success = $stmt->execute([$user_one_id, $user_two_id]);
-        
-        // Log for debugging
-        error_log("Delete connection between $user_one_id and $user_two_id: " . ($success ? "Success" : "Failure"));
-        
-        return $success;
-    }
-
-    public function createConnection($user_one_id, $user_two_id)
-    {
-        $stmt = $this->db->prepare("CALL CreateConnection(?, ?)");
-        $success = $stmt->execute([$user_one_id, $user_two_id]);
-        
-        // Log for debugging
-        error_log("Create connection between $user_one_id and $user_two_id: " . ($success ? "Success" : "Failure"));
-        
-        return $success;
-    }
-} -->
+}

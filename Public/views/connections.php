@@ -1,5 +1,11 @@
 <?php
 session_start();
+
+// Session handling
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 $user_id = $_SESSION['user_id'] ?? null;
 
 error_log("User ID from session: " . $user_id);
@@ -73,14 +79,28 @@ error_log("All connections: " . print_r($allConnections, true));
               
         </div>
         <div id="qendra">
-  <div class="connection-filters">
-    <button class="filter-btn active" onclick="showConnections('pending')">Pending</button>
-    <button class="filter-btn" onclick="showConnections('accepted')">Accepted</button>
-  </div>
+          
+  <!-- <div class="connection-filters">
+    <span class="filter-btn active" id="connected-btn">Connected</span>
+    <span class="filter-btn" id="pending-btn">Pending Requests</span>
+</div> -->
   <div id="center">
+    <div id="current-user-id" data-user-id="<?= htmlspecialchars($_SESSION['user_id']) ?>"></div>
   <?php if (empty($allConnections)): ?>
-    <p>No connections found.</p>
-    <p>User ID from session: <?= htmlspecialchars($user_id) ?></p> <!-- DEBUG LINE -->
+      <div class="empty-connections-wrapper">
+            <div class="empty-connections-container">
+                <div class="empty-connections">
+                    <div class="empty-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <h3>You don't have any connections yet!</h3>
+                    <p>Start growing your network by connecting with other users.</p>
+                    <button class="find-connections-btn" onclick="window.location.href='/search'">
+                        <i class="fas fa-search"></i> Find connections
+                    </button>
+                </div>
+            </div>
+        </div>
 <?php else: ?>
   <div id="connections-list">
     <?php foreach ($allConnections as $connection): 
