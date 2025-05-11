@@ -13,8 +13,16 @@ if (!isset($_SESSION['user_id'])) {
 $userModel = new User();
 $userId = $_SESSION['user_id'];
 
+// Get current user data for form pre-fill
+$user = $userModel->getProfile($userId);
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Debugging: Check form submission data
+    var_dump($_POST); // Debugging POST data
+    var_dump($_FILES); // Debugging FILES data
+
+    // Get form data
     $username = $_POST['username'] ?? '';
     $name = $_POST['name'] ?? '';
     $surname = $_POST['surname'] ?? '';
@@ -23,7 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $bio = $_POST['bio'] ?? '';
 
-    $profilePicturePath = null;
+    // Debugging: Check if the bio and phone number are being correctly captured
+    var_dump($bio);
+    var_dump($phone);
+
+    // Keep the current profile picture if no new one is uploaded
+    $profilePicturePath = $user['profile_picture'];
 
     // Handle profile picture upload
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -48,7 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Debugging: Ensure the final values are set properly
+    var_dump($profilePicturePath);  // Check the profile picture path
+
     try {
+        // Update the user profile in the database
         $userModel->updateProfile($userId, [
             'username' => $username,
             'name' => $name,
@@ -60,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'profile_picture' => $profilePicturePath
         ]);
 
-
         $_SESSION['success'] = 'Profile updated successfully!';
         header('Location: profile.php');
         exit();
@@ -68,10 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Failed to update profile: ' . $e->getMessage();
     }
 }
-
-// Get current user data for form pre-fill
-$user = $userModel->getProfile($userId);
-
 ?>
 
 <!DOCTYPE html>
@@ -84,6 +96,7 @@ $user = $userModel->getProfile($userId);
     <h1>Edit Profile</h1>
 
     <?php if (isset($error)) echo '<p style="color:red;">' . $error . '</p>'; ?>
+    <?php if (isset($_SESSION['success'])) echo '<p style="color:green;">' . $_SESSION['success'] . '</p>'; ?>
 
     <form method="POST" enctype="multipart/form-data">
         <label>Username:</label><br>
@@ -105,7 +118,7 @@ $user = $userModel->getProfile($userId);
         <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>"><br><br>
 
         <label>Bio:</label><br>
-        <textarea name="bio" rows="4" value="<?= htmlspecialchars($userData['bio'] ?? '') ?>"></textarea><br><br>
+        <textarea name="bio" rows="4"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea><br><br>
 
         <label>Profile Picture:</label><br>
         <input type="file" name="profile_picture"><br><br>
