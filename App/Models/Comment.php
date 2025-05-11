@@ -13,7 +13,7 @@ class Comment
         $this->db = $database->connect();
     }
 
-   public function getCommentsForPost($postId)
+ public function getCommentsForPost($postId)
 {
     try {
         $stmt = $this->db->prepare("CALL get_comments_for_post(?)");
@@ -22,18 +22,12 @@ class Comment
         // Fetch all results
         $comments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         
-        if ($comments === false) {
-            throw new Exception('No comments found for this post.');
-        }
+        // Return empty array instead of throwing error for no comments
+        return $comments ?: [];
         
-        return $comments;
     } catch (Exception $e) {
-        // Handle any errors
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-        return false;  // Ensure we return false if there's an issue
+        error_log('Error fetching comments: ' . $e->getMessage());
+        return [];  // Return empty array on error
     }
 }
 

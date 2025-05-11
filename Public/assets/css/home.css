@@ -379,6 +379,8 @@ body {
 
 
 .comment {
+  display: flex;
+  flex-direction: column;
     padding: 10px;
     margin-bottom: 15px;
     background: #f9f9f9;
@@ -386,9 +388,16 @@ body {
 }
 
 .comment-header {
+  width: 98%;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 8px;
+}
+#userDetail{
+  width: 55%;
+  display: flex;
+  align-items: center;
 }
 
 .comment-profile-pic {
@@ -410,16 +419,14 @@ body {
 }
 
 .comment-body {
-    text-align: center; /* Center-align the text */
-    padding: 8px 8px;
-    margin: 0 auto;
+    padding: 8px 43px;
+
     max-width: 90%; /* Prevent too-wide centering */
     line-height: 1.4;
     color: #333;
 }
 .comment-body-container {
     display: flex;
-    justify-content: center;
 }
 
 .edit-buttons {
@@ -500,37 +507,59 @@ body {
 
 
 
-
+/* Comment Menu Styles */
 .comment-menu-wrapper {
     position: relative;
-    display: inline-block;
+    margin-left: auto; /* Push to the right */
 }
 
 .comment-menu-toggle {
+ 
     background: none;
     border: none;
-    font-size: 18px;
     cursor: pointer;
+    font-size: 1.2em;
+    color: #666;
+    padding: 0 5px;
 }
 
 .comment-actions {
+  display: none;
     position: absolute;
-    top: 20px;
     right: 0;
+    top: 100%;
     background: white;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    z-index: 1000;
-    padding: 5px;
-    display: none;
-    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 10;
+    min-width: 100px;
 }
 
 .comment-actions button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
     background: none;
     border: none;
     cursor: pointer;
-    padding: 5px 10px;
-    width: 100%;
-    text-align: left;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.comment-actions button:hover {
+    background: #f5f5f5;
+}
+
+.comment-actions button i {
+    margin-right: 5px;
+}
+
+.comment-actions button.delete-comment {
+    color: #e74c3c;
+}
+
+#time-act{
+  display: flex;
 }

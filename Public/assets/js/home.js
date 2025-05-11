@@ -544,17 +544,18 @@ function createCommentElement(comment) {
 
     commentDiv.innerHTML = `
         <div class="comment-header">
-            <img src="${comment.profile_picture || '/assets/img/default-profile.png'}" 
+            <div id="userDetail">
+            <img src="${comment.profile_picture || '/assets/img/profile.jpg'}" 
                  alt="${comment.username}" class="comment-profile-pic">
             <strong>${comment.name} ${comment.surname}</strong>
-            <div class="comment-body">${comment.body}</div>
-        </div>
-        <span class="comment-time">${formatCommentTime(comment.created_at)}</span>
-
-        ${comment.user_id == currentUserId ? `
+            </div>
+           <div id="time-act"> 
+            <span class="comment-time">${formatCommentTime(comment.created_at)}</span>
+            
+            ${comment.user_id == currentUserId ? `
             <div class="comment-menu-wrapper">
                 <button class="comment-menu-toggle">⋮</button>
-                <div class="comment-actions" style="display: none;">
+                <div class="comment-actions">
                     <button class="edit-comment" data-comment-id="${comment.id}">
                         <i class="fas fa-edit"></i> Edit
                     </button>
@@ -563,26 +564,40 @@ function createCommentElement(comment) {
                     </button>
                 </div>
             </div>
-        ` : ''}
+            ` : ''}
+            </div>
+            
+            
+        </div>
+        <div class="comment-body">${comment.body}</div>
     `;
 
-    // Add event listeners if the comment belongs to the current user
     if (comment.user_id == currentUserId) {
-        const editBtn = commentDiv.querySelector('.edit-comment');
-        const deleteBtn = commentDiv.querySelector('.delete-comment');
         const toggleBtn = commentDiv.querySelector('.comment-menu-toggle');
         const actionsMenu = commentDiv.querySelector('.comment-actions');
-
-        toggleBtn?.addEventListener('click', () => {
-            actionsMenu.style.display = (actionsMenu.style.display === 'none' || !actionsMenu.style.display)
-                ? 'block'
-                : 'none';
+        
+        // Toggle menu visibility
+        toggleBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            actionsMenu.style.display = actionsMenu.style.display === 'none' ? 'block' : 'none';
         });
 
-        editBtn?.addEventListener('click', () => handleEditComment(comment.id));
-        deleteBtn?.addEventListener('click', () => handleDeleteComment(comment.id, comment.post_id));
-    }
+        // Close menu when clicking elsewhere
+        document.addEventListener('click', () => {
+            actionsMenu.style.display = 'none';
+        });
 
+        // Prevent menu from closing when clicking inside it
+        actionsMenu?.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Add edit/delete handlers
+        commentDiv.querySelector('.edit-comment')?.addEventListener('click', () => handleEditComment(comment.id));
+        commentDiv.querySelector('.delete-comment')?.addEventListener('click', () => handleDeleteComment(comment.id, comment.post_id));
+    }
+console.log('Comment data:', comment);
+// Should show: {id: 1, user_id: 123, ...}
     return commentDiv;
 }
 
