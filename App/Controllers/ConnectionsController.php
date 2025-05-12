@@ -36,6 +36,21 @@ class ConnectionsController
         header('Content-Type: application/json');
         echo json_encode($allConnections);
     }
+ public function getConnectionStatus($senderId, $receiverId)
+{
+    $model = new \App\Models\Connections();
+    $statusData = $model->getConnectionStatus($senderId, $receiverId);
+
+    $message = strtolower($statusData['message']);
+
+    if (strpos($message, 'already connected') !== false) {
+        return 'connected';
+    } elseif (strpos($message, 'pending') !== false) {
+        return 'pending';
+    } else {
+        return 'none';
+    }
+}
 
     public function handleConnectionAction()
 {
@@ -79,8 +94,9 @@ class ConnectionsController
         }
     }
 }
+
 public function handleSendConnectionRequest() {
-    // Get raw input
+    error_log("handleSendConnectionRequest called");
     $data = json_decode(file_get_contents('php://input'), true);
 
     if (!isset($data['user_one_id'], $data['user_two_id'])) {
@@ -96,8 +112,15 @@ public function handleSendConnectionRequest() {
         return;
     }
 
-    // You had this commented out — make sure it's defined!
-    $connectionModel = new \App\Models\Connections();
+    $connectionModel = $this->connectionsModel;
+
+    error_log("userOneId: $userOneId | userTwoId: $userTwoId");
+
+    if ($connectionModel->connectionExists($userOneId, $userTwoId)) {
+        echo json_encode(['success' => false, 'message' => 'You are already connected.']);
+        return;
+    }
+
     $result = $connectionModel->sendConnectionRequest($userOneId, $userTwoId);
 
     if ($result) {
@@ -106,6 +129,7 @@ public function handleSendConnectionRequest() {
         echo json_encode(['success' => false, 'message' => 'Failed to send connection request']);
     }
 }
+
     private function isAjaxRequest()
     {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 

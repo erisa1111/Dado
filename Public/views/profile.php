@@ -310,27 +310,34 @@ if (!$userData) {
 
     <script src="../components/nav_home/nav_home.js"></script>
     <script src="../assets/js/profile.js"></script>
-    <script>
-
+      <script>
 document.addEventListener("DOMContentLoaded", function() {
     const connectButtons = document.querySelectorAll('.follow-btn[data-recipient-id]');
-
     connectButtons.forEach(button => {
+        const recipientId = button.getAttribute('data-recipient-id');
+        const senderId = document.getElementById('current-user-id').getAttribute('data-user-id');  // Make sure this is in your HTML
+        // Check initial connection status on page load
+        checkConnectionStatus(senderId, recipientId, button);
+        
         button.addEventListener('click', async function(e) {
             console.log('Connect button clicked');
-            const recipientId = this.getAttribute('data-recipient-id');
-            const senderId = document.getElementById('current-user-id').getAttribute('data-user-id');  // Make sure this is in your HTML
             console.log('Sender ID:', senderId);
             console.log('Recipient ID:', recipientId);
             if (senderId === recipientId) {
                 alert('You cannot connect with yourself.');
                 return;
             }
+            // 1. Check connection status before sending
+            console.log('Checking connection status...');
 
-            // Send connection request
+            checkConnectionStatus(senderId, recipientId, button);
+            console.log('Connection status checked');
+            console.log('Button innerHTML:', button.innerHTML);
+            // 2. Send connection request only if status is 'none'
+            if (button.innerHTML !== 'Connect') return;  // Avoid sending if status is 'pending' or 'connected'
             try {
                 console.log('Sending connection request...');
-                const response = await fetch('/handle_connection.php',  {
+                const response = await fetch('/handle_connection.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -341,18 +348,20 @@ document.addEventListener("DOMContentLoaded", function() {
                         user_two_id: recipientId
                     })
                 });
-                console.log('Response status:', response.status);
-                console.log('Response received:', response);
-                console.log('if u dont get nothing, the data awayt response.json is not working');
                 const data = await response.json();
                 console.log(data); 
-
+                console.log('Response received:', data);
+                console.log('Response status:', response.status);
                 if (data.success) {
                     alert('Connection request sent successfully!');
-                    this.disabled = true;  // Disable the "Connect" button
-                    this.innerHTML = 'Request Sent';
-                } else {
+                    button.disabled = true;
+                    button.innerHTML = 'Request Sent';
+                } if(data.status==="pending") {
+                    button.innerHTML = 'Request Sent';
                     alert('Failed to send connection request: ' + data.message);
+                }if (data.status==="connected"){
+                    button.innerHTML = 'Connected';
+                    alert('You are already connected with this user.');
                 }
             } catch (error) {
                 console.error('Error sending connection request:', error);
@@ -360,6 +369,27 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+    // Function to check connection status
+    async function checkConnectionStatus(senderId, recipientId, button) {
+        try {
+            console.log('Loading initial connection status...');
+            const statusResponse = await fetch(`/api/connection_status.php?sender_id=${senderId}&receiver_id=${recipientId}`);
+            const statusData = await statusResponse.json();
+            console.log("Initial status check:", statusData);
+            if (statusData.status === 'connected') {
+                button.innerHTML = 'Connected';
+                button.disabled = true;
+            } else if (statusData.status === 'pending') {
+                button.innerHTML = 'Request Sent';
+                button.disabled = true;
+            } else {
+                button.innerHTML = 'Connect';
+                button.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error loading initial connection status:', error);
+        }
+    }
 });
     </script>
 </body>

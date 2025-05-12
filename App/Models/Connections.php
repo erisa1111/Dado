@@ -97,4 +97,32 @@ public function getAllConnections($user_id)
 
     return $result;
 }
+
+public function getConnectionStatus($userId1, $userId2)
+{
+    $stmt = $this->db->prepare("SELECT * FROM connections WHERE ((user_one_id = ? AND user_two_id = ?) OR (user_one_id = ? AND user_two_id = ?)) AND status IN ('pending', 'accepted')");
+    $stmt->execute([$userId1, $userId2, $userId2, $userId1]);
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    if ($result) {
+        if ($result['status'] === 'pending') {
+            return ['success' => 0, 'message' => 'You have already sent a connection request, it is pending.'];
+        } elseif ($result['status'] === 'accepted') {
+            return ['success' => 0, 'message' => 'You are already connected with this user.'];
+        }
+    }
+
+    return ['success' => 1, 'message' => 'No connection, ready to send request.'];
+}
+public function connectionExists($userId1, $userId2)
+{
+    // Correct the stored procedure call to pass the parameters user_id1 and user_id2
+    $stmt = $this->db->prepare("CALL CheckConnectionExists(?, ?)");
+    $stmt->execute([$userId1, $userId2]);
+    $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    error_log("Checking if connection exists between $userId1 and $userId2: " . print_r($result, true));
+
+    return count($result) > 0;
+}
 }

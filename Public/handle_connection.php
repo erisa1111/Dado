@@ -1,7 +1,8 @@
 <?php
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/../logs/php_errors.log');
+error_log("handle_connection.php called");
+// ini_set('display_errors', 0);
+// ini_set('log_errors', 1);
+// ini_set('error_log', __DIR__ . '/../logs/php_errors.log');
 
 header('Content-Type: application/json');
 
