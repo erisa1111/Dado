@@ -1,7 +1,7 @@
 <?php
-require_once '/Users/macair/Desktop/dadodado/App/Models/Post.php';
-require_once '/Users/macair/Desktop/dadodado/App/Controllers/PostsController.php';
-require_once '/Users/macair/Desktop/dadodado/Config/Database.php';
+require_once __DIR__ . '/../../App/Models/Post.php';
+require_once __DIR__ . '/../../App/Controllers/PostsController.php';
+require_once __DIR__ . '/../../Config/Database.php';
 
 use App\Controllers\PostsController;
 ini_set('display_errors', 0);

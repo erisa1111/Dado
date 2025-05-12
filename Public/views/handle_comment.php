@@ -1,5 +1,5 @@
 <?php
-require_once '/Users/macair/Desktop/dadodado/App/Controllers/CommentsController.php';
+require_once __DIR__ . '/../../App/Controllers/CommentsController.php';
 use App\Controllers\CommentsController;
 
 $controller = new CommentsController();

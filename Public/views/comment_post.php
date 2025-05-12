@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 if (ob_get_length()) ob_clean();
 
-require_once '/Users/macair/Desktop/dadodado/App/Controllers/CommentsController.php';
+require_once __DIR__ . '/../../App/Controllers/CommentsController.php';
 
 try {
     session_start();

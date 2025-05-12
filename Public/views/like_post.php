@@ -11,7 +11,7 @@ if (ob_get_length()) ob_clean();
 header('Content-Type: application/json');
 
 try {
-require_once '/Users/macair/Desktop/dadodado/App/Controllers/PostsController.php';
+require_once __DIR__ . '/../../App/Controllers/PostsController.php';
     
     // Get JSON input
     $input = json_decode(file_get_contents('php://input'), true);

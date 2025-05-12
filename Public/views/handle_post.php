@@ -1,5 +1,5 @@
 <?php
-require_once '/Users/macair/Desktop/dadodado/App/Controllers/PostsController.php';
+require_once __DIR__ . '/../../App/Controllers/PostsController.php';
 use App\Controllers\PostsController;
 
 header('Content-Type: application/json');
