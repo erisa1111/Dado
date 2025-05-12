@@ -36,6 +36,21 @@ class ConnectionsController
         header('Content-Type: application/json');
         echo json_encode($allConnections);
     }
+ public function getConnectionStatus($senderId, $receiverId)
+{
+    $model = new \App\Models\Connections();
+    $statusData = $model->getConnectionStatus($senderId, $receiverId);
+
+    $message = strtolower($statusData['message']);
+
+    if (strpos($message, 'already connected') !== false) {
+        return 'connected';
+    } elseif (strpos($message, 'pending') !== false) {
+        return 'pending';
+    } else {
+        return 'none';
+    }
+}
 
     public function handleConnectionAction()
 {
@@ -59,20 +74,85 @@ class ConnectionsController
                 $success = $this->connectionsModel->deleteConnection($userOneId, $userTwoId);
                 break;
             case 'create':
-                $success = $this->connectionsModel->createConnection($userOneId, $userTwoId);
+                 $response = $this->connectionsModel->sendConnectionRequest($userOneId, $userTwoId);
+                 $success = $response['success'] ?? false;
                 break;
+            case 'remove':
+                 $success = $this->connectionsModel->deleteConnection($userOneId, $userTwoId);
+                break;    
             default:
-                $success = false;
+                 $response = ['success' => false, 'message' => 'Invalid action'];
         }
 
         if ($this->isAjaxRequest()) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => $success]);
+           echo json_encode([
+                'success' => $success,
+                'message' => $response['message'] ?? 'Unknown result'
+            ]);
             exit;
         } else {
             header('Location: /connections');
             exit;
         }
+    }
+}
+public function handleRemoveConnection($userOneId, $userTwoId) {
+    error_log("handleRemoveConnection called");
+
+    if ($userOneId === $userTwoId) {
+        echo json_encode(['success' => false, 'message' => 'You cannot remove yourself']);
+        return;
+    }
+
+    $connectionModel = $this->connectionsModel;
+
+    if (!$connectionModel->connectionExists($userOneId, $userTwoId)) {
+        echo json_encode(['success' => false, 'message' => 'Connection does not exist']);
+        return;
+    }
+
+    $result = $connectionModel->deleteConnection($userOneId, $userTwoId);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Connection removed successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to remove connection']);
+    }
+}
+
+public function handleSendConnectionRequest() {
+    error_log("handleSendConnectionRequest called");
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    if (!isset($data['user_one_id'], $data['user_two_id'])) {
+        echo json_encode(['success' => false, 'message' => 'Missing required data']);
+        return;
+    }
+
+    $userOneId = $data['user_one_id'];
+    $userTwoId = $data['user_two_id'];
+
+    if ($userOneId === $userTwoId) {
+        echo json_encode(['success' => false, 'message' => 'You cannot connect with yourself']);
+        return;
+    }
+
+    $connectionModel = $this->connectionsModel;
+
+    error_log("userOneId: $userOneId | userTwoId: $userTwoId");
+
+    if ($connectionModel->connectionExists($userOneId, $userTwoId)) {
+        echo json_encode(['success' => false, 'message' => 'You are already connected.']);
+        return;
+    }
+
+    $result = $connectionModel->sendConnectionRequest($userOneId, $userTwoId);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Connection request sent']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to send connection request']);
     }
 }
 
