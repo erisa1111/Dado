@@ -24,5 +24,13 @@ if (!isset($data['user_one_id'], $data['user_two_id'])) {
 }
 
 $controller = new ConnectionsController();
-$controller->handleSendConnectionRequest();
-exit; 
+$action = $data['action'] ?? 'add';  // default to 'add' if not provided
+
+$controller = new ConnectionsController();
+
+if ($action === 'remove') {
+    $controller->handleRemoveConnection($data['user_one_id'], $data['user_two_id']);
+} else {
+    $controller->handleSendConnectionRequest($data['user_one_id'], $data['user_two_id']);
+}
+exit;

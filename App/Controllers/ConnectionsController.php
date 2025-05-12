@@ -77,6 +77,9 @@ class ConnectionsController
                  $response = $this->connectionsModel->sendConnectionRequest($userOneId, $userTwoId);
                  $success = $response['success'] ?? false;
                 break;
+            case 'remove':
+                 $success = $this->connectionsModel->deleteConnection($userOneId, $userTwoId);
+                break;    
             default:
                  $response = ['success' => false, 'message' => 'Invalid action'];
         }
@@ -92,6 +95,29 @@ class ConnectionsController
             header('Location: /connections');
             exit;
         }
+    }
+}
+public function handleRemoveConnection($userOneId, $userTwoId) {
+    error_log("handleRemoveConnection called");
+
+    if ($userOneId === $userTwoId) {
+        echo json_encode(['success' => false, 'message' => 'You cannot remove yourself']);
+        return;
+    }
+
+    $connectionModel = $this->connectionsModel;
+
+    if (!$connectionModel->connectionExists($userOneId, $userTwoId)) {
+        echo json_encode(['success' => false, 'message' => 'Connection does not exist']);
+        return;
+    }
+
+    $result = $connectionModel->deleteConnection($userOneId, $userTwoId);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Connection removed successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to remove connection']);
     }
 }
 

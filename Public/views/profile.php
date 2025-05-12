@@ -313,6 +313,7 @@ if (!$userData) {
       <script>
 document.addEventListener("DOMContentLoaded", function() {
     const connectButtons = document.querySelectorAll('.follow-btn[data-recipient-id]');
+    
     connectButtons.forEach(button => {
         const recipientId = button.getAttribute('data-recipient-id');
         const senderId = document.getElementById('current-user-id').getAttribute('data-user-id');  // Make sure this is in your HTML
@@ -327,14 +328,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 alert('You cannot connect with yourself.');
                 return;
             }
+
             // 1. Check connection status before sending
             console.log('Checking connection status...');
-
-            checkConnectionStatus(senderId, recipientId, button);
+            await checkConnectionStatus(senderId, recipientId, button);  // Refresh status before doing anything else
             console.log('Connection status checked');
             console.log('Button innerHTML:', button.innerHTML);
-            // 2. Send connection request only if status is 'none'
+
+            // 2. Send connection request only if status is 'none' (Not already pending or connected)
             if (button.innerHTML !== 'Connect') return;  // Avoid sending if status is 'pending' or 'connected'
+
             try {
                 console.log('Sending connection request...');
                 const response = await fetch('/handle_connection.php', {
@@ -352,14 +355,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.log(data); 
                 console.log('Response received:', data);
                 console.log('Response status:', response.status);
+
                 if (data.success) {
                     alert('Connection request sent successfully!');
                     button.disabled = true;
                     button.innerHTML = 'Request Sent';
-                } if(data.status==="pending") {
+                } else if (data.status === "pending") {
                     button.innerHTML = 'Request Sent';
                     alert('Failed to send connection request: ' + data.message);
-                }if (data.status==="connected"){
+                } else if (data.status === "connected") {
                     button.innerHTML = 'Connected';
                     alert('You are already connected with this user.');
                 }
@@ -369,6 +373,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+
     // Function to check connection status
     async function checkConnectionStatus(senderId, recipientId, button) {
         try {
@@ -376,21 +381,74 @@ document.addEventListener("DOMContentLoaded", function() {
             const statusResponse = await fetch(`/api/connection_status.php?sender_id=${senderId}&receiver_id=${recipientId}`);
             const statusData = await statusResponse.json();
             console.log("Initial status check:", statusData);
+
             if (statusData.status === 'connected') {
-                button.innerHTML = 'Connected';
-                button.disabled = true;
+                button.innerHTML = 'Unfollow';
+                button.disabled = false;
+
+                // Remove the previous event listener (if any) to avoid multiple listeners
+                button.removeEventListener('click', handleUnfollow);
+
+                // Add the unfollow handler
+                button.addEventListener('click', handleUnfollow);
+
             } else if (statusData.status === 'pending') {
                 button.innerHTML = 'Request Sent';
                 button.disabled = true;
+
             } else {
                 button.innerHTML = 'Connect';
                 button.disabled = false;
+
+                // Remove the unfollow event listener when switching to "Connect"
+                button.removeEventListener('click', handleUnfollow);
             }
         } catch (error) {
             console.error('Error loading initial connection status:', error);
         }
     }
+
+    // Unfollow handler
+    async function handleUnfollow(e) {
+        e.stopImmediatePropagation();
+        const confirmUnfollow = confirm("Are you sure you want to unfollow?");
+        if (!confirmUnfollow) return;
+
+        const senderId = document.getElementById('current-user-id').getAttribute('data-user-id');
+        const recipientId = e.target.getAttribute('data-recipient-id');
+        
+        try {
+            const response = await fetch('/handle_connection.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    action: 'remove',
+                    user_one_id: senderId,
+                    user_two_id: recipientId
+                })
+            });
+            const result = await response.json();
+            console.log("Unfollow result:", result);
+            if (result.success) {
+                e.target.innerHTML = 'Connect';  // Change the button back to "Connect"
+                alert('You have unfollowed the user.');
+                // Remove unfollow listener after success
+                e.target.removeEventListener('click', handleUnfollow);
+                checkConnectionStatus(senderId, recipientId, e.target);  // Refresh status
+            } else {
+                alert('Failed to unfollow: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error unfollowing:', error);
+            alert('An error occurred while trying to unfollow.');
+        }
+    }
 });
+
+
     </script>
 </body>
 
