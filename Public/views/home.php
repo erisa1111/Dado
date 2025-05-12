@@ -27,7 +27,6 @@ if (!$userData) {
 ?>
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,28 +46,7 @@ if (!$userData) {
     <br><br><br><br><br><br><br><br>
     <div class="content">
         <div class="left">
-            <div class="profile">
-           
-                <div class="photo">
-                   
-                    <img 
-                        class="profile-image" 
-                        src="/assets/img/default_profile.webp" 
-                        alt="Profile Image">
-                    <div class="info">
-                        <h3 class="name"><?= htmlspecialchars($userData['name']) . ' ' . htmlspecialchars($userData['surname']) ?></h3>
-                        <p class="status"><?= htmlspecialchars($userData['username']) ?></p>
-                    </div>
-                </div>
-        
-                <div class="bio">
-                    
-                    <div class="bio-box">
-                        <p>Hello im a nanny and i have specialized in childcare</p>
-                    </div>
-                </div>
-               
-            </div>
+            <?php include __DIR__ . '/../components/profile_card/profile_card.php'; ?>
           
             <div class="recent">
                 <div class="image-container">
