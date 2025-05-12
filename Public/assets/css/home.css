@@ -845,3 +845,76 @@ button.cancel-edit:hover{
 }
 
 
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal-content input[type="text"]:focus,
+.modal-content input[type="number"]:focus,
+.modal-content textarea:focus {
+    border-color: #e2687e;
+    box-shadow: 0 0 5px rgba(226, 104, 126, 0.3);
+}
+
+/* Two columns layout inside modal */
+.two-cols {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.two-cols .form-group {
+    flex: 1 1 45%; /* Take ~half of the space but responsive */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make the modal content scrollable if it gets too long */
+.modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding-right: 20px; /* extra padding for scrollbar */
+}
+
+/* Customize scrollbar inside modal */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #e2687e;
+    border-radius: 4px;
+}
+.salary-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.salary-wrapper input {
+    width: 100%;
+    padding: 10px 35px 10px 10px; /* right padding for € */
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 14px;
+    text-align: left;
+}
+
+.salary-wrapper .currency-symbol {
+    position: absolute;
+    right: 30px;
+    top: 67%;
+    transform: translateY(-50%);
+    color: #555;
+    pointer-events: none;
+    font-weight: 500;
+    font-size: 14px;
+}

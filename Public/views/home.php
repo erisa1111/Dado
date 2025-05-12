@@ -10,6 +10,7 @@ $posts = $postController->getPosts();
 
 
 
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,7 +72,15 @@ $posts = $postController->getPosts();
     <div id="center">
       <div class="add_post">
         <p>Add post..</p>
-        <button id="add"><i class="fa-regular fa-square-plus"></i></button>
+        <div class="add_buttons">
+          <button id="add"><i class="fa-regular fa-square-plus"></i></button>
+       
+   
+          <button id="add_job"><i class="fa-solid fa-briefcase"></i></button>
+
+
+        </div>
+
       </div>
 
       <div id="post-modal" class="modal" style="display: none;">
@@ -92,6 +101,41 @@ $posts = $postController->getPosts();
 
         </div>
       </div>
+      <div id="jobpost-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <button id="close-jobpost-modal" class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+    <h2>Create Job Post</h2>
+    <form id="jobpost-form">
+      <label for="job-title">Job Title</label>
+      <input type="text" id="job-title" placeholder="Enter job title" required />
+
+      <label for="job-description">Description</label>
+      <textarea id="job-description" placeholder="Describe the job..." required></textarea>
+
+      <label for="job-location">Location</label>
+      <input type="text" id="job-location" placeholder="Enter location" required />
+
+      <div class="two-cols">
+    <div class="form-group salary-wrapper">
+        <label for="salary">Salary</label>
+        <input type="number" id="salary" placeholder="Salary...">
+        <span class="currency-symbol">€</span>
+    </div>
+    <div class="form-group">
+        <label for="schedule">Schedule</label>
+        <input type="text" id="schedule" placeholder="e.g. Full-time, Part-time">
+    </div>
+</div>
+
+
+      <label for="job-num-kids">Number of Kids</label>
+      <input type="number" id="job-num-kids" placeholder="Enter number of kids" min="0" />
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</div>
+
 
       <?php foreach ($posts as $post): ?>
         <div class="post" id="post-<?php echo $post['id']; ?>">
@@ -110,15 +154,15 @@ $posts = $postController->getPosts();
                   <button type="button" class="edit-post" data-post-id="<?php echo $post['id']; ?>">
                     <i class="fas fa-edit"></i> Edit
                   </button>
-                  <button type="button"class="delete-post" data-post-id="<?php echo $post['id']; ?>">
+                  <button type="button" class="delete-post" data-post-id="<?php echo $post['id']; ?>">
                     <i class="fas fa-trash"></i> Delete
                   </button>
                 </div>
               </div>
             <?php endif; ?>
-        
+
           </div>
-          <div class="post-content" >
+          <div class="post-content">
             <?php echo htmlspecialchars($post['body']); ?>
           </div>
           <?php if (!empty($post['image_url'])): ?>
@@ -138,46 +182,44 @@ $posts = $postController->getPosts();
             <div class="likes"><?php echo $post['like_count']; ?> likes</div>
             <div class="comments"><?php echo $post['comment_count']; ?> comments</div>
           </div>
-          
+
 
           <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>" style="display:none">
             <div class="no-comments">No comments yet</div>
           </div>
           <div class="post-comment">
-          <input
-  type="text"
-  id="comment-<?php echo $post['id']; ?>" name="comment" placeholder="Add a comment..."
+            <input type="text" id="comment-<?php echo $post['id']; ?>" name="comment" placeholder="Add a comment..."
               class="comment-input" data-post-id="<?php echo $post['id']; ?>">
             <button id="submit-comment" data-post-id="<?php echo $post['id']; ?>">
               <i class="fa-regular fa-paper-plane"></i>
             </button>
             <div id="current-user-id" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
           </div>
-          </div>
-          <?php endforeach; ?>
+        </div>
+      <?php endforeach; ?>
 
-          <!-- Edit Post Modal -->
-<div id="editModal" class="modal2" style="display:none;">
-  <div class="modal2-content">
-    <span class="close" id="editClose">&times;</span>
-    <h3>Edit Post</h3>
-    <textarea id="editContent"></textarea>
-    <input type="file" id="editImage">
-    <button id="saveEdit">Save Changes</button>
-  </div>
-</div>
+      <!-- Edit Post Modal -->
+      <div id="editModal" class="modal2" style="display:none;">
+        <div class="modal2-content">
+          <span class="close" id="editClose">&times;</span>
+          <h3>Edit Post</h3>
+          <textarea id="editContent"></textarea>
+          <input type="file" id="editImage">
+          <button id="saveEdit">Save Changes</button>
+        </div>
+      </div>
 
-<!-- Delete Post Modal -->
-<div id="deleteModal" class="modal2" style="display:none;">
-  <div class="modal2-content">
-    <span class="close" id="deleteClose">&times;</span>
-    <h3>Are you sure you want to delete this post?</h3>
-    <button id="confirmDelete">Yes, Delete</button>
-    <button id="cancelDelete">Cancel</button>
-  </div>
-</div>
+      <!-- Delete Post Modal -->
+      <div id="deleteModal" class="modal2" style="display:none;">
+        <div class="modal2-content">
+          <span class="close" id="deleteClose">&times;</span>
+          <h3>Are you sure you want to delete this post?</h3>
+          <button id="confirmDelete">Yes, Delete</button>
+          <button id="cancelDelete">Cancel</button>
+        </div>
+      </div>
 
-          </div>
+    </div>
 
 
 

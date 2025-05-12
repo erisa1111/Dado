@@ -1,4 +1,10 @@
 initializeModal();
+document.addEventListener("DOMContentLoaded", function() {
+    // Your code here
+    initializeModalJob();
+});
+
+
 
 
 document.getElementById('post-form').addEventListener('submit', async function(e) {
@@ -49,9 +55,16 @@ document.getElementById('post-form').addEventListener('submit', async function(e
 });  
 
 
-// Add this function to your home.js
 function toggleModalVisibility(show) {
     const modal = document.getElementById('post-modal');
+    if (show) {
+        modal.style.display = 'block';
+    } else {
+        modal.style.display = 'none';
+    }
+}
+function toggleModalVisibilityJob(show) {
+    const modal = document.getElementById('jobpost-modal');
     if (show) {
         modal.style.display = 'block';
     } else {
@@ -102,6 +115,28 @@ function initializeModal() {
     modal.addEventListener('click', (event) => {
         if (event.target === modal) {
             toggleModalVisibility(false);
+        }
+    });
+}
+function initializeModalJob() {
+    const addButton = document.getElementById('add_job');
+    const closeButton = document.getElementById('close-jobpost-modal');
+    const modal = document.getElementById('jobpost-modal');
+
+    // Show modal when Add button is clicked
+    addButton.addEventListener('click', () => {
+        toggleModalVisibilityJob(true);
+    });
+
+    // Hide modal when Close button is clicked
+    closeButton.addEventListener('click', () => {
+        toggleModalVisibilityJob(false);
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            toggleModalVisibilityJob(false);
         }
     });
 }
