@@ -23,7 +23,10 @@ $connectionsController = new App\Controllers\ConnectionsController();
 //$connections = $connectionsController->getConnections(); 
 $allConnections = $connectionsController->getConnections($user_id);
 error_log("All connections: " . print_r($allConnections, true));
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,29 +46,7 @@ error_log("All connections: " . print_r($allConnections, true));
     <br><br><br><br><br><br><br><br>
     <div class="content">
         <div class="left">
-            <div class="profile">
-           
-                <div class="photo">
-                   
-                    <img 
-                        class="profile-image" 
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s" 
-                        alt="Profile Image"
-                    >
-                    <div class="info">
-                        <h3 class="name">Filan Fisteku</h3>
-                        <p class="status">Status</p>
-                    </div>
-                </div>
-                
-                <div class="bio">
-                    
-                    <div class="bio-box">
-                        <p>Hello im a nanny and i have specialized in childcare</p>
-                    </div>
-                </div>
-               
-            </div>
+            <?php include __DIR__ . '/../components/profile_card/profile_card.php'; ?>
           
             <div class="recent">
                 <div class="image-container">
