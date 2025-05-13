@@ -15,7 +15,7 @@ class PostsController
 
     public function __construct()
     {
-        session_start(); // Add this line
+       // session_start(); // Add this line
 
         $database = new Database();
        $this->db = $database->connect();
