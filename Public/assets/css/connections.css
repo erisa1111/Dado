@@ -36,9 +36,9 @@ body {
   display: flex;
   flex-direction: column;
   height: 90vh;
-  width: 50%;
+  width: 100%;
   overflow-y: auto;
-  padding: 10px;
+  /*padding: 10px;*/
   border-radius: 10px;
 
 }
@@ -360,4 +360,115 @@ body {
 
 .app a:hover {
   color: #e2687e;
+}
+
+
+.connection-filters {
+  display: flex;
+  /*justify-content: center;*/
+  margin-left: 3%;
+  /*gap: 10px;*/
+  /*margin-bottom: 2px;*/
+}
+.filter-btn {
+  /*padding: 6px 5px;*/
+  font-size: 14px;
+ /* border: 1px solid #e2687e;*/
+ /* background-color: white;*/
+  color: #251f20;
+  /*border-radius: 20px;*/
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.filter-btn:hover,
+.filter-btn.active {
+  /*background-color: #e2687e;*/
+  color: #e2687e;
+}
+#qendra {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  width: 50%;
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+#connections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+.connection-filters{
+  gap:10px;
+}
+/* Full-width wrapper */
+.empty-connections-wrapper {
+    width: 100%;
+    margin-top: 0px;
+   
+}
+
+/* Centered container with max-width */
+.empty-connections-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 0 auto;
+    padding: 0px;
+}
+
+/* Content box styling */
+.empty-connections {
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+    border-radius: 12px;
+    background: #f8f9fa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Rest of your empty state styles */
+.empty-icon {
+    font-size: 3rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+.empty-connections h3 {
+    color: #343a40;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.empty-connections p {
+    color: #6c757d;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.find-connections-btn {
+    background-color: #f9e4e7;
+    color:rgb(104, 103, 103);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.find-connections-btn:hover {
+    background-color: #e2687e;
+    color:white;
+}
+
+.find-connections-btn i {
+    font-size: 0.9rem;
 }

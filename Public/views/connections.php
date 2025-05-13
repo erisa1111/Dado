@@ -1,3 +1,32 @@
+<?php
+session_start();
+
+// Session handling
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+$user_id = $_SESSION['user_id'] ?? null;
+
+error_log("User ID from session: " . $user_id);
+
+if (!$user_id) {
+    echo "User not logged in.";
+    exit;
+}
+require_once __DIR__ . '/../../App/Models/Connections.php';
+require_once __DIR__ . '/../../App/Controllers/ConnectionsController.php';
+require_once __DIR__ . '/../../Config/Database.php';
+// Initialize the controller
+$connectionsModel = new \App\Models\Connections();
+$connectionsController = new App\Controllers\ConnectionsController();
+//$connections = $connectionsController->getConnections(); 
+$allConnections = $connectionsController->getConnections($user_id);
+error_log("All connections: " . print_r($allConnections, true));
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,29 +46,7 @@
     <br><br><br><br><br><br><br><br>
     <div class="content">
         <div class="left">
-            <div class="profile">
-           
-                <div class="photo">
-                   
-                    <img 
-                        class="profile-image" 
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s" 
-                        alt="Profile Image"
-                    >
-                    <div class="info">
-                        <h3 class="name">Filan Fisteku</h3>
-                        <p class="status">Status</p>
-                    </div>
-                </div>
-                
-                <div class="bio">
-                    
-                    <div class="bio-box">
-                        <p>Hello im a nanny and i have specialized in childcare</p>
-                    </div>
-                </div>
-               
-            </div>
+            <?php include __DIR__ . '/../components/profile_card/profile_card.php'; ?>
           
             <div class="recent">
                 <div class="image-container">
@@ -52,10 +59,48 @@
               </div>
               
         </div>
-        <div id="center">
+        <div id="qendra">
+          
+  <!-- <div class="connection-filters">
+    <span class="filter-btn active" id="connected-btn">Connected</span>
+    <span class="filter-btn" id="pending-btn">Pending Requests</span>
+</div> -->
+  <div id="center">
+    <div id="current-user-id" data-user-id="<?= htmlspecialchars($_SESSION['user_id']) ?>"></div>
+  <?php if (empty($allConnections)): ?>
+      <div class="empty-connections-wrapper">
+            <div class="empty-connections-container">
+                <div class="empty-connections">
+                    <div class="empty-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <h3>You don't have any connections yet!</h3>
+                    <p>Start growing your network by connecting with other users.</p>
+                    <button class="find-connections-btn" onclick="window.location.href='/search'">
+                        <i class="fas fa-search"></i> Find connections
+                    </button>
+                </div>
+            </div>
         </div>
+<?php else: ?>
+  <div id="connections-list">
+    <?php foreach ($allConnections as $connection): 
+        // Optional: implement logic to get user image from DB if available
+        $profile_image = 'https://w7.pngwing.com/pngs/584/113/png-transparent-pink-user-icon.png'; // Placeholder
 
+        // Extract and pass variables
+        $sender_name = $connection['sender_name'] ?? 'Unknown';
+        $sender_surname = $connection['sender_surname'] ?? '';
+        $message = $connection['message'] ?? 'Sent you a connection request';
+        $status = $connection['status'];
+        $created_at = $connection['created_at'];
 
+        include __DIR__ . '/../components/connections_card/connections_card.php';
+    endforeach; ?>
+</div>
+    <?php endif; ?>
+</div>
+        </div>
         <div class="right">
             <div class="recommend">
               <h2>Add to your feed</h2>
@@ -114,5 +159,6 @@
  
 </body>
 </html>
+
 <script src="../components/nav_home/nav_home.js"></script>
 <script src="../components/connections_card/connections_card.js"></script>

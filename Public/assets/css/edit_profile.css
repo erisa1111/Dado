@@ -1,0 +1,81 @@
+ body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    padding: 20px;
+    }
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container input,
+.form-container textarea {
+    width: 100%;
+    padding: 10px;
+    /* margin: 8px 0; */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.form-container label {
+    font-weight: bold;
+    /* margin-bottom: 5px; */
+    display: inline-block;
+    margin-top: 15px;
+    color: #444;
+}
+
+.form-container textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-container button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-block: 15px;
+}
+
+.form-container button:hover {
+    background-color: #45a049;
+}
+
+.profile_image {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile_image img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.form-container input[type="file"] {
+    padding: 6px;
+    border: 1px solid #ccc;
+}
+
+.error-message {
+    color: red;
+    text-align: center;
+}

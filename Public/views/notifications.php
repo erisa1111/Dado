@@ -1,3 +1,21 @@
+<?php
+session_start(); // Start session to access $_SESSION data
+use App\Models\User;
+
+require_once __DIR__ . '/../../App/Models/User.php'; // Adjust path if needed
+if (!isset($_SESSION['user_id'])) {
+    echo "No user logged in!";
+    header('Location: login.php');
+    exit();
+}
+$userModel = new User();
+$userData = $userModel->getProfile($_SESSION['user_id']);
+if (!$userData) {
+    echo "User not found.";
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,27 +35,7 @@
   <br><br><br><br><br><br><br><br>
   <div class="content">
     <div class="left">
-      <div class="profile">
-
-        <div class="photo">
-
-          <img class="profile-image"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s"
-            alt="Profile Image">
-          <div class="info">
-            <h3 class="name">Filan Fisteku</h3>
-            <p class="status">Status</p>
-          </div>
-        </div>
-
-        <div class="bio">
-
-          <div class="bio-box">
-            <p>Hello im a nanny and i have specialized in childcare</p>
-          </div>
-        </div>
-
-      </div>
+      <?php include __DIR__ . '/../components/profile_card/profile_card.php'; ?>
 
       <div class="recent">
         <div class="image-container">
