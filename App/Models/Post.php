@@ -22,9 +22,16 @@ class Post
 
     public function create($userId, $title, $body, $imageUrl = null)
     {
+        /*var_dump($userId, $title, $body, $imageUrl);
         $stmt = $this->db->prepare("CALL create_post(?, ?, ?, ?)");
         $stmt->execute([$userId, $title, $body, $imageUrl]);
-        return true;
+        return true;*/
+        $stmt = $this->db->prepare("CALL create_post(?, ?, ?, ?)");
+    $stmt->execute([$userId, $title, $body, $imageUrl]);
+
+    // Assume your SP does SELECT LAST_INSERT_ID(); after insert
+    $result = $stmt->fetch();
+    return $this->db->lastInsertId(); 
     }
 
     public function like($postId, $userId)
@@ -51,4 +58,17 @@ class Post
         $stmt->execute([$postId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+        public function updatePost($postId, $content) {
+        $stmt = $this->db->prepare("CALL update_post(:post_id, :content)");
+        $stmt->bindParam(':post_id', $postId);
+        $stmt->bindParam(':content', $content);
+        return $stmt->execute();
+    }
+
+    public function deletePost($postId) {
+        $stmt = $this->db->prepare("CALL delete_post(:post_id)");
+        $stmt->bindParam(':post_id', $postId);
+        return $stmt->execute();
+    }
+
 }
