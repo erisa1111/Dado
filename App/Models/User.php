@@ -107,6 +107,13 @@ class User
         }
     }
 
+  public function isUsernameTaken($username) {
+    // Use the already established connection ($this->conn)
+    $stmt = $this->conn->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    return $stmt->fetchColumn() > 0;
+}
+
 
 
 }

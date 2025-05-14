@@ -14,7 +14,15 @@ class AuthController
         exit();
     }
 
-    public function signup()
+    public function checkUsername()
+{
+    $userModel = new User();
+    $username = $_GET['username'] ?? '';
+    $isTaken = $userModel->isUsernameTaken($username);
+    echo json_encode(['taken' => $isTaken]);
+}
+
+   public function signup()
 {
     $userModel = new User();
 
@@ -28,6 +36,12 @@ class AuthController
     $gender = $_POST['gender'];
     $user_type = $_POST['role']; // 'nanny' or 'parent'
 
+    // NEW: Check if username is already taken
+    if ($userModel->isUsernameTaken($username)) {
+    $redirectUrl = ($user_type == 'parent') ? '/views/signup_p.php?error=username' : '/views/signup_n.php?error=username';
+    header("Location: $redirectUrl");
+    exit();
+}
     // Map user type to role_id
     $role_id = ($user_type === 'nanny') ? 2 : 0;
 
@@ -50,7 +64,7 @@ class AuthController
         'password' => $password,
         'location' => $location,
         'gender' => $gender,
-        'role_id' => $role_id, // pass role_id instead
+        'role_id' => $role_id,
         'expected_salary' => $expected_salary,
         'experience' => $experience,
         'schedule' => $schedule,
@@ -58,18 +72,9 @@ class AuthController
 
     $validationResult = Validation::validateSignupData($data);
 
-    // If validation fails, show the error message
     if ($validationResult !== true) {
         echo "<div class='error-message'>" . $validationResult . "</div>";
-
-        // Include the correct signup form based on the user type
-        // if ($user_type == 'nanny') {
-        //     include __DIR__ . '/index.php'; // Nanny signup form
-        // } else {
-        //     include __DIR__ . '/index.php'; // Parent signup form
-        // }
-
-        return; // Stop further execution
+        return;
     }
 
     try {
