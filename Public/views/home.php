@@ -51,28 +51,8 @@ if (!$userData) {
   <br><br><br><br><br><br><br><br>
   <div class="content">
     <div class="left">
-      <div class="profile">
+      <?php include __DIR__ . '/../components/profile_card/profile_card.php'; ?>
 
-
-        <div class="photo">
-
-          <img class="profile-image"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s"
-            alt="Profile Image">
-          <div class="info">
-            <h3 class="name">Filan Fisteku</h3>
-            <p class="status">Status</p>
-          </div>
-        </div>
-
-        <div class="bio">
-
-          <div class="bio-box">
-            <p>Hello im a nanny and i have specialized in childcare</p>
-          </div>
-        </div>
-
-      </div>
 
       <div class="recent">
         <div class="image-container">
@@ -157,9 +137,12 @@ if (!$userData) {
       <?php foreach ($posts as $post): ?>
         <div class="post" id="post-<?php echo $post['id']; ?>">
           <div class="post-header">
-            <img class="profile-img"
-              src="<?php echo htmlspecialchars($post['profile_picture'] ?? '/assets/img/dado_profile.webp'); ?>"
-              alt="User Profile">
+            <?php
+            $profilePic = !empty($post['profile_picture']) 
+              ? '/' . ltrim($post['profile_picture'], '/\\') 
+              : '/assets/img/dado_profile.webp';
+            ?>
+            <img class="profile-img" src="<?php echo htmlspecialchars($profilePic); ?>" alt="User Profile">
             <div class="details">
               <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
               <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
