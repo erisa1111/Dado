@@ -1112,3 +1112,63 @@ input#date-range {
   background: #f8f8f8;
   border-radius: 8px;
 }
+
+
+/* Job Post Styling */
+.job-post {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.job-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.job-title {
+  color: #333;
+  margin: 0 0 5px 0;
+}
+
+.job-meta {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.job-description {
+  margin: 15px 0;
+  line-height: 1.5;
+}
+
+.job-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.apply-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.feed-item {
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.post, .job-post {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+

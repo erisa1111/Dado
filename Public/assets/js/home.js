@@ -52,6 +52,77 @@ document.getElementById('post-form').addEventListener('submit', async function(e
         alert(`Error: ${error.message}`);
     }
 });  
+document.getElementById('jobpost-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    // Get values
+    const title = document.getElementById('job-title').value.trim();
+    const description = document.getElementById('job-description').value.trim();
+    const location = document.getElementById('job-location').value;
+    const salary = document.getElementById('salary').value.trim();
+    const jobType = document.querySelector('input[name="job-type"]:checked').value;
+    const numKids = document.getElementById('job-num-kids').value.trim();
+    const startHour = document.getElementById('start-hour').value.trim();
+    const endHour = document.getElementById('end-hour').value.trim();
+    const dateRange = document.getElementById('date-range').value.trim();
+
+    // Simple validation
+    if (!title || !description || !location) {
+        alert('Please fill in the required fields.');
+        return;
+    }
+
+    // If you are using a combined date range field like "2025-05-16 to 2025-05-20"
+    let dateFrom = '';
+    let dateTo = '';
+    if (dateRange.includes('to')) {
+        [dateFrom, dateTo] = dateRange.split('to').map(item => item.trim());
+    } else {
+        alert('Please select a valid date range.');
+        return;
+    }
+
+    // Append data
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('location', location);
+    formData.append('salary', salary);
+    formData.append('job_type', jobType);
+    formData.append('num_kids', numKids);
+    formData.append('start_hour', startHour);
+    formData.append('end_hour', endHour);
+    formData.append('date_from', dateFrom);
+    formData.append('date_to', dateTo);
+
+    try {
+        const response = await fetch('http://localhost:4000/views/create_jobpost.php', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message || "Job post creation failed.");
+        }
+
+        alert('Job post created successfully!');
+        toggleModalVisibility(false);  // Assuming same modal function
+        location.reload();
+
+    } catch (error) {
+        console.error("Job Post Error:", error);
+        alert(`Error: ${error.message}`);
+    }
+});
+
 
 
 function toggleModalVisibility(show) {
@@ -143,38 +214,7 @@ function initializeModalJob() {
     }
 }
 
-form.addEventListener('submit', function (e) {
-    const salaryRaw = salaryInput.value.replace(/[^0-9.]/g, '');
-    const salaryNumber = parseFloat(salaryRaw);
 
-    if (isNaN(salaryNumber) || salaryNumber <= 0) {
-        salaryInput.setCustomValidity('Please enter a valid salary like 500.00');
-        salaryInput.reportValidity();
-        e.preventDefault();
-        return;
-    }
-
-    salaryInput.value = salaryNumber.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    salaryInput.setCustomValidity('');
-
-    // Dates validation
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
-    if (new Date(startDate) >= new Date(endDate)) {
-        alert('End Date must be after Start Date.');
-        e.preventDefault();
-        return;
-    }
-
-    // Hours validation
-    const startHour = document.getElementById('start-hour').value;
-    const endHour = document.getElementById('end-hour').value;
-    if (startHour >= endHour) {
-        alert('End Hour must be after Start Hour.');
-        e.preventDefault();
-        return;
-    }
-});
 
 
 
