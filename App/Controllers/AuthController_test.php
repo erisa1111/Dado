@@ -6,6 +6,7 @@ require_once __DIR__ . '/AuthController.php';
 require_once __DIR__ . '/../../App/Models/User.php';
 require_once __DIR__ . '/../../App/Helpers/Validation.php';
 require_once __DIR__ . '/../../Config/Database.php'; // Adjust path if needed
+require_once __DIR__ . '/../../App/vendor/autoload.php';
 
 use App\Controllers\AuthController;
 
@@ -26,6 +27,27 @@ $output = ob_get_clean();
 
 echo "Output for checkUsername(): <pre>$output</pre>";
 
+echo "<h2>Testing checkEmail()</h2>";
+
+// $_GET['email'] = 'flagmatoshi@gmail.com'; // Use an email that already exists in your DB
+
+// ob_start();
+// $authController->checkEmail(); // Should return JSON like {"taken":true}
+// $output = ob_get_clean();
+
+//echo "Output for checkEmail(): <pre>$output</pre>";
+
+// 2. ✅ Testing verifyEmail() method
+echo "<h2>Testing verifyEmail()</h2>";
+
+// Set a token value (replace with a valid token from your DB for accurate test)
+$_GET['token'] = '5f7e68e28f7979be6e86a405ad656717';
+
+ob_start();
+$authController->verifyEmail(); // This might redirect or output a message
+$output = ob_get_clean();
+
+echo "Output for verifyEmail(): <pre>$output</pre>";
 
 // 2. ✅ Testing signup() method with POST data
 echo "<h2>Testing signup()</h2>";

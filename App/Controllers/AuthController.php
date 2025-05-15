@@ -4,6 +4,8 @@ require_once __DIR__ . '/../Helpers/Validation.php';
 
 use App\Models\User;
 use App\Helpers\Validation;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class AuthController
 {
@@ -21,6 +23,79 @@ class AuthController
     $isTaken = $userModel->isUsernameTaken($username);
     echo json_encode(['taken' => $isTaken]);
 }
+public function verifyEmail()
+{
+    $token = $_GET['token'] ?? null;
+    if (!$token) {
+        header('Location: /login?error=invalid_token');
+        exit();
+    }
+
+    $userModel = new User();
+    if ($userModel->verifyUser($token)) {
+        // verifyUser should UPDATE users SET is_verified=1 WHERE token=…
+        header('Location: /login?verified=1');
+    } else {
+        header('Location: /login?error=verification_failed');
+    }
+    exit();
+}
+    
+private function sendWelcomeEmail($toEmail, $name, $verificationToken)
+
+{
+    // Include the Composer autoloader
+    require_once __DIR__ . '/../vendor/autoload.php';
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+                ? 'https' 
+                : 'http';
+    $host   = $_SERVER['HTTP_HOST'];             // e.g. "localhost:8000"
+    $baseUrl = "{$scheme}://{$host}";
+
+    // 2) Construct the full verification URL
+    $verificationUrl = "{$baseUrl}/verify-email?token={$verificationToken}";
+    try {
+        $mail = new PHPMailer(true);
+    // Server settings - Updated with Gmail config
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'erisamatoshi@gmail.com';
+        $mail->Password   = 'csdh napr ujin gtzo';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+        $mail->SMTPDebug  = 0; // Enable verbose debug output
+
+        // Recipients
+        $mail->setFrom('no-reply@yourdomain.com', 'DADO');
+        $mail->addAddress($toEmail, $name);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'Welcome to Our Platform!';
+        
+        //$verificationUrl = "http://yourdomain.com/verify-email?token=$verificationToken";
+        
+        $mail->Body = "<h1>Welcome, $name!</h1>
+            <p>Thank you for signing up to our platform.</p>
+            <p>Please verify your email address by clicking the link below:</p>
+            <p><a href='$verificationUrl'>Verify Email Address</a></p>";
+        
+        $mail->AltBody = "Welcome, $name!\n\nVerify your email: $verificationUrl";
+
+        if (!$mail->send()) {
+            error_log("Mailer Error: " . $mail->ErrorInfo);
+            return false;
+        }
+        
+        return true;
+
+    } catch (Exception $e) {
+        error_log("PHPMailer Exception: " . $e->getMessage());
+        return false;
+    }
+}
+
 
    public function signup()
 {
@@ -73,21 +148,42 @@ class AuthController
     $validationResult = Validation::validateSignupData($data);
 
     if ($validationResult !== true) {
-        echo "<div class='error-message'>" . $validationResult . "</div>";
+       // echo "<div class='error-message'>" . $validationResult . "</div>";
         return;
     }
 
-    try {
-        $userModel->createUser($data);
+ try {
+        $success = $userModel->createUser($data);
+
+        if ($success) {
+            // echo "User created successfully.<br>";
+
+            $userId = $userModel->getLastInsertId();
+           // echo "User ID: $userId<br>";
+
+            $verificationToken = bin2hex(random_bytes(32));
+           // echo "Verification token: $verificationToken<br>";
+
+            $userModel->storeVerificationToken($userId, $verificationToken);
+           // echo "Verification token stored.<br>";
+
+            $emailSent = $this->sendWelcomeEmail($email, $name, $verificationToken);
+           // echo "sendWelcomeEmail returned: " . ($emailSent ? "true" : "false") . "<br>";
+        } else {
+            echo "User creation failed.<br>";
+        }
+
+        // Comment out redirect for now so you see above messages
         header('Location: views/login.php');
         exit();
+
     } catch (\Exception $e) {
         echo "Signup failed: " . $e->getMessage();
     }
 }
 
 
-public function login()
+function login()
 {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         include __DIR__ . '/../../Public/views/login.php';
@@ -115,6 +211,14 @@ public function login()
         var_dump($user); // or echo '<pre>' . print_r($user, true) . '</pre>';
 
         if ($user) {
+    // ← Insert the “verified?” check right here:
+     if (empty($user['is_verified'])) {
+        // user hasn’t clicked the link yet:
+        echo "Please verify your email before logging in.";
+        return;
+    }
+
+        if ($user) {
             // Check if password_hash exists before verifying
             if (isset($user['password_hash']) && password_verify($password, $user['password_hash'])) {
                 // Password is correct, start the session
@@ -135,7 +239,7 @@ public function login()
         }
     }
 }
-
+}
 
     public function logout(){
         // Start the session to access session variables

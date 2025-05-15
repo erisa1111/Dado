@@ -70,11 +70,12 @@ select {
     margin: 10px 0px;
     background-color: #eee;
     width: 90%;
-    border: none;
+    border-color: #a5a4a4;
+    /*border: none ;*/
     padding: 12px 15px;
     padding-left: 10px;
     border-radius: 5px;
-    color: #777777;
+    color: #121111;
 }
 
 

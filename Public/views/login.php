@@ -11,6 +11,21 @@
 <body>
 
     <div class="container" id="container">
+        <?php if (!empty($_GET['error'])): ?>
+  <div class="error">
+    <?php if ($_GET['error'] === 'not_verified'): ?>
+      Please verify your email before logging in.
+    <?php else: /* invalid_credentials */ ?>
+      Invalid username or password.
+    <?php endif; ?>
+  </div>
+<?php endif; ?>
+
+<?php if (!empty($_GET['verified'])): ?>
+  <div class="success">
+    Your email was verified! You can now log in.
+  </div>
+<?php endif; ?>
 
         <div class="form-container sign-in-container">
         <form action="/login" method="POST">

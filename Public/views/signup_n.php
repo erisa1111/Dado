@@ -43,7 +43,13 @@ $role = isset($_GET['role']) ? $_GET['role'] : null;
                     <option value="M" style="color:black;">Male</option>
                 </select>
                 <input type="text" id="expected_salary" name="expected_salary" placeholder="Avg Wage (e.g., 1000.00)" required />
-                <input type="text" name="experience" placeholder="Experience (in years)" required />
+                <select name="experience" required>
+    <option value="" disabled selected hidden>Select Experience</option>
+    <option value="Less than a year">Less than a year</option>
+    <option value="1 year +">1 year +</option>
+    <option value="2 years +">2 years +</option>
+    <option value="5 years +">5 years +</option>
+</select>
                 <select name="schedule" required>
                     <option value="" disabled selected hidden>Select Schedule</option>
                     <option value="Full-Time">Full-Time</option>
