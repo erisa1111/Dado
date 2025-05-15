@@ -116,6 +116,8 @@ public function login()
                 session_start();
                 $_SESSION['user_id'] = $user['id']; // Use 'id' instead of 'user_id'
                 $_SESSION['username'] = $user['username'];
+                $_SESSION['role_id'] = $user['role_id']; // Store role_id from DB
+
 
                 // Redirect to the dashboard or home page
                 header('Location: views/home.php'); // Replace with your actual redirect page

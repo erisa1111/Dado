@@ -15,10 +15,12 @@ class PostsController
 
     public function __construct()
     {
-        session_start(); // Add this line
+        if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}// Add this line
 
         $database = new Database();
-       $this->db = $database->connect();
+        $this->db = $database->connect();
         $this->postModel = new Post($this->db);
    
     }

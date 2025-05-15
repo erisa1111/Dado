@@ -1,6 +1,5 @@
-initializeModal();
-document.addEventListener("DOMContentLoaded", function() {
-    // Your code here
+document.addEventListener('DOMContentLoaded', function() {
+    initializeModal();
     initializeModalJob();
 });
 
@@ -123,28 +122,70 @@ function initializeModalJob() {
     const closeButton = document.getElementById('close-jobpost-modal');
     const modal = document.getElementById('jobpost-modal');
 
-    // Show modal when Add button is clicked
-    addButton.addEventListener('click', () => {
-        toggleModalVisibilityJob(true);
-    });
+    if (addButton) { // Safe check
+        addButton.addEventListener('click', () => {
+            toggleModalVisibilityJob(true);
+        });
+    }
 
-    // Hide modal when Close button is clicked
-    closeButton.addEventListener('click', () => {
-        toggleModalVisibilityJob(false);
-    });
-
-    // Close modal when clicking outside
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
             toggleModalVisibilityJob(false);
-        }
-    });
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                toggleModalVisibilityJob(false);
+            }
+        });
+    }
 }
+
+form.addEventListener('submit', function (e) {
+    const salaryRaw = salaryInput.value.replace(/[^0-9.]/g, '');
+    const salaryNumber = parseFloat(salaryRaw);
+
+    if (isNaN(salaryNumber) || salaryNumber <= 0) {
+        salaryInput.setCustomValidity('Please enter a valid salary like 500.00');
+        salaryInput.reportValidity();
+        e.preventDefault();
+        return;
+    }
+
+    salaryInput.value = salaryNumber.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    salaryInput.setCustomValidity('');
+
+    // Dates validation
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    if (new Date(startDate) >= new Date(endDate)) {
+        alert('End Date must be after Start Date.');
+        e.preventDefault();
+        return;
+    }
+
+    // Hours validation
+    const startHour = document.getElementById('start-hour').value;
+    const endHour = document.getElementById('end-hour').value;
+    if (startHour >= endHour) {
+        alert('End Hour must be after Start Hour.');
+        e.preventDefault();
+        return;
+    }
+});
+
+
+
+
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     
     setupPostHandlers();
 });
+
 
 function setupPostHandlers() {
     // Event delegation for post actions

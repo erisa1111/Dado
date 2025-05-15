@@ -1,5 +1,7 @@
 <?php
-session_start(); // Start session to access $_SESSION data
+session_start();
+
+
 use App\Models\User;
 
 require_once __DIR__ . '/../../App/Models/Post.php';
@@ -25,6 +27,8 @@ if (!$userData) {
 }
 
 
+
+
 ?>
 
 
@@ -40,6 +44,8 @@ if (!$userData) {
 
   <link rel="stylesheet" href="/components/postcard/postcard.css">
   <link rel="stylesheet" href="/components/nav_home/nav_home.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 
 </head>
 
@@ -93,7 +99,9 @@ if (!$userData) {
           <button id="add"><i class="fa-regular fa-square-plus"></i></button>
        
    
-          <button id="add_job"><i class="fa-solid fa-briefcase"></i></button>
+<?php if ($_SESSION['role_id'] == 0): ?>
+    <button id="add_job"><i class="fa-solid fa-briefcase"></i></i></button>
+<?php endif; ?>
 
 
         </div>
@@ -118,35 +126,119 @@ if (!$userData) {
 
         </div>
       </div>
-      <div id="jobpost-modal" class="modal" style="display: none;">
+   <div id="jobpost-modal" class="modal" style="display: none;">
   <div class="modal-content">
     <button id="close-jobpost-modal" class="close-modal"><i class="fa-solid fa-xmark"></i></button>
     <h2>Create Job Post</h2>
     <form id="jobpost-form">
       <label for="job-title">Job Title</label>
       <input type="text" id="job-title" placeholder="Enter job title" required />
+  <div class="two-cols">
+  <div class="form-group job-type-wrapper">
+  <label>Job Type</label>
+  <div class="job-type-buttons">
+    <input type="radio" id="part-time" name="job-type" value="Part-Time" checked>
+    <label for="part-time">Part-Time</label>
+
+    <input type="radio" id="full-time" name="job-type" value="Full-Time">
+    <label for="full-time">Full-Time</label>
+  </div>
+</div>
+<div class="loc">
+<label for="job-location">Location</label>
+<select id="job-location" required>
+  <option value="">Select City</option>
+  <option value="Prishtinë">Prishtinë</option>
+  <option value="Gjilan">Gjilan</option>
+  <option value="Ferizaj">Ferizaj</option>
+  <option value="Mitrovicë">Mitrovicë</option>
+  <option value="Pejë">Pejë</option>
+  <option value="Prizren">Prizren</option>
+  <option value="Gjakovë">Gjakovë</option>
+  <option value="Vushtrri">Vushtrri</option>
+  <option value="Podujevë">Podujevë</option>
+  <option value="Kamenicë">Kamenicë</option>
+  <option value="Viti">Viti</option>
+  <option value="Malishevë">Malishevë</option>
+  <option value="Suharekë">Suharekë</option>
+  <option value="Rahovec">Rahovec</option>
+  <option value="Deçan">Deçan</option>
+  <option value="Istog">Istog</option>
+  <option value="Skenderaj">Skenderaj</option>
+  <option value="Dragash">Dragash</option>
+  <option value="Klinë">Klinë</option>
+  <option value="Kaçanik">Kaçanik</option>
+  <option value="Lipjan">Lipjan</option>
+  <option value="Obiliq">Obiliq</option>
+  <option value="Fushë Kosovë">Fushë Kosovë</option>
+  <option value="Shtime">Shtime</option>
+  <option value="Shtërpcë">Shtërpcë</option>
+  <option value="Leposaviq">Leposaviq</option>
+  <option value="Zubin Potok">Zubin Potok</option>
+  <option value="Zvečan">Zvečan</option>
+  <option value="Graçanicë">Graçanicë</option>
+  <option value="Ranillug">Ranillug</option>
+  <option value="Kllokot">Kllokot</option>
+  <option value="Novobërdë">Novobërdë</option>
+  <option value="Parteš">Parteš</option>
+  <option value="Mitrovicë e Jugut">Mitrovicë e Jugut</option>
+  <option value="Mitrovicë e Veriut">Mitrovicë e Veriut</option>
+</select>
+</div>
+</div>
+
 
       <label for="job-description">Description</label>
       <textarea id="job-description" placeholder="Describe the job..." required></textarea>
 
-      <label for="job-location">Location</label>
-      <input type="text" id="job-location" placeholder="Enter location" required />
+      
 
       <div class="two-cols">
-    <div class="form-group salary-wrapper">
-        <label for="salary">Salary</label>
-        <input type="number" id="salary" placeholder="Salary...">
-        <span class="currency-symbol">€</span>
+        <div class="form-group salary-wrapper">
+    <label for="salary">Salary </label>
+    <div class="input-group">
+
+      <input 
+        type="text" 
+        id="salary" 
+        placeholder="e.g. 5000" 
+        inputmode="numeric"
+        required
+        oninput="formatSalary(this)"
+        onblur="finalizeSalary(this)"
+      >
     </div>
-    <div class="form-group">
-        <label for="schedule">Schedule</label>
-        <input type="text" id="schedule" placeholder="e.g. Full-time, Part-time">
-    </div>
+    <small class="helper-text">Format: 9,999.00 (2 decimal places)</small>
+  </div>
+
+
+        <div class="form-group">
+          <label for="job-num-kids">Number of Kids</label>
+          <input type="number" id="job-num-kids" placeholder="e.g. 2" min="0" required />
+        </div>
+      </div>
+
+
+
+       <div class="two-cols">
+  <div class="form-group">
+    <label for="start-hour">Start Hour</label>
+    <input type="text" id="start-hour" required  readonly style="cursor:pointer;">
+  </div>
+  <div class="form-group">
+    <label for="end-hour">End Hour</label>
+    <input type="text" id="end-hour" required  readonly style="cursor:pointer;">
+  </div>
 </div>
 
 
-      <label for="job-num-kids">Number of Kids</label>
-      <input type="number" id="job-num-kids" placeholder="Enter number of kids" min="0" />
+
+      <div class="form-group">
+    <label for="date-range">Select Date Range</label>
+    <input type="text" id="date-range" placeholder="Select date range">
+</div>
+
+      
 
       <button type="submit">Submit</button>
     </form>
@@ -157,9 +249,9 @@ if (!$userData) {
       <?php foreach ($posts as $post): ?>
         <div class="post" id="post-<?php echo $post['id']; ?>">
           <div class="post-header">
-            <img class="profile-img"
-              src="<?php echo htmlspecialchars($post['profile_picture'] ?? '/assets/img/dado_profile.webp'); ?>"
-              alt="User Profile">
+            <img class="profile-img" 
+     src="<?php echo file_exists($post['profile_picture']) ? htmlspecialchars($post['profile_picture']) : '/assets/img/dado_profile.webp'; ?>" 
+     alt="User Profile">
             <div class="details">
               <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
               <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
@@ -306,6 +398,68 @@ if (!$userData) {
     <script src="/components/nav_home/nav_home.js"></script>
     <script src="/components/postcard/postcard.js"></script>
     <script src="/assets/js/home.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+   <script>
+    flatpickr("#date-range", {
+        mode: "range",
+        minDate: "today",
+        dateFormat: "Y-m-d",
+        onChange: function(selectedDates, dateStr, instance) {
+            if (selectedDates.length === 2) {
+                // Perfect, user selected a full range, do nothing
+            } else if (selectedDates.length === 1) {
+                // User started a new selection, clear any previously selected range
+                instance.clear();
+                instance.setDate(selectedDates[0]);
+            }
+        }
+    });
+    flatpickr("#start-hour", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    minuteIncrement: 15,
+    clickOpens: true,
+  });
+
+  flatpickr("#end-hour", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    minuteIncrement: 15,
+    clickOpens: true,
+  });
+   function formatSalary(input) {
+    // Remove all formatting to get raw numbers
+    let value = input.value.replace(/[^\d]/g, '');
+    
+    // If empty, return empty
+    if (!value) return '';
+    
+    // Convert to number and format with thousand separators
+    let num = parseInt(value, 10);
+    input.value = num.toLocaleString('en-US');
+  }
+
+  function finalizeSalary(input) {
+    // Add .00 if no decimals exist
+    if (input.value && !input.value.includes('.')) {
+      input.value += '.00';
+    }
+    // Ensure exactly 2 decimal places
+    else if (input.value.includes('.')) {
+      let parts = input.value.split('.');
+      parts[1] = parts[1].padEnd(2, '0').substring(0, 2);
+      input.value = parts.join('.');
+    }
+  }
+
+    
+
+</script>
+</script>
 
 
 
