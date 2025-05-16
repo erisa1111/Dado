@@ -534,13 +534,15 @@ button.cancel-edit:hover{
 
 /* Comment Menu Styles */
 .comment-menu-wrapper,
-.post-menu-wrapper {
+.post-menu-wrapper,
+.job-post-menu-wrapper {
     position: relative;
     margin-left: auto; /* Push to the right */
 }
 
 .comment-menu-toggle,
-.post-menu-toggle {
+.post-menu-toggle,
+.job-post-menu-wrapper {
  
     background: none;
     border: none;
@@ -551,7 +553,8 @@ button.cancel-edit:hover{
 }
 
 .comment-actions,
-.post-act {
+.post-act,
+.job-post-act {
   display: none;
     position: absolute;
     right: 0;
@@ -565,7 +568,9 @@ button.cancel-edit:hover{
 }
 
 .comment-actions button,
-.post-act button{
+.post-act button,
+.job-post-act button ,
+.job-comment-act button{
     display: block;
     width: 100%;
     text-align: left;
@@ -578,7 +583,9 @@ button.cancel-edit:hover{
 }
 
 .comment-actions button:hover,
-.post-act button:hover {
+.post-act button:hover,
+.job-post-act button:hover,
+.job-comment-act button:hover {
     background: #f5f5f5;
 }
 
@@ -723,6 +730,8 @@ button.cancel-edit:hover{
     margin: 0 auto;
     margin-top: 50px;
     animation: fadeInUp 0.4s ease;
+        clip-path: inset(0 round 16px);
+
 }
 
 /* Close Modal Button */
@@ -845,6 +854,8 @@ button.cancel-edit:hover{
 
 .modal-content input[type="text"],
 .modal-content input[type="number"],
+.modal-content input[type="date"],
+.modal-content input[type="time"],
 .modal-content textarea {
     width: 100%;
     padding: 10px;
@@ -854,9 +865,22 @@ button.cancel-edit:hover{
     font-size: 14px;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
+.modal-content input::placeholder,
+.modal-content textarea::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Optional: Soft hover effect */
+.modal-content input:hover,
+.modal-content textarea:hover {
+    border-color: #ccc;
+}
 
 .modal-content input[type="text"]:focus,
 .modal-content input[type="number"]:focus,
+.modal-content input[type="date"]:focus,
+.modal-content input[type="time"]:focus,
 .modal-content textarea:focus {
     border-color: #e2687e;
     box-shadow: 0 0 5px rgba(226, 104, 126, 0.3);
@@ -865,7 +889,6 @@ button.cancel-edit:hover{
 /* Two columns layout inside modal */
 .two-cols {
     display: flex;
-    gap: 15px;
     flex-wrap: wrap;
 }
 
@@ -874,10 +897,14 @@ button.cancel-edit:hover{
     display: flex;
     flex-direction: column;
 }
+.two-cols label{
+  margin-bottom: 15px;
+}
+
 
 /* Make the modal content scrollable if it gets too long */
 .modal-content {
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
     padding-right: 20px; /* extra padding for scrollbar */
 }
@@ -915,4 +942,244 @@ button.cancel-edit:hover{
     pointer-events: none;
     font-weight: 500;
     font-size: 14px;
+}
+
+.three-cols {
+  display: flex;
+  gap: 1rem;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.radio-group input {
+  margin-right: 0.3rem;
+}
+
+.two-cols {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.two-cols .form-group {
+  flex: 1 1 45%;   /* roughly half width, same as your date inputs */
+  display: flex;
+  flex-direction: column;
+}
+
+
+.form-group {
+  flex: 1;
+  position: relative;
+}
+.job-type-buttons {
+    display: flex;
+    width: 100%;
+  
+    gap: 10px;
+}
+
+.job-type-buttons input[type="radio"] {
+    display: none;
+}
+
+.job-type-buttons label {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.job-type-buttons input[type="radio"]:checked + label {
+    background-color: #ffe6ec;
+    border-color: #e2687e;
+    color: #e2687e;
+    box-shadow: 0 0 5px rgba(226, 104, 126, 0.2);
+}
+.modal-content select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: #fff;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px 16px;
+}
+
+.modal-content select:focus {
+    border-color: #e2687e;
+    box-shadow: 0 0 5px rgba(226, 104, 126, 0.3);
+}
+.loc{
+  display: flex;
+  flex-direction: column;
+}
+/* Customize the range highlight and selected dates */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.inRange {
+    background: #ffe6ec;
+    color: #e2687e;
+    border-color: #e2687e;
+}
+
+.flatpickr-day.inRange {
+     background: #ffe6ec !important;
+  color: #e2687e !important;
+}
+
+.flatpickr-day.today {
+    border-color: #e2687e;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+input#date-range {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+/* Remove the gray outline inside the range */
+.flatpickr-day.inRange {
+    background-color: #ffe6ec !important;
+    border-color: #ffe6ec !important;
+    color: #e2687e !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Ensure start and end have clean pink and no default outlines */
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected {
+    background-color: #e2687e !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+/* Pink border and glow on focus */
+/* Input focus styling */
+#start-hour:focus, #end-hour:focus {
+  border-color: #e2687e;
+  box-shadow: 0 0 5px rgba(226, 104, 126, 0.5);
+  outline: none;
+}
+
+/* Customize flatpickr time picker */
+.flatpickr-time .flatpickr-hour,
+.flatpickr-time .flatpickr-minute {
+  border-radius: 6px;
+  color: #e2687e ; /* very light gray text */
+}
+
+.flatpickr-time .flatpickr-hour.selected,
+.flatpickr-time .flatpickr-minute.selected {
+  background-color: #e2687e !important; /* pink background */
+  color: #e2687e !important; /* light text */
+  border-radius: 8px !important;
+}
+
+/* If your entire .modal is scrollable */
+.modal {
+
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #e2687e #f8f8f8;
+}
+
+.modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background-color: #e2687e;
+  border-radius: 8px;
+}
+
+.modal::-webkit-scrollbar-track {
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+
+
+
+.job-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.job-title {
+  color: #333;
+  margin: 0 0 5px 0;
+}
+
+.job-meta {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.job-description {
+  margin: 15px 0;
+  line-height: 1.5;
+  
+}
+
+.job-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.apply-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+.post, .job-post {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+
+.feed-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Make sure nothing is hiding these elements */
+#center .job-post {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
