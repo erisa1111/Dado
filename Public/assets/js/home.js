@@ -373,24 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
 });
-// Only load comments when explicitly requested (comment button clicked)
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.comment-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const postId = this.getAttribute('data-post-id');
-            const commentsList = document.getElementById(`comments-list-${postId}`);
-            
-            // Toggle comments visibility
-            if (commentsList.style.display === 'none' || !commentsList.style.display) {
-                loadComments(postId);
-                commentsList.style.display = 'block';
-            } else {
-                commentsList.style.display = 'none';
-            }
-        });
-    });
-});
+
 
 
 async function toggleLike(postId) {
@@ -445,7 +428,6 @@ async function toggleLike(postId) {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize comment functionality for all posts
     document.querySelectorAll('.post').forEach(post => {
         const postId = post.id.split('-')[1];
         initCommentFunctionality(postId);
@@ -453,27 +435,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initCommentFunctionality(postId) {
-    // Comment button to toggle comments visibility
     const commentBtn = document.querySelector(`.comment-btn[data-post-id="${postId}"]`);
     const commentsList = document.getElementById(`comments-list-${postId}`);
-    
-   commentBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    console.log('Comment button clicked for post', postId);
-    console.log('Current display state:', commentsList.style.display);
-    
-    if (commentsList.style.display === 'none' || !commentsList.style.display) {
-        console.log('Loading comments...');
-        loadComments(postId);
-        commentsList.style.display = 'block';
-        console.log('Comments should be visible now');
-    } else {
-        commentsList.style.display = 'none';
-        console.log('Comments hidden');
-    }
-});
+    if (!commentBtn || !commentsList) return;
 
-    // Comment submission - Enter key
+    commentBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        commentsList.classList.toggle('visible');
+        if (commentsList.classList.contains('visible')) {
+            loadComments(postId);
+        }
+    });
+
     const commentInput = document.getElementById(`comment-${postId}`);
     commentInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -481,7 +455,6 @@ function initCommentFunctionality(postId) {
         }
     });
 
-    // Comment submission - Button click
     const submitBtn = document.querySelector(`#submit-comment[data-post-id="${postId}"]`);
     submitBtn.addEventListener('click', function() {
         submitComment(postId);
@@ -588,18 +561,15 @@ function createCommentElement(comment) {
         const toggleBtn = commentDiv.querySelector('.comment-menu-toggle');
         const actionsMenu = commentDiv.querySelector('.comment-actions');
         
-        // Toggle menu visibility
         toggleBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
             actionsMenu.style.display = actionsMenu.style.display === 'none' ? 'block' : 'none';
         });
 
-        // Close menu when clicking elsewhere
         document.addEventListener('click', () => {
             actionsMenu.style.display = 'none';
         });
 
-        // Prevent menu from closing when clicking inside it
         actionsMenu?.addEventListener('click', (e) => {
             e.stopPropagation();
         });
@@ -714,18 +684,17 @@ async function loadComments(postId) {
     const commentsList = document.getElementById(`comments-list-${postId}`);
     if (!commentsList) return;
 
-    commentsList.classList.add('visible');
     commentsList.innerHTML = '<div class="loading-comments">Loading comments...</div>';
 
     try {
         const response = await fetch(`http://localhost:4000/views/get_comments.php?post_id=${postId}`);
         const data = await response.json();
 
-        commentsList.innerHTML = ''; // Clear previous content
+        commentsList.innerHTML = '';
 
         if (data.success && data.comments?.length > 0) {
             data.comments.forEach(comment => {
-                const commentElement = createCommentElement(comment); // ⬅ use the new version
+                const commentElement = createCommentElement(comment);
                 commentsList.appendChild(commentElement);
             });
         } else {
@@ -737,38 +706,7 @@ async function loadComments(postId) {
     }
 }
 
-function initCommentFunctionality(postId) {
-    const commentBtn = document.querySelector(`.comment-btn[data-post-id="${postId}"]`);
-    const commentsList = document.getElementById(`comments-list-${postId}`);
-    
-    if (!commentBtn || !commentsList) return;
 
-    commentBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        
-        // Toggle comments visibility
-        if (commentsList.style.display === 'none' || commentsList.style.display === '') {
-            // Show comments
-            commentsList.style.display = 'block';
-            loadComments(postId);
-        } else {
-            // Hide comments
-            commentsList.style.display = 'none';
-        }
-    });
-
-    // Comment submission
-    const commentInput = document.getElementById(`comment-${postId}`);
-    const submitBtn = document.querySelector(`#submit-comment[data-post-id="${postId}"]`);
-    
-    commentInput?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') submitComment(postId);
-    });
-    
-    submitBtn?.addEventListener('click', function() {
-        submitComment(postId);
-    });
-}
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize functionality for both post types
