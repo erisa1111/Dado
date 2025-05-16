@@ -28,7 +28,7 @@ class CommentJobPost
 
     public function addCommentForJobPost($jobPostId, $userId, $comment, $parentCommentId = null)
     {
-        $stmt = $this->db->prepare("CALL add_comment_for_job_post(?, ?, ?, ?)");
+        $stmt = $this->db->prepare("CALL add_comment_job_post(?, ?, ?, ?)");
         $stmt->execute([$jobPostId, $userId, $comment, $parentCommentId]);
         $result = $stmt->fetch();
         return $result['comment_id'] ?? null;
@@ -54,7 +54,7 @@ class CommentJobPost
     {
         $stmt = $this->db->prepare("
             SELECT c.*, u.username, u.profile_picture 
-            FROM comments_job_posts c
+            FROM job_post_comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.id = ?
         ");
@@ -64,7 +64,7 @@ class CommentJobPost
 
     public function getCommentCountForJobPost($jobPostId)
     {
-        $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM comments_job_posts WHERE job_post_id = ?");
+        $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM job_post_comments WHERE job_post_id = ?");
         $stmt->execute([$jobPostId]);
         $result = $stmt->fetch();
         return $result['count'];

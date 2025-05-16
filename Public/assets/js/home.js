@@ -902,7 +902,7 @@ async function submitJobComment(postId) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ 
-                post_id: postId,
+                job_post_id: postId,
     comment: commentText 
             })
         });
@@ -950,7 +950,7 @@ async function loadJobComments(postId) {
     commentsList.innerHTML = '<div class="loading-comments">Loading comments...</div>';
 
     try {
-        const response = await fetch(`http://localhost:4000/views/get_job_comments.php?job_post_id=${postId}`);
+        const response = await fetch(`http://localhost:4000/views/get_job_post_comments.php?job_post_id=${postId}`);
         const data = await response.json();
 
         commentsList.innerHTML = '';

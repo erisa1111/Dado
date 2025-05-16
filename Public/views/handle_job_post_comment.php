@@ -5,7 +5,7 @@ use App\Controllers\CommentsJobPostsController;
 $controller = new CommentsJobPostsController();
 
 if ($_GET['action'] == 'updateComment') {
-    $controller->updateCommentForJobPost()();
+    $controller->updateCommentForJobPost();
 }elseif(($_GET['action'] == 'deleteComment')){
     $controller->deleteCommentForJobPost();
 }

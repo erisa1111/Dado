@@ -11,7 +11,7 @@ try {
     session_start();
 
     $input = json_decode(file_get_contents('php://input'), true);
-    if (!$input || !isset($input['post_id']) || !isset($input['comment'])) {
+    if (!$input || !isset($input['job_post_id']) || !isset($input['comment'])) {
         throw new Exception('Post ID and comment are required');
     }
 

@@ -9,7 +9,7 @@ try {
         session_start();
     }
 
-    $postId = $_GET['post_id'] ?? null;
+    $postId = $_GET['job_post_id'] ?? null;
     if (!$postId) {
         throw new Exception("Post ID required");
     }
