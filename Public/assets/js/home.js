@@ -3,9 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeModalJob();
 });
 
-
-
-
 document.getElementById('post-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -122,6 +119,10 @@ document.getElementById('jobpost-form').addEventListener('submit', async functio
         alert(`Error: ${error.message}`);
     }
 });
+
+
+
+
 
 
 
@@ -354,7 +355,12 @@ document.getElementById('confirmDelete').addEventListener('click', async () => {
 document.getElementById('editClose').onclick = () => document.getElementById('editModal').style.display = 'none';
 document.getElementById('deleteClose').onclick = () => document.getElementById('deleteModal').style.display = 'none';
 document.getElementById('cancelDelete').onclick = () => document.getElementById('deleteModal').style.display = 'none';
-
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('post-menu-toggle')) {
+        const menu = e.target.nextElementSibling;
+        menu.classList.toggle('visible');
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     // Like button functionality
@@ -433,12 +439,8 @@ async function toggleLike(postId) {
         alert('Failed to update like. Please try again.');
     }
 }
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('post-menu-toggle')) {
-        const menu = e.target.nextElementSibling;
-        menu.classList.toggle('visible');
-    }
-});
+
+
 
 
 
@@ -765,5 +767,359 @@ function initCommentFunctionality(postId) {
     
     submitBtn?.addEventListener('click', function() {
         submitComment(postId);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize functionality for both post types
+   
+    initJobPostFunctionality();
+});
+function initJobPostFunctionality() {
+    // Like button functionality for job posts
+    document.querySelectorAll('.job-like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            toggleJobLike(postId);
+        });
+    });
+
+    // Comment functionality for job posts
+    document.querySelectorAll('.job-post').forEach(post => {
+        const postId = post.id.split('-')[2]; // job-post-ID format
+        initJobCommentFunctionality(postId);
+    });
+}
+async function toggleJobLike(postId) {
+    try {
+        console.log('Attempting to like job post:', postId); // Debug log
+        
+        const response = await fetch('like_job_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ job_post_id: postId })
+        });
+
+        // First check if response is OK
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server responded with status:', response.status, 'Text:', errorText);
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        // Then try to parse as JSON
+        let data;
+        try {
+            data = await response.json();
+            console.log('Response data:', data); // Debug log
+        } catch (jsonError) {
+            console.error('Failed to parse JSON:', jsonError);
+            throw new Error('Invalid JSON response from server');
+        }
+
+        if (!data || typeof data.success === 'undefined') {
+            console.error('Invalid data structure:', data);
+            throw new Error('Invalid data structure from server');
+        }
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Action failed');
+        }
+
+        // Update UI - make sure we're targeting the correct elements
+        const postElement = document.getElementById(`job-post-${postId}`);
+        if (!postElement) {
+            console.error('Could not find job post element with ID:', `job-post-${postId}`);
+            return;
+        }
+
+        const likesCountElement = postElement.querySelector('.job-likes');
+        if (likesCountElement) {
+            likesCountElement.textContent = `${data.job_like_count} likes`;
+        } else {
+            console.error('Could not find likes count element in post:', postId);
+        }
+        
+        const likeButton = postElement.querySelector('.job-like-btn i');
+        if (likeButton) {
+            likeButton.classList.toggle('fa-regular', !data.is_liked);
+            likeButton.classList.toggle('fa-solid', data.is_liked);
+            likeButton.style.color = data.is_liked ? 'red' : '';
+        } else {
+            console.error('Could not find like button in post:', postId);
+        }
+
+    } catch (error) {
+        console.error('Error in toggleJobLike:', error);
+        // Show user-friendly error message
+        alert('Failed to update like. Please try again. Error: ' + error.message);
+    }
+}
+
+function initJobCommentFunctionality(postId) {
+    const commentBtn = document.querySelector(`.job-comment-btn[data-post-id="${postId}"]`);
+    const commentsList = document.getElementById(`job-comments-list-${postId}`);
+    
+    if (!commentBtn || !commentsList) return;
+
+    commentBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        if (commentsList.style.display === 'none' || commentsList.style.display === '') {
+            commentsList.style.display = 'block';
+            loadJobComments(postId);
+        } else {
+            commentsList.style.display = 'none';
+        }
+    });
+
+    const commentInput = document.getElementById(`job-comment-${postId}`);
+    const submitBtn = document.querySelector(`#job-submit-comment[data-post-id="${postId}"]`);
+    
+    commentInput?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') submitJobComment(postId);
+    });
+    
+    submitBtn?.addEventListener('click', function() {
+        submitJobComment(postId);
+    });
+}
+
+async function submitJobComment(postId) {
+    const commentInput = document.getElementById(`job-comment-${postId}`);
+    const commentText = commentInput.value.trim();
+    
+    if (!commentText) return;
+    
+    commentInput.disabled = true;
+    
+    try {
+        const response = await fetch('/views/comment_job_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                post_id: postId,
+    comment: commentText 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update comment count
+            const commentsCount = document.querySelector(`#job-post-${postId} .job-comments`);
+            if (commentsCount) {
+                commentsCount.textContent = `${data.comment_count} comments`;
+            }
+            
+            // Add new comment to list if visible
+            const commentsList = document.getElementById(`job-comments-list-${postId}`);
+            if (commentsList && commentsList.style.display !== 'none') {
+                if (commentsList.querySelector('.job-no-comments')) {
+                    commentsList.innerHTML = '';
+                }
+                
+                const div = document.createElement('div');
+                div.classList.add('comment');
+                div.innerHTML = `
+                    <strong>${data.comment.name} ${data.comment.surname}</strong> (${data.comment.username}):<br>
+                    ${data.comment.body} <br>
+                    <small>Posted on ${data.comment.created_at}</small>
+                `;
+                commentsList.appendChild(div);
+            }
+            
+            commentInput.value = '';
+        }
+    } catch (error) {
+        console.error('Error adding job comment:', error);
+    } finally {
+        commentInput.disabled = false;
+    }
+}
+
+async function loadJobComments(postId) {
+    const commentsList = document.getElementById(`job-comments-list-${postId}`);
+    if (!commentsList) return;
+
+    commentsList.classList.add('visible');
+    commentsList.innerHTML = '<div class="loading-comments">Loading comments...</div>';
+
+    try {
+        const response = await fetch(`http://localhost:4000/views/get_job_comments.php?job_post_id=${postId}`);
+        const data = await response.json();
+
+        commentsList.innerHTML = '';
+
+        if (data.success && data.comments?.length > 0) {
+            data.comments.forEach(comment => {
+                const commentElement = createJobCommentElement(comment);
+                commentsList.appendChild(commentElement);
+            });
+        } else {
+            commentsList.innerHTML = '<div class="job-no-comments">No comments yet</div>';
+        }
+    } catch (error) {
+        console.error('Error loading job comments:', error);
+        commentsList.innerHTML = '<div class="comments-error">Error loading comments</div>';
+    }
+}
+
+function createJobCommentElement(comment) {
+    const commentDiv = document.createElement('div');
+    commentDiv.className = 'comment';
+    commentDiv.id = `job-comment-${comment.id}`;
+
+    const currentUserId = document.getElementById('current-user-id-job')?.dataset?.userId || null;
+
+    commentDiv.innerHTML = `
+        <div class="comment-header">
+            <div id="userDetail">
+            <img src="${comment.profile_picture || '/assets/img/profile.jpg'}" 
+                 alt="${comment.username}" class="comment-profile-pic">
+            <strong>${comment.name} ${comment.surname}</strong>
+            </div>
+           <div id="time-act"> 
+            <span class="comment-time">${formatCommentTime(comment.created_at)}</span>
+            
+            ${comment.user_id == currentUserId ? `
+            <div class="comment-menu-wrapper">
+                <button class="comment-menu-toggle">⋮</button>
+                <div class="comment-actions">
+                    <button class="edit-comment" data-comment-id="${comment.id}">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="delete-comment" data-comment-id="${comment.id}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+            ` : ''}
+            </div>
+        </div>
+        <div class="comment-body">${comment.body}</div>
+    `;
+
+    if (comment.user_id == currentUserId) {
+        const toggleBtn = commentDiv.querySelector('.comment-menu-toggle');
+        const actionsMenu = commentDiv.querySelector('.comment-actions');
+        
+        toggleBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            actionsMenu.style.display = actionsMenu.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', () => {
+            actionsMenu.style.display = 'none';
+        });
+
+        actionsMenu?.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        commentDiv.querySelector('.edit-comment')?.addEventListener('click', () => handleEditJobComment(comment.id));
+        commentDiv.querySelector('.delete-comment')?.addEventListener('click', () => handleDeleteJobComment(comment.id, comment.job_post_id));
+    }
+
+    return commentDiv;
+}
+
+async function handleDeleteJobComment(commentId, postId) {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    
+    const currentUserId = document.getElementById('current-user-id-job')?.dataset?.userId;
+    if (!currentUserId) {
+        alert('You must be logged in to delete comments');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:4000/views/handle_job_comment.php?action=deleteComment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                comment_id: commentId,
+                user_id: currentUserId 
+            })
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById(`job-comment-${commentId}`)?.remove();
+            // Update comment count
+            const commentsCount = document.querySelector(`#job-post-${postId} .job-comments`);
+            if (commentsCount) {
+                commentsCount.textContent = `${data.comment_count} comments`;
+            }
+        } else {
+            alert(data.message || 'Failed to delete comment');
+        }
+    } catch (error) {
+        console.error('Error deleting job comment:', error);
+        alert('Error deleting comment. Check console for details.');
+    }
+}
+
+async function handleEditJobComment(commentId) {
+    const commentElement = document.getElementById(`job-comment-${commentId}`);
+    const commentBody = commentElement.querySelector('.comment-body');
+    const currentText = commentBody.textContent;
+    const currentUserId = document.getElementById('current-user-id-job')?.dataset?.userId;
+
+    if (!currentUserId) {
+        alert('You must be logged in to edit comments');
+        return;
+    }
+
+    commentBody.innerHTML = `
+        <textarea class="edit-comment-input">${currentText}</textarea>
+        <div class="edit-comment-buttons">
+            <button class="save-edit">Save</button>
+            <button class="cancel-edit">Cancel</button>
+        </div>
+    `;
+
+    const textarea = commentBody.querySelector('.edit-comment-input');
+    textarea.focus();
+
+    commentBody.querySelector('.save-edit').addEventListener('click', async () => {
+        const newText = textarea.value.trim();
+        if (!newText) return;
+
+        try {
+            const response = await fetch('http://localhost:4000/views/handle_job_comment.php?action=updateComment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    comment_id: commentId,
+                    new_comment: newText,
+                    user_id: currentUserId
+                })
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const data = await response.json();
+
+            if (data.success) {
+                commentBody.innerHTML = newText;
+            } else {
+                alert(data.message || 'Failed to update comment');
+                commentBody.innerHTML = currentText;
+            }
+        } catch (error) {
+            console.error('Error updating job comment:', error);
+            alert('Error updating comment. Check console for details.');
+            commentBody.innerHTML = currentText;
+        }
+    });
+
+    commentBody.querySelector('.cancel-edit').addEventListener('click', () => {
+        commentBody.innerHTML = currentText;
     });
 }

@@ -9,6 +9,8 @@ require_once __DIR__ . '/../../App/Controllers/PostsController.php';
 require_once __DIR__ . '/../../App/Controllers/JobPostController.php';
 require_once __DIR__ . '/../../Config/Database.php';
 
+
+
 // Initialize the controller
 $postController = new App\Controllers\PostsController(); // No arguments for the constructor now
 $posts = $postController->getPosts();
@@ -30,7 +32,30 @@ if (!$userData) {
   echo "User not found.";
   exit();
 }
+$allPosts = [];
 
+// Add regular posts with type identifier
+foreach ($posts as $post) {
+  $allPosts[] = [
+    'type' => 'post',
+    'data' => $post,
+    'sort_date' => strtotime($post['created_at'])
+  ];
+}
+
+// Add job posts with type identifier
+foreach ($jobPosts as $jobPost) {
+  $allPosts[] = [
+    'type' => 'jobpost',
+    'data' => $jobPost,
+    'sort_date' => strtotime($jobPost['created_at'])
+  ];
+}
+
+// Sort all posts by date (newest first)
+usort($allPosts, function ($a, $b) {
+  return $b['sort_date'] - $a['sort_date'];
+});
 
 
 
@@ -107,14 +132,14 @@ if (!$userData) {
           <?php if ($_SESSION['role_id'] == 0): ?>
             <button id="add_job"><i class="fa-solid fa-briefcase"></i></i></button>
           <?php endif; ?>
-    
-    
+
+
         </div>
-    
+
       </div>
-    
+
       <div id="post-modal" class="modal" style="display: none;">
-    
+
         <div class="modal-content">
           <button id="close-modal" class="close-modal"><i class="fa-solid fa-xmark"></i></button>
           <h2>Create Your Post</h2>
@@ -124,11 +149,11 @@ if (!$userData) {
             <br>
             <label for="post-images" class="add_image"><i class="fa-solid fa-image"></i></label>
             <input type="file" id="post-images" accept="image/*" multiple />
-    
+
             <div id="image-preview"></div>
             <button type="submit">Submit</button>
           </form>
-    
+
         </div>
       </div>
       <div id="jobpost-modal" class="modal" style="display: none;">
@@ -144,7 +169,7 @@ if (!$userData) {
                 <div class="job-type-buttons">
                   <input type="radio" id="part-time" name="job-type" value="Part-Time" checked>
                   <label for="part-time">Part-Time</label>
-    
+
                   <input type="radio" id="full-time" name="job-type" value="Full-Time">
                   <label for="full-time">Full-Time</label>
                 </div>
@@ -191,33 +216,33 @@ if (!$userData) {
                 </select>
               </div>
             </div>
-    
-    
+
+
             <label for="job-description">Description</label>
             <textarea id="job-description" placeholder="Describe the job..." required></textarea>
-    
-    
-    
+
+
+
             <div class="two-cols">
               <div class="form-group salary-wrapper">
                 <label for="salary">Salary </label>
                 <div class="input-group">
-    
+
                   <input type="text" id="salary" placeholder="e.g. 5000" inputmode="numeric" required
                     oninput="formatSalary(this)" onblur="finalizeSalary(this)">
                 </div>
                 <small class="helper-text">Format: 9,999.00 (2 decimal places)</small>
               </div>
-    
-    
+
+
               <div class="form-group">
                 <label for="job-num-kids">Number of Kids</label>
                 <input type="number" id="job-num-kids" placeholder="e.g. 2" min="0" required />
               </div>
             </div>
-    
-    
-    
+
+
+
             <div class="two-cols">
               <div class="form-group">
                 <label for="start-hour">Start Hour</label>
@@ -228,146 +253,177 @@ if (!$userData) {
                 <input type="text" id="end-hour" required readonly style="cursor:pointer;">
               </div>
             </div>
-    
-    
-    
+
+
+
             <div class="form-group">
               <label for="date-range">Select Date Range</label>
               <input type="text" id="date-range" placeholder="Select date range">
             </div>
-    
-    
-    
+
+
+
             <button type="submit">Submit</button>
           </form>
         </div>
       </div>
-    
-    
-      <?php foreach ($posts as $post): ?>
-        <div class="post" id="post-<?php echo $post['id']; ?>">
-          <div class="post-header">
-            <img class="profile-img"
-              src="<?php echo file_exists($post['profile_picture']) ? htmlspecialchars($post['profile_picture']) : '/assets/img/dado_profile.webp'; ?>"
-              alt="User Profile">
-            <div class="details">
-              <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
-              <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
+
+      <div class="feed-container">
+        <?php foreach ($allPosts as $item): ?>
+          <?php if ($item['type'] === 'post'): $post = $item['data']; ?>
+            <div class="post" id="post-<?php echo $post['id']; ?>">
+              <div class="post-header">
+                <img class="profile-img"
+                  src="<?php echo file_exists($post['profile_picture']) ? htmlspecialchars($post['profile_picture']) : '/assets/img/dado_profile.webp'; ?>"
+                  alt="User Profile">
+                <div class="details">
+                  <h4 class="username"><?php echo htmlspecialchars($post['username']); ?></h4>
+                  <p class="location">Posted on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
+                </div>
+                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['user_id']): ?>
+                  <div class="post-menu-wrapper">
+                    <button type="button" class="post-menu-toggle">⋮</button>
+                    <div class="post-act">
+                      <button type="button" class="edit-post" data-post-id="<?php echo $post['id']; ?>">
+                        <i class="fas fa-edit"></i> Edit
+                      </button>
+                      <button type="button" class="delete-post" data-post-id="<?php echo $post['id']; ?>">
+                        <i class="fas fa-trash"></i> Delete
+                      </button>
+                    </div>
+                  </div>
+                <?php endif; ?>
+
+              </div>
+              <div class="post-content">
+                <?php echo htmlspecialchars($post['body']); ?>
+              </div>
+              <?php if (!empty($post['image_url'])): ?>
+                <div class="post-images">
+                  <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Post Image">
+                </div>
+              <?php endif; ?>
+              <div class="post-actions">
+                <button class="act like-btn" data-post-id="<?php echo $post['id']; ?>">
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+                <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
+                  <i class="fa-regular fa-comment"></i>
+                </button>
+              </div>
+              <div class="post-footer">
+                <div class="likes"><?php echo $post['like_count']; ?> likes</div>
+                <div class="comments"><?php echo $post['comment_count']; ?> comments</div>
+              </div>
+
+
+              <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>" style="display:none">
+                <div class="no-comments">No comments yet</div>
+              </div>
+              <div class="post-comment">
+                <input type="text" id="comment-<?php echo $post['id']; ?>" name="comment" placeholder="Add a comment..."
+                  class="comment-input" data-post-id="<?php echo $post['id']; ?>">
+                <button id="submit-comment" data-post-id="<?php echo $post['id']; ?>">
+                  <i class="fa-regular fa-paper-plane"></i>
+                </button>
+                <div id="current-user-id" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
+              </div>
             </div>
-            <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['user_id']): ?>
-              <div class="post-menu-wrapper">
-                <button type="button" class="post-menu-toggle">⋮</button>
-                <div class="post-act">
-                  <button type="button" class="edit-post" data-post-id="<?php echo $post['id']; ?>">
-                    <i class="fas fa-edit"></i> Edit
-                  </button>
-                  <button type="button" class="delete-post" data-post-id="<?php echo $post['id']; ?>">
-                    <i class="fas fa-trash"></i> Delete
-                  </button>
+          <?php elseif ($item['type'] === 'jobpost'):
+            $jobpost = $item['data']; ?>
+
+            <div class="job-post" id="job-post-<?php echo $jobpost['id']; ?>">
+              <div class="job-post-header">
+                <img class="profile-img"
+                  src="<?php echo file_exists($jobpost['profile_picture']) ? htmlspecialchars($jobpost['profile_picture']) : '/assets/img/dado_profile.webp'; ?>"
+                  alt="User Profile">
+                <div class="details">
+                  <h4 class="username"><?php echo htmlspecialchars($jobpost['username']); ?></h4>
+                  <p class="location">Posted on <?php echo date('F j, Y', strtotime($jobpost['created_at'])); ?></p>
+                </div>
+
+                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $jobpost['parent_id']): ?>
+                  <div class="post-menu-wrapper">
+                    <button type="button" class="post-menu-toggle">⋮</button>
+                    <div class="post-act">
+                      <button type="button" class="edit-job-post" data-post-id="<?php echo $jobpost['id']; ?>">
+                        <i class="fas fa-edit"></i> Edit
+                      </button>
+                      <button type="button" class="delete-job-post" data-post-id="<?php echo $jobpost['id']; ?>">
+                        <i class="fas fa-trash"></i> Delete
+                      </button>
+                    </div>
+                  </div>
+                <?php endif; ?>
+              </div>
+              <div class="job-post-content">
+                <div class="job-header">
+                  <h3 class="job-title"><?php echo htmlspecialchars($jobpost['title']); ?></h3>
+                  <div class="job-meta">
+                    <span class="job-type"><?php echo htmlspecialchars($jobpost['schedule']); ?></span> |
+                    <span class="job-location"><?php echo htmlspecialchars($jobpost['location']); ?></span> |
+                    <span class="job-salary"><?php echo '$' . number_format($jobpost['salary'], 2); ?></span>
+                  </div>
+                </div>
+
+                <div class="job-description">
+                  <p><?php echo nl2br(htmlspecialchars($jobpost['description'])); ?></p>
+                </div>
+
+                <div class="job-details-grid">
+                  <div><strong>Number of Kids:</strong> <?php echo (int) $jobpost['num_kids']; ?></div>
+                  <div><strong>Start Hour:</strong>
+                    <?php echo isset($jobpost['start_hour']) ? htmlspecialchars($jobpost['start_hour']) : 'Not set'; ?>
+                  </div>
+                  <div><strong>End Hour:</strong>
+                    <?php echo isset($jobpost['end_hour']) ? htmlspecialchars($jobpost['end_hour']) : 'Not set'; ?></div>
+                  <div><strong>Date From:</strong>
+                    <?php echo isset($jobpost['date_from']) ? htmlspecialchars($jobpost['date_from']) : 'Not set'; ?></div>
+                  <div><strong>Date To:</strong>
+                    <?php echo isset($jobpost['date_to']) ? htmlspecialchars($jobpost['date_to']) : 'Not set'; ?></div>
+
+                </div>
+
+                <div class="job-post-actions">
+                  <form method="POST" action="apply.php" class="apply-form">
+                    <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
+                    <button type="submit" class="apply-btn">Apply</button>
+                  </form>
                 </div>
               </div>
-            <?php endif; ?>
-    
-          </div>
-          <div class="post-content">
-            <?php echo htmlspecialchars($post['body']); ?>
-          </div>
-          <?php if (!empty($post['image_url'])): ?>
-            <div class="post-images">
-              <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Post Image">
+              <div class="job-post-actions2">
+                <button class="act job-like-btn" data-post-id="<?php echo $jobpost['id']; ?>">
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+                <button class="act job-comment-btn" data-post-id="<?php echo $jobpost['id']; ?>">
+                  <i class="fa-regular fa-comment"></i>
+                </button>
+              </div>
+              <div class="job-post-footer">
+              <div class="job-likes"><?php echo isset($jobpost['job_like_count']) ? $jobpost['job_like_count'] : 0; ?> likes</div>
+              <div class="job-comments"><?php echo isset($jobpost['job_comment_count']) ? $jobpost['job_comment_count'] : 0; ?> comments</div>
+              </div>
+
+
+              <div class="job-comments-list" id="job-comments-list-<?php echo $jobpost['id']; ?>" style="display:none">
+                <div class="job-no-comments">No comments yet</div>
+              </div>
+              <div class="job-post-comment">
+                <input type="text" id="job-comment-<?php echo $jobpost['id']; ?>" name="comment" placeholder="Add a comment..."
+                  class="job-comment-input" data-post-id="<?php echo $jobpost['id']; ?>">
+                <button id="job-submit-comment" data-post-id="<?php echo $jobpost['id']; ?>">
+                  <i class="fa-regular fa-paper-plane"></i>
+                </button>
+
+                <div id="current-user-id-job" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
+              </div>
             </div>
           <?php endif; ?>
-          <div class="post-actions">
-            <button class="act like-btn" data-post-id="<?php echo $post['id']; ?>">
-              <i class="fa-regular fa-heart"></i>
-            </button>
-            <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
-              <i class="fa-regular fa-comment"></i>
-            </button>
-          </div>
-          <div class="post-footer">
-            <div class="likes"><?php echo $post['like_count']; ?> likes</div>
-            <div class="comments"><?php echo $post['comment_count']; ?> comments</div>
-          </div>
-    
-    
-          <div class="comments-list" id="comments-list-<?php echo $post['id']; ?>" style="display:none">
-            <div class="no-comments">No comments yet</div>
-          </div>
-          <div class="post-comment">
-            <input type="text" id="comment-<?php echo $post['id']; ?>" name="comment" placeholder="Add a comment..."
-              class="comment-input" data-post-id="<?php echo $post['id']; ?>">
-            <button id="submit-comment" data-post-id="<?php echo $post['id']; ?>">
-              <i class="fa-regular fa-paper-plane"></i>
-            </button>
-            <div id="current-user-id" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-      <?php foreach ($jobPosts as $jobpost): ?>
-        <div class="job-post" id="job-post-<?php echo $jobpost['id']; ?>">
-          <div class="job-header">
-            <h3 class="job-title"><?php echo htmlspecialchars($jobpost['title']); ?></h3>
-            <div class="job-meta">
-              <span class="job-type"><?php echo htmlspecialchars($jobpost['schedule']); ?></span> |
-              <span class="job-location"><?php echo htmlspecialchars($jobpost['location']); ?></span> |
-              <span class="job-salary"><?php echo '$' . number_format($jobpost['salary'], 2); ?></span>
-            </div>
-          </div>
-    
-          <div class="job-description">
-            <p><?php echo nl2br(htmlspecialchars($jobpost['description'])); ?></p>
-          </div>
-    
-          <div class="job-details-grid">
-            <div><strong>Number of Kids:</strong> <?php echo (int) $jobpost['num_kids']; ?></div>
-            <div><strong>Start Hour:</strong>
-              <?php echo isset($jobpost['start_hour']) ? htmlspecialchars($jobpost['start_hour']) : 'Not set'; ?></div>
-            <div><strong>End Hour:</strong>
-              <?php echo isset($jobpost['end_hour']) ? htmlspecialchars($jobpost['end_hour']) : 'Not set'; ?></div>
-            <div><strong>Date From:</strong>
-              <?php echo isset($jobpost['date_from']) ? htmlspecialchars($jobpost['date_from']) : 'Not set'; ?></div>
-            <div><strong>Date To:</strong>
-              <?php echo isset($jobpost['date_to']) ? htmlspecialchars($jobpost['date_to']) : 'Not set'; ?></div>
-    
-          </div>
-    
-          <div class="job-post-actions">
-            <form method="POST" action="apply.php" class="apply-form">
-              <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
-              <button type="submit" class="apply-btn">Apply</button>
-            </form>
-          </div>
-          <div class="job-post-actions2">
-            <button class="act job-like-btn" data-post-id="<?php echo $post['id']; ?>">
-              <i class="fa-regular fa-heart"></i>
-            </button>
-            <button class="act job-comment-btn" data-post-id="<?php echo $post['id']; ?>">
-              <i class="fa-regular fa-comment"></i>
-            </button>
-          </div>
-          <div class="job-post-footer">
-            <div class="job-likes"><?php echo $post['like_count']; ?> likes</div>
-            <div class="job-comments"><?php echo $post['comment_count']; ?> comments</div>
-          </div>
-    
-    
-          <div class="job-comments-list" id="comments-list-<?php echo $post['id']; ?>" style="display:none">
-            <div class="job-no-comments">No comments yet</div>
-          </div>
-          <div class="job-post-comment">
-            <input type="text" id="comment-<?php echo $post['id']; ?>" name="comment" placeholder="Add a comment..."
-              class="job-comment-input" data-post-id="<?php echo $post['id']; ?>">
-            <button id="job-submit-comment" data-post-id="<?php echo $post['id']; ?>">
-              <i class="fa-regular fa-paper-plane"></i>
-            </button>
-            <div id="current-user-id-job" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    
-    
-    
+        <?php endforeach; ?>
+      </div>
+
+
+
       <!-- Edit Post Modal -->
       <div id="editModal" class="modal2" style="display:none;">
         <div class="modal2-content">
@@ -378,7 +434,7 @@ if (!$userData) {
           <button id="saveEdit">Save Changes</button>
         </div>
       </div>
-    
+
       <!-- Delete Post Modal -->
       <div id="deleteModal" class="modal2" style="display:none;">
         <div class="modal2-content">
@@ -389,9 +445,9 @@ if (!$userData) {
         </div>
       </div>
     </div>
-    
-    
-      
+
+
+
 
 
 
@@ -457,6 +513,8 @@ if (!$userData) {
         <a href="#">Dado</a>
       </div>
     </div>
+
+
 
     <script src="/components/nav_home/nav_home.js"></script>
     <script src="/components/postcard/postcard.js"></script>

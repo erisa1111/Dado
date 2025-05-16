@@ -534,13 +534,15 @@ button.cancel-edit:hover{
 
 /* Comment Menu Styles */
 .comment-menu-wrapper,
-.post-menu-wrapper {
+.post-menu-wrapper,
+.job-post-menu-wrapper {
     position: relative;
     margin-left: auto; /* Push to the right */
 }
 
 .comment-menu-toggle,
-.post-menu-toggle {
+.post-menu-toggle,
+.job-post-menu-wrapper {
  
     background: none;
     border: none;
@@ -551,7 +553,8 @@ button.cancel-edit:hover{
 }
 
 .comment-actions,
-.post-act {
+.post-act,
+.job-post-act {
   display: none;
     position: absolute;
     right: 0;
@@ -565,7 +568,9 @@ button.cancel-edit:hover{
 }
 
 .comment-actions button,
-.post-act button{
+.post-act button,
+.job-post-act button ,
+.job-comment-act button{
     display: block;
     width: 100%;
     text-align: left;
@@ -578,7 +583,9 @@ button.cancel-edit:hover{
 }
 
 .comment-actions button:hover,
-.post-act button:hover {
+.post-act button:hover,
+.job-post-act button:hover,
+.job-comment-act button:hover {
     background: #f5f5f5;
 }
 
@@ -1114,19 +1121,14 @@ input#date-range {
 }
 
 
-/* Job Post Styling */
-.job-post {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  padding: 20px;
-  margin-bottom: 20px;
-}
+
 
 .job-header {
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
   margin-bottom: 15px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .job-title {
@@ -1142,6 +1144,7 @@ input#date-range {
 .job-description {
   margin: 15px 0;
   line-height: 1.5;
+  
 }
 
 .job-details-grid {
@@ -1159,11 +1162,7 @@ input#date-range {
   border-radius: 4px;
   cursor: pointer;
 }
-.feed-item {
-  display: block;
-  width: 100%;
-  margin-bottom: 20px;
-}
+
 
 .post, .job-post {
   background: #fff;
@@ -1172,3 +1171,15 @@ input#date-range {
 }
 
 
+.feed-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Make sure nothing is hiding these elements */
+#center .job-post {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}

@@ -119,4 +119,66 @@ class JobPostController
                 echo json_encode(['success' => false, 'message' => 'Action not found']);
         }
     }
+    public function toggleJobLike($postId)
+{
+    try {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $postId = $input['job_post_id'] ?? null;
+        
+        $userId = $_SESSION['user_id'] ?? null;
+
+        if (!$postId || !$userId) {
+            return json_encode([
+                'success' => false,
+                'message' => 'Invalid data'
+            ]);
+        }
+
+        // Your existing like logic here...
+        $isLiked = $this->isJobPostLiked($postId, $userId);
+
+        if ($isLiked) {
+            $stmt = $this->db->prepare("DELETE FROM job_post_likes WHERE job_post_id = ? AND user_id = ?");
+            $stmt->execute([$postId, $userId]);
+        } else {
+            $stmt = $this->db->prepare("INSERT INTO job_post_likes (job_post_id, user_id) VALUES (?, ?)");
+            $stmt->execute([$postId, $userId]);
+        }
+
+        $likeCount = $this->getJobLikeCount($postId);
+
+        return json_encode([
+            'success' => true,
+            'job_like_count' => $likeCount,
+            'is_liked' => !$isLiked
+        ]);
+
+    } catch (Exception $e) {
+        return json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+}
+
+    private function isJobPostLiked($postId, $userId)
+    {
+        // You might need to implement this method in your Post model
+        // or use a direct query here
+        $database = new Database();
+        $db = $database->connect();
+        $stmt = $db->prepare("SELECT 1 FROM job_post_likes WHERE job_post_id = ? AND user_id = ?");
+        $stmt->execute([$postId, $userId]);
+        return (bool)$stmt->fetch();
+    }
+
+    private function getJobLikeCount($postId)
+    {
+        $database = new Database();
+        $db = $database->connect();
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM job_post_likes WHERE job_post_id = ?");
+        $stmt->execute([$postId]);
+        $result = $stmt->fetch();
+        return $result['count'];
+    }
 }
