@@ -856,7 +856,19 @@ async function toggleJobLike(postId) {
         // Show user-friendly error message
         alert('Failed to update like. Please try again. Error: ' + error.message);
     }
-}
+}// Add this to your DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing code...
+    
+    // Add this event delegation for job post comments
+    document.addEventListener('click', function(e) {
+        // Handle job comment submission
+        if (e.target.matches('#job-submit-comment, #job-submit-comment i')) {
+            const postId = e.target.closest('[data-post-id]').getAttribute('data-post-id');
+            submitJobComment(postId);
+        }
+    });
+});
 
 function initJobCommentFunctionality(postId) {
     const commentBtn = document.querySelector(`.job-comment-btn[data-post-id="${postId}"]`);
@@ -875,27 +887,30 @@ function initJobCommentFunctionality(postId) {
         }
     });
 
+    // Keep the input keypress listener (input element isn't recreated)
     const commentInput = document.getElementById(`job-comment-${postId}`);
-    const submitBtn = document.querySelector(`#job-submit-comment[data-post-id="${postId}"]`);
-    
     commentInput?.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') submitJobComment(postId);
     });
     
-    submitBtn?.addEventListener('click', function() {
-        submitJobComment(postId);
-    });
+    // Remove the button click listener here since we're using delegation
 }
-
 async function submitJobComment(postId) {
-    const commentInput = document.getElementById(`job-comment-${postId}`);
-    const commentText = commentInput.value.trim();
+    console.log('Attempting to submit job comment for post:', postId); // Debug log
     
+    const commentInput = document.getElementById(`job-comment-${postId}`);
+    if (!commentInput) {
+        console.error('Job comment input not found for post', postId);
+        return;
+    }
+    
+    const commentText = commentInput.value.trim();
     if (!commentText) return;
     
     commentInput.disabled = true;
     
     try {
+        console.log('Submitting job comment:', commentText); // Debug log
         const response = await fetch('/views/comment_job_post.php', {
             method: 'POST',
             headers: {
@@ -903,11 +918,18 @@ async function submitJobComment(postId) {
             },
             body: JSON.stringify({ 
                 job_post_id: postId,
-    comment: commentText 
+                comment: commentText 
             })
         });
         
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Job comment submission failed:', errorText);
+            throw new Error('Failed to submit comment');
+        }
+        
         const data = await response.json();
+        console.log('Job comment response:', data); // Debug log
         
         if (data.success) {
             // Update comment count
@@ -923,20 +945,18 @@ async function submitJobComment(postId) {
                     commentsList.innerHTML = '';
                 }
                 
-                const div = document.createElement('div');
-                div.classList.add('comment');
-                div.innerHTML = `
-                    <strong>${data.comment.name} ${data.comment.surname}</strong> (${data.comment.username}):<br>
-                    ${data.comment.body} <br>
-                    <small>Posted on ${data.comment.created_at}</small>
-                `;
-                commentsList.appendChild(div);
+                const commentElement = createJobCommentElement(data.comment);
+                commentsList.appendChild(commentElement);
             }
             
             commentInput.value = '';
+        } else {
+            console.error('Job comment submission failed:', data.message);
+            alert(data.message || 'Failed to submit comment');
         }
     } catch (error) {
         console.error('Error adding job comment:', error);
+        alert('Error submitting comment. Please try again.');
     } finally {
         commentInput.disabled = false;
     }
