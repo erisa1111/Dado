@@ -36,7 +36,7 @@ class CommentJobPost
 
     public function deleteCommentForJobPost($commentId, $userId)
     {
-        $stmt = $this->db->prepare("CALL delete_comment_for_job_post(?, ?)");
+        $stmt = $this->db->prepare("CALL delete_comment_job_post(?, ?)");
         $stmt->execute([$commentId, $userId]);
         $result = $stmt->fetch();
         return $result['affected_rows'] > 0;

@@ -1038,7 +1038,7 @@ async function handleDeleteJobComment(commentId, postId) {
     }
 
     try {
-        const response = await fetch('http://localhost:4000/views/handle_job_comment.php?action=deleteComment', {
+        const response = await fetch('http://localhost:4000/views/handle_job_post_comment.php?action=deleteComment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -1093,7 +1093,7 @@ async function handleEditJobComment(commentId) {
         if (!newText) return;
 
         try {
-            const response = await fetch('http://localhost:4000/views/handle_job_comment.php?action=updateComment', {
+            const response = await fetch('http://localhost:4000/views/handle_job_post_comment.php?action=updateComment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
