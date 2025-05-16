@@ -35,6 +35,11 @@
     <input type="password" name="password" placeholder="Password" required />
     
     <button type="submit">Log in</button>
+
+    
+                   <div style="margin-top: 15px; text-align: center; font-size: 0.9em;">
+       <p>Registered already? <a href="login.php" style="color: #333; text-decoration: none;"> LogIn</a></p>
+    </div>
 </form>
         </div>
 

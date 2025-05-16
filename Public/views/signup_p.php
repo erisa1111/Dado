@@ -48,7 +48,9 @@ $role = isset($_GET['role']) ? $_GET['role'] : null;
     <option value="M" style ="color:black;">Male</option>
 </select>
                 <input type="hidden" name="role" value="parent">
-
+           <div style="margin-top: 15px; text-align: center;">
+       <p style="color: #333; text-decoration: none;  font-size: 0.9em;">Registered already? <a href="login.php" style="color: #333; text-decoration: none;  font-size: 0.9em;"> LogIn</a></p>
+    </div>
 
             </div>
             
@@ -63,7 +65,11 @@ $role = isset($_GET['role']) ? $_GET['role'] : null;
                 <input type="text" name="phone_number" placeholder="Phone number" required />
                 <input type="password" name="password" id="password" placeholder="Password" required />
                 <span id="password-feedback" style="font-size: 0.9em; color: red;"></span>
+
                 <button type="submit" id="submit-btn" >Sign Up</button>
+                <div style="margin-top: 15px; text-align: center;">
+       <p style="color: #333; text-decoration: none;  font-size: 0.9em;">Registered already? <a href="login.php" style="color: #333; text-decoration: none;  font-size: 0.9em;"> LogIn</a></p>
+    </div>
             </div>
         </form>
     </div>
