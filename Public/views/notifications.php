@@ -58,22 +58,8 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
     </div>
 
     <div id="center">
-      <?php if (empty($allNotifications)): ?>
-        <div class="empty-notifications">
-          <p>No new notifications.</p>
-        </div>
-      <?php else: ?>
-        <?php foreach ($allNotifications as $notification): ?>
-          <?php
-          // Make $notification available to the card component
-          include __DIR__ . '/../components/notifications_card/notifications_card.php';
-          ?>
-        <?php endforeach; ?>
-      <?php endif; ?>
-
-      <!-- Raw notifications JSON (updated by JS) -->
-      <pre id="raw-notifications" style="display:none;"></pre>
-    </div>
+     <div id="notifications-container"></div>
+    </div> 
 
     <div class="right">
       <div class="recommend">
@@ -134,23 +120,62 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
   </div>
 
   <script src="../components/nav_home/nav_home.js"></script>
-  <script>
-    // Build the URL of this page + ?action=fetch
-    const fetchUrl = window.location.pathname + '?action=fetch';
+ <script>
+  const fetchUrl = window.location.pathname + '?action=fetch';
 
-    fetch(fetchUrl, { credentials: 'include' })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          document.getElementById('raw-notifications').textContent = JSON.stringify(data.notifications, null, 2);
-        } else {
-          document.getElementById('raw-notifications').textContent = 'Error: ' + data.message;
-        }
-      })
-      .catch(err => {
-        document.getElementById('raw-notifications').textContent = 'Error fetching notifications: ' + err;
-      });
-  </script>
+  fetch(fetchUrl, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const container = document.getElementById('notifications-container');
+        container.innerHTML = ''; // Clear previous
+
+        data.notifications.forEach(notification => {
+          const card = document.createElement('div');
+          card.className = 'notification-card';
+const iconHTML = notification.type === 'comment'
+  ? `<i class="fa-regular fa-comment notification-icon"></i>`
+  : `<i class="fa-regular fa-heart notification-icon"></i>`;
+        const username = notification.type === 'comment'
+  ? `${notification.commenter_name} ${notification.commenter_surname}`
+  : `${notification.liker_name} ${notification.liker_surname}`;
+      const profilePicture = notification.type === 'comment'
+          ? notification.commenter_profile_picture
+          : notification.liker_profile_picture;
+
+          const commentPreview = notification.type === 'comment'
+            ? `<div class="notification-preview">
+                 <p class="notification-preview-text">${notification.comment}</p>
+               </div>`
+            : '';
+
+    card.innerHTML = `
+    <div class="notification-header">
+      <img class="notification-profile-pic" src="${profilePicture}" alt="${username}'s profile picture" />
+      ${iconHTML}
+      <div class="notification-details">
+        <p class="notification-username">${username}</p>
+        <p class="notification-action">
+          ${notification.type === 'comment' ? 'commented on your post' : 'liked your post'}
+          "<strong>${notification.post_title}</strong>"
+        </p>
+        <span class="notification-time">${notification.created_at}</span>
+      </div>
+    </div>
+    ${commentPreview}
+  `;
+  container.appendChild(card);
+});
+
+
+      } else {
+        document.getElementById('notifications-container').innerHTML = 'Error: ' + data.message;
+      }
+    })
+    .catch(err => {
+      document.getElementById('notifications-container').innerHTML = 'Error fetching notifications: ' + err;
+    });
+</script>
 </body>
 </html>
 <!-- <script src="../components/notifications_card/notifications_card.js"></script> -->
