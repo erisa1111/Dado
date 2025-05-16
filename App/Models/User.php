@@ -71,6 +71,7 @@ class User
         
         return $result;
     }
+
     public function updateProfile($userId, $data){
         try {
             // Prepare the SQL query
@@ -106,6 +107,45 @@ class User
             throw new \Exception("Profile update failed: " . $e->getMessage());
         }
     }
+
+    public function searchUsersByUsername($username)
+    {
+        try {
+               $searchTerm = '%' . $username . '%';
+                $startsWithTerm = $username . '%';
+
+                $stmt = $this->conn->prepare("
+                    SELECT 
+                        u.*, 
+                        r.name AS role_name
+                    FROM 
+                        users u
+                    INNER JOIN 
+                        roles r ON u.role_id = r.id
+                    WHERE 
+                        u.username LIKE :searchTerm
+                    ORDER BY 
+                        CASE
+                            WHEN u.username = :exact THEN 1
+                            WHEN u.username LIKE :startsWith THEN 2
+                            ELSE 3
+                        END,
+                        u.username ASC
+                ");
+
+                $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+                $stmt->bindParam(':exact', $username, PDO::PARAM_STR);
+                $stmt->bindParam(':startsWith', $startsWithTerm, PDO::PARAM_STR);
+
+                $stmt->execute();
+
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new \Exception("Search failed: " . $e->getMessage());
+        }
+    }
+
+
 
 
 
