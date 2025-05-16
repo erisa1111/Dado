@@ -85,7 +85,7 @@ class Notifications
     foreach ($comments as &$c) {
         $c['type'] = 'comment';
         $c['commenter_profile_picture'] = $c['commenter_profile_picture'] 
-            ? '/assets/uploads/pfps/' . $c['commenter_profile_picture'] 
+            ? '/../../Public/assets/uploads/pfps/' . $c['commenter_profile_picture'] 
             : '/assets/default-profile.png';
     }
 
@@ -93,7 +93,7 @@ class Notifications
     foreach ($likes as &$l) {
         $l['type'] = 'like';
         $l['liker_profile_picture'] = $l['liker_profile_picture'] 
-            ? '/assets/uploads/pfps/' . $l['liker_profile_picture'] 
+            ? '/../../Public/assets/uploads/pfps/' . $l['liker_profile_picture'] 
             : '/assets/default-profile.png';
     }
 
