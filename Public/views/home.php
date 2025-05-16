@@ -87,28 +87,8 @@ usort($allPosts, function ($a, $b) {
   <br><br><br><br><br><br><br><br>
   <div class="content">
     <div class="left">
-      <div class="profile">
+      <?php include __DIR__ . '/../components/profile_card/profile_card.php'; ?>
 
-
-        <div class="photo">
-
-          <img class="profile-image"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s"
-            alt="Profile Image">
-          <div class="info">
-            <h3 class="name">Filan Fisteku</h3>
-            <p class="status">Status</p>
-          </div>
-        </div>
-
-        <div class="bio">
-
-          <div class="bio-box">
-            <p>Hello im a nanny and i have specialized in childcare</p>
-          </div>
-        </div>
-
-      </div>
 
       <div class="recent">
         <div class="image-container">
@@ -328,6 +308,7 @@ usort($allPosts, function ($a, $b) {
                 </button>
                 <div id="current-user-id" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
               </div>
+
             </div>
           <?php elseif ($item['type'] === 'jobpost'):
             $jobpost = $item['data']; ?>
