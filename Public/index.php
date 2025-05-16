@@ -14,6 +14,7 @@ require_once dirname(__DIR__) . '/App/Models/User.php';
 require_once dirname(__DIR__) . '/App/Controllers/AuthController.php';
 require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php';
 require_once dirname(__DIR__) . '/App/Controllers/PostsController.php';
+require_once dirname(__DIR__) . '/App/vendor/autoload.php';
 
 
 // Get the current URL path
@@ -35,6 +36,8 @@ switch ($request_uri) {
 
     case '/login':
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $verified = $_GET['verified'] ?? null;
+            $error = $_GET['error'] ?? null;
             include __DIR__ . '/views/login.php'; 
             exit();
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -42,12 +45,15 @@ switch ($request_uri) {
            
         }
         break;
+     case '/verify-email':
+        (new AuthController())->verifyEmail();
+        break;
 
-        case '/logout':
-            require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php'; // make sure it's included
+    case '/logout':
+        require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php'; // make sure it's included
 
-            (new \App\Controllers\LogoutController())->logout();
-            break;  
+        (new \App\Controllers\LogoutController())->logout();
+        break;  
             
         
     default:

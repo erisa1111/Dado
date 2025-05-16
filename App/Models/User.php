@@ -9,6 +9,7 @@ require_once dirname(__DIR__) . '/../Config/Database.php'; // Adjust the path if
 
 class User
 {
+    public int $lastId;
     private $conn;
 
     public function __construct()
@@ -20,7 +21,8 @@ class User
     public function createUser($data)
     {
         try {
-            $stmt = $this->conn->prepare("CALL CreateUser(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            //qetu  e bon qe me tu kthy id e userit qe sa u ba signup
+            $stmt = $this->conn->prepare("CALL CreateUser(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_id)");
     
             $stmt->execute([
                 $data['name'],
@@ -37,6 +39,11 @@ class User
                 $data['schedule']
             ]);
     
+             $row = $this->conn
+                ->query("SELECT @new_id AS id")
+                ->fetch(PDO::FETCH_ASSOC);
+
+            $this->lastId = isset($row['id']) ? (int)$row['id'] : null;
             return true;
     
         } catch (PDOException $e) {
@@ -107,6 +114,58 @@ class User
         }
     }
 
+  public function isUsernameTaken($username) {
+    // Use the already established connection ($this->conn)
+    $stmt = $this->conn->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    return $stmt->fetchColumn() > 0;
+}
 
+public function storeVerificationToken($userId, $token)
+    {
+        try {
+            $stmt = $this->conn->prepare("UPDATE users SET verification_token = ? WHERE id = ?");
+            return $stmt->execute([$token, $userId]);
+        } catch (PDOException $e) {
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get user by verification token
+     */
+    public function getUserByVerificationToken($token)
+    {
+        try {
+            $stmt = $this->conn->prepare("SELECT * FROM users WHERE verification_token = ?");
+            $stmt->execute([$token]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Verify user by token
+     */
+    public function verifyUser($token)
+    {
+        try {
+            $stmt = $this->conn->prepare("UPDATE users SET is_verified = TRUE, verification_token = NULL WHERE verification_token = ?");
+            return $stmt->execute([$token]);
+        } catch (PDOException $e) {
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get the last inserted user ID
+     * Needed because your createUser uses a stored procedure
+     */
+    public function getLastInsertId(): int
+    {
+        // return the ID captured from the OUT parameter
+        return $this->lastId ?? 0;
+    }
 
 }

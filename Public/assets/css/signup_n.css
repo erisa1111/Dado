@@ -60,7 +60,7 @@ select {
     padding: 12px 15px;
     padding-left: 10px;
     border-radius: 5px;
-    color: #555;
+    color: #777777;
 }
 
 .select-field {
@@ -70,7 +70,7 @@ select {
     margin: 10px 0;
     width: 90%;
     border-radius: 5px;
-    color: #555; /* normal color for selected text */
+    color: #212121; /* normal color for selected text */
 }
 
 /* Make the placeholder option gray */
@@ -86,7 +86,7 @@ h1 {
 
 input {
     background-color: #eee;
-    border: none;
+    border: 2px solid #ccc;
     padding: 12px 15px;
     margin: 10px 0;
     width: 90%;
