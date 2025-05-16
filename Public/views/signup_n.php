@@ -70,6 +70,10 @@ $role = isset($_GET['role']) ? $_GET['role'] : null;
                <input type="password" name="password" id="password" placeholder="Password" required />
                 <span id="password-feedback" style="font-size: 0.9em; color: red;"></span>
                 <button type="submit">Sign Up</button>
+
+                   <div style="margin-top: 15px; text-align: center;">
+       <p style="color: #333; text-decoration: none;  font-size: 0.9em;">Registered already? <a href="login.php" style="color: #333; text-decoration: none;  font-size: 0.9em;"> LogIn</a></p>
+    </div>
             </div>
         </form>
     </div>
