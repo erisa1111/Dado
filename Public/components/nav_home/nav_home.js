@@ -9,7 +9,9 @@ async function loadNav() {
         navPlaceholder.innerHTML = navHtml;
         setActiveLink();
         initializeSearchIcon();
-        initializeSuggestionList(); // Call the suggestion list function here
+        initializeSuggestionList();
+        initializeChatDropdown();
+        initializeRatingDropdown(); // Call the suggestion list function here
     } catch (error) {
         console.error("Error loading navbar:", error);
     }
@@ -135,6 +137,174 @@ function initializeSuggestionList() {
         if (!e.target.closest('.search-container')) {
             suggestionList.style.display = 'none';
         }
+    });
+}
+function initializeChatDropdown() {
+    const chatIcon = document.querySelector('.chat-icon');
+    const dropdown = document.getElementById('chatDropdown');
+    const messageItems = document.querySelectorAll('.message_');
+
+    if (chatIcon && dropdown) {
+        chatIcon.addEventListener('click', () => {
+            dropdown.classList.toggle('open');
+        });
+    } else {
+        console.error("Chat icon or dropdown not found.");
+    }
+
+    // Add click event to each message to open chat window
+    if (messageItems) {
+        messageItems.forEach((message) => {
+            message.addEventListener('click', () => {
+                const userName = message.querySelector('.name').textContent;
+                const userImg = message.querySelector('img').src;
+                openChatWindow(userName, userImg);
+            });
+        });
+    }
+}
+
+function openChatWindow(userName, userImg) {
+    // Check if a chat window for this user already exists
+    if (document.querySelector(`.chat-window[data-user="${userName}"]`)) {
+        return; // Avoid opening duplicate chat windows
+    }
+
+    // Create a new chat window
+    const chatContainer = document.createElement('div');
+    chatContainer.classList.add('chat-window');
+    chatContainer.setAttribute('data-user', userName);
+
+    chatContainer.innerHTML = `
+        <div class="chat-header">
+            <img src="${userImg}" alt="${userName}" class="chat-user-img">
+            <span>${userName}</span>
+            <button class="close-chat">&times;</button>
+        </div>
+        <div class="chat-body">
+            <div class="messages">
+                <!-- Messages will appear here -->
+                <div class="message received">Hi ${userName}, how can I help you?</div>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" placeholder="Type a message...">
+            <button class="send-btn">Send</button>
+        </div>
+    `;
+
+    // Append the chat window to the body
+    document.body.appendChild(chatContainer);
+
+    // Close chat window functionality
+    chatContainer.querySelector('.close-chat').addEventListener('click', () => {
+        chatContainer.remove();
+    });
+
+    // Handle message sending
+    const sendBtn = chatContainer.querySelector('.send-btn');
+    const messageInput = chatContainer.querySelector('input');
+    const messagesDiv = chatContainer.querySelector('.messages');
+
+    sendBtn.addEventListener('click', () => {
+        const message = messageInput.value.trim();
+        if (message) {
+            const sentMessage = document.createElement('div');
+            sentMessage.classList.add('message', 'sent');
+            sentMessage.textContent = message;
+
+            messagesDiv.appendChild(sentMessage);
+            messageInput.value = ''; // Clear input
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
+        }
+    });
+}
+
+function initializeRatingDropdown() {
+    const ratingIcon = document.querySelector('.rating-icon');
+    const ratingDropdown = document.getElementById('ratingDropdown');
+
+    if (ratingIcon && ratingDropdown) {
+        ratingIcon.addEventListener('click', () => {
+            ratingDropdown.classList.toggle('open');
+        });
+    } else {
+        console.error("Rating icon or dropdown not found.");
+    }
+
+    // Handle click on a contract to open the review section
+    const contracts = document.querySelectorAll('.contract');
+    contracts.forEach(contract => {
+        contract.addEventListener('click', () => {
+            const nannyName = contract.querySelector('.name').textContent;
+            const details = contract.querySelector('.details').textContent;
+            
+            openRatingModal(nannyName, details);
+        });
+    });
+}
+
+function openRatingModal(nannyName, details) {
+    const modal = document.createElement('div');
+    modal.classList.add('rating-modal');
+    modal.innerHTML = `
+    <span class="close-modal">&times;</span>
+        <div class="modal-content">
+            
+            <h3>Rate & Review</h3>
+            <div class="contract-details">
+           
+            
+                <strong>Nanny:</strong> ${nannyName} <br>
+                <strong>Details:</strong> ${details}
+            </div>
+            <div class="star-rating">
+                <span class="star" data-value="1">&#9733;</span>
+                <span class="star" data-value="2">&#9733;</span>
+                <span class="star" data-value="3">&#9733;</span>
+                <span class="star" data-value="4">&#9733;</span>
+                <span class="star" data-value="5">&#9733;</span>
+            </div>
+            <textarea placeholder="Write your review here..." class="review-text"></textarea>
+            <button class="submit-review">Submit</button>
+        </div>
+    `;
+
+    // Append modal to the body
+    document.body.appendChild(modal);
+
+    // Handle star rating
+    const stars = modal.querySelectorAll('.star');
+    stars.forEach(star => {
+        star.addEventListener('click', (e) => {
+            const rating = e.target.getAttribute('data-value');
+            stars.forEach(s => s.classList.remove('selected'));
+            for (let i = 0; i < rating; i++) {
+                stars[i].classList.add('selected');
+            }
+        });
+    });
+
+    // Handle review submission
+    modal.querySelector('.submit-review').addEventListener('click', () => {
+        const selectedStars = modal.querySelectorAll('.star.selected').length;
+        const reviewText = modal.querySelector('.review-text').value.trim();
+
+        if (selectedStars > 0 || reviewText) {
+            console.log(`Nanny: ${nannyName}`);
+            console.log(`Details: ${details}`);
+            console.log(`Submitted Rating: ${selectedStars}`);
+            console.log(`Submitted Review: ${reviewText}`);
+            alert("Thank you for your feedback!");
+            modal.remove(); // Close modal
+        } else {
+            alert("Please provide a rating or review before submitting.");
+        }
+    });
+
+    // Close modal functionality
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
     });
 }
 

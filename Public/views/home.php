@@ -59,6 +59,7 @@ usort($allPosts, function ($a, $b) {
 
 
 
+
 ?>
 
 
@@ -87,8 +88,28 @@ usort($allPosts, function ($a, $b) {
   <br><br><br><br><br><br><br><br>
   <div class="content">
     <div class="left">
-      <?php include __DIR__ . '/../components/profile_card/profile_card.php'; ?>
+      <div class="profile">
 
+
+        <div class="photo">
+
+          <img class="profile-image"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYXz402I39yGoxw90IrFr9w0vuQnuVSkgPCg&s"
+            alt="Profile Image">
+          <div class="info">
+            <h3 class="name">Filan Fisteku</h3>
+            <p class="status">Status</p>
+          </div>
+        </div>
+
+        <div class="bio">
+
+          <div class="bio-box">
+            <p>Hello im a nanny and i have specialized in childcare</p>
+          </div>
+        </div>
+
+      </div>
 
       <div class="recent">
         <div class="image-container">
@@ -308,7 +329,6 @@ usort($allPosts, function ($a, $b) {
                 </button>
                 <div id="current-user-id" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
               </div>
-
             </div>
           <?php elseif ($item['type'] === 'jobpost'):
             $jobpost = $item['data']; ?>
@@ -341,36 +361,49 @@ usort($allPosts, function ($a, $b) {
                 <div class="job-header">
                   <h3 class="job-title"><?php echo htmlspecialchars($jobpost['title']); ?></h3>
                   <div class="job-meta">
+                    <div class="m">
                     <span class="job-type"><?php echo htmlspecialchars($jobpost['schedule']); ?></span> |
                     <span class="job-location"><?php echo htmlspecialchars($jobpost['location']); ?></span> |
-                    <span class="job-salary"><?php echo '$' . number_format($jobpost['salary'], 2); ?></span>
+                    <span class="job-salary"><?php echo '$' . number_format($jobpost['salary'], 2); ?></span></div>
+                    <div class="kids"> <p id="kids_num"><?php echo (int) $jobpost['num_kids']; ?></p> <strong>Kids</strong></div>
                   </div>
                 </div>
+                <div class="job_desc_content">
 
                 <div class="job-description">
                   <p><?php echo nl2br(htmlspecialchars($jobpost['description'])); ?></p>
                 </div>
 
                 <div class="job-details-grid">
-                  <div><strong>Number of Kids:</strong> <?php echo (int) $jobpost['num_kids']; ?></div>
-                  <div><strong>Start Hour:</strong>
+                  
+                  <div class="time_date">
+
+                  <div><i class="fa-regular fa-clock"></i>
                     <?php echo isset($jobpost['start_hour']) ? htmlspecialchars($jobpost['start_hour']) : 'Not set'; ?>
-                  </div>
-                  <div><strong>End Hour:</strong>
+                    <span> - </span>
                     <?php echo isset($jobpost['end_hour']) ? htmlspecialchars($jobpost['end_hour']) : 'Not set'; ?></div>
-                  <div><strong>Date From:</strong>
-                    <?php echo isset($jobpost['date_from']) ? htmlspecialchars($jobpost['date_from']) : 'Not set'; ?></div>
-                  <div><strong>Date To:</strong>
-                    <?php echo isset($jobpost['date_to']) ? htmlspecialchars($jobpost['date_to']) : 'Not set'; ?></div>
 
+                 
+             
+                  <div><i class="fa-regular fa-calendar"></i>
+                    <?php echo isset($jobpost['date_from']) ? htmlspecialchars($jobpost['date_from']) : 'Not set'; ?>
+                                        <span> - </span>
+
+                    <?php echo isset($jobpost['date_to']) ? htmlspecialchars($jobpost['date_to']) : 'Not set'; ?>
+                  </div>
+                  </div>
+                </div>
                 </div>
 
-                <div class="job-post-actions">
-                  <form method="POST" action="apply.php" class="apply-form">
-                    <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
-                    <button type="submit" class="apply-btn">Apply</button>
-                  </form>
-                </div>
+                <?php if ($_SESSION['user_id'] != $jobpost['parent_id']) : ?>
+  <div class="job-post-actions">
+    <form method="POST" action="apply.php" class="apply-form">
+      <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
+      <button type="submit" class="apply-btn">Apply</button>
+    </form>
+  </div>
+<?php endif; ?>
+
               </div>
               <div class="job-post-actions2">
                 <button class="act job-like-btn" data-post-id="<?php echo $jobpost['id']; ?>">
