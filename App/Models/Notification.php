@@ -196,4 +196,46 @@ class Notifications
 
     return $all;
     }
+
+    public function acceptApplication(int $applicationId): bool
+{
+    try {
+        $stmt = $this->db->prepare("CALL AcceptApplication(?)");
+        $stmt->execute([$applicationId]);
+        // Clear any extra result sets
+        while ($stmt->nextRowset()) {}
+        return true;
+    } catch (PDOException $e) {
+        error_log("Database error in acceptApplication: " . $e->getMessage());
+        return false;
+    }
+}
+
+public function createJobFromApplication(int $applicationId): bool
+{
+    try {
+        $stmt = $this->db->prepare("CALL CreateJobFromApplication(?)");
+        $stmt->execute([$applicationId]);
+        // Clear any extra result sets
+        while ($stmt->nextRowset()) {}
+        return true;
+    } catch (PDOException $e) {
+        error_log("Database error in createJobFromApplication: " . $e->getMessage());
+        return false;
+    }
+}
+public function declineApplication(int $applicationId): bool
+{
+    try {
+        $stmt = $this->db->prepare("CALL DeclineApplication(?)");
+        $stmt->execute([$applicationId]);
+        // Clear any extra result sets
+        while ($stmt->nextRowset()) {}
+        return true;
+    } catch (PDOException $e) {
+        error_log("Database error in declineApplication: " . $e->getMessage());
+        return false;
+    }
+}
+
 }

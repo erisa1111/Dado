@@ -2,8 +2,8 @@
 namespace App\Models;
 
 use Config\Database;
-// use PDO; // ✅ ADD THIS LINE
-// use PDOException;
+use PDO; // ✅ ADD THIS LINE
+use PDOException;
 
 class JobPost{
     private $db;
