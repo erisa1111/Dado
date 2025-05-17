@@ -72,6 +72,79 @@ class Notifications
         return [];
     }
 }
+// ✅ NEW: Job Post Comments Notifications
+    public function getJobPostCommentsNotifications(int $userId): array
+    {
+        try {
+            $stmt = $this->db->prepare("CALL GetPostJobComments(?)");
+            $stmt->execute([$userId]);
+            $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            while ($stmt->nextRowset()) {}
+
+            foreach ($notifications as &$notification) {
+                $notification['commenter_profile_picture'] = !empty($notification['commenter_profile_picture']) 
+                    ? $this->profilePicBaseUrl . $notification['commenter_profile_picture'] 
+                    : '/assets/img/default-profile.png';
+            }
+
+            return $notifications;
+        } catch (PDOException $e) {
+            error_log("Database error in getJobPostCommentsNotifications: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // ✅ NEW: Job Post Likes Notifications
+    public function getJobPostLikesNotifications(int $userId): array
+    {
+        try {
+            $stmt = $this->db->prepare("CALL GetPostJobLikes(?)");
+            $stmt->execute([$userId]);
+            $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            while ($stmt->nextRowset()) {}
+
+            foreach ($notifications as &$notification) {
+                $notification['liker_profile_picture'] = !empty($notification['liker_profile_picture']) 
+                    ? $this->profilePicBaseUrl . $notification['liker_profile_picture'] 
+                    : '/assets/img/default-profile.png';
+            }
+
+            return $notifications;
+        } catch (PDOException $e) {
+            error_log("Database error in getJobPostLikesNotifications: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // ✅ NEW: Job Post Applications Notifications
+    public function getJobPostApplicationsNotifications(int $userId): array
+    {
+        try {
+            $stmt = $this->db->prepare("CALL GetJobPostApplications(?)");
+            $stmt->execute([$userId]);
+            $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            while ($stmt->nextRowset()) {}
+
+           foreach ($notifications as &$notification) {
+    $notification['nanny_profile_picture'] = !empty($notification['nanny_profile_picture']) 
+        ? $this->profilePicBaseUrl . $notification['nanny_profile_picture'] 
+        : '/assets/img/default-profile.png';
+
+    // 🛠 Rename fields for frontend compatibility
+    $notification['applicant_name'] = $notification['nanny_name'];
+    $notification['applicant_surname'] = $notification['nanny_surname'];
+    $notification['applicant_profile_picture'] = $notification['nanny_profile_picture'];
+
+    // (Optional) unset if you want to clean up
+    unset($notification['nanny_name'], $notification['nanny_surname'], $notification['nanny_profile_picture']);
+}
+
+            return $notifications;
+        } catch (PDOException $e) {
+            error_log("Database error in getJobPostApplicationsNotifications: " . $e->getMessage());
+            return [];
+        }
+    }
 
     /**
      * Optionally merge comments and likes into a unified list, sorted by date
@@ -97,7 +170,26 @@ class Notifications
             : '/assets/default-profile.png';
     }
 
-    $all = array_merge($comments, $likes);
+    
+    // 💼 Job post comments
+    $jobComments = $this->getJobPostCommentsNotifications($userId);
+    foreach ($jobComments as &$jc) {
+        $jc['type'] = 'job_comment';
+    }
+
+    // 👍 Job post likes
+    $jobLikes = $this->getJobPostLikesNotifications($userId);
+    foreach ($jobLikes as &$jl) {
+        $jl['type'] = 'job_like';
+    }
+
+    // 📩 Job applications
+    $jobApplications = $this->getJobPostApplicationsNotifications($userId);
+    foreach ($jobApplications as &$ja) {
+        $ja['type'] = 'job_application';
+    }
+
+    $all = array_merge($comments, $likes,  $jobComments, $jobLikes, $jobApplications);
     usort($all, function($a, $b) {
         return strtotime($b['created_at']) <=> strtotime($a['created_at']);
     });

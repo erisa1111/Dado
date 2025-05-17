@@ -2,6 +2,8 @@
 namespace App\Models;
 
 use Config\Database;
+// use PDO; // ✅ ADD THIS LINE
+// use PDOException;
 
 class JobPost{
     private $db;
@@ -77,5 +79,28 @@ class JobPost{
         $stmt = $this->db->prepare("CALL CloseJobPost(?)");
         return $stmt->execute([$id]);
     }
+    public function hasAlreadyApplied(int $nannyId, int $jobPostId): bool
+{
+    $stmt = $this->db->prepare("CALL HasAlreadyApplied(?, ?)");
+    $stmt->execute([$nannyId, $jobPostId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+    
+    return $result && $result['already_applied'] == 1;
+}
+    public function applyToJobPost($nannyId, $jobPostId, $status = 'pending')
+{
+    $stmt = $this->db->prepare("CALL CreateJobApplication(?, ?, ?)");
+    $stmt->execute([
+        $nannyId,
+        $jobPostId,
+        $status
+    ]);
+
+    // If you want to confirm it worked:
+    $result = $stmt->fetch();
+    $stmt->closeCursor();
+    return $result ?? true; // return result if any, or just true
+}
 }
 

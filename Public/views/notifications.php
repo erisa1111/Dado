@@ -19,7 +19,9 @@ require_once __DIR__ . '/../../App/Controllers/NotificationsController.php';
 
 // Initialize the Notifications model
 $notificationsModel = new \App\Models\Notifications();
-
+$jobComments = $notificationsModel->getJobPostCommentsNotifications($user_id);
+$jobLikes = $notificationsModel->getJobPostLikesNotifications($user_id);
+$jobApplications = $notificationsModel->getJobPostApplicationsNotifications($user_id);
 // Get all notifications for the logged in user
 $allNotifications = $notificationsModel->getAllNotifications($user_id);
 
@@ -123,58 +125,86 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
  <script>
   const fetchUrl = window.location.pathname + '?action=fetch';
 
-  fetch(fetchUrl, { credentials: 'include' })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        const container = document.getElementById('notifications-container');
-        container.innerHTML = ''; // Clear previous
+fetch(fetchUrl, { credentials: 'include' })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      const container = document.getElementById('notifications-container');
+      container.innerHTML = ''; // Clear previous
 
-        data.notifications.forEach(notification => {
-          const card = document.createElement('div');
-          card.className = 'notification-card';
-const iconHTML = notification.type === 'comment'
-  ? `<i class="fa-regular fa-comment notification-icon"></i>`
-  : `<i class="fa-regular fa-heart notification-icon"></i>`;
-        const username = notification.type === 'comment'
-  ? `${notification.commenter_name} ${notification.commenter_surname}`
-  : `${notification.liker_name} ${notification.liker_surname}`;
-      const profilePicture = notification.type === 'comment'
-          ? notification.commenter_profile_picture
-          : notification.liker_profile_picture;
+      data.notifications.forEach(notification => {
+        const card = document.createElement('div');
+        card.className = 'notification-card';
 
-          const commentPreview = notification.type === 'comment'
-            ? `<div class="notification-preview">
-                 <p class="notification-preview-text">${notification.comment}</p>
-               </div>`
-            : '';
+        let iconHTML = '';
+        let message = '';
+        let profilePicture = '/assets/default-profile.png';
+        let commentPreview = '';
 
-    card.innerHTML = `
-    <div class="notification-header">
-      <img class="notification-profile-pic" src="${profilePicture}" alt="${username}'s profile picture" />
-      ${iconHTML}
-      <div class="notification-details">
-        <p class="notification-username">${username}</p>
-        <p class="notification-action">
-          ${notification.type === 'comment' ? 'commented on your post' : 'liked your post'}
-          "<strong>${notification.post_title}</strong>"
-        </p>
-        <span class="notification-time">${notification.created_at}</span>
-      </div>
-    </div>
-    ${commentPreview}
-  `;
-  container.appendChild(card);
-});
+        switch (notification.type) {
+          case 'comment':
+            iconHTML = `<i class="fa-regular fa-comment notification-icon"></i>`;
+            profilePicture = notification.commenter_profile_picture;
+            message = `<strong>${notification.commenter_name} ${notification.commenter_surname}</strong> commented on your post.`;
+            commentPreview = `<div class="notification-preview">
+                                <p class="notification-preview-text">${notification.comment}</p>
+                              </div>`;
+            break;
+
+          case 'like':
+            iconHTML = `<i class="fa-regular fa-heart notification-icon"></i>`;
+            profilePicture = notification.liker_profile_picture;
+            message = `<strong>${notification.liker_name} ${notification.liker_surname}</strong> liked your post.`;
+            break;
+
+          case 'job_comment':
+            iconHTML = `<i class="fa-solid fa-briefcase notification-icon"></i>`;
+            message = `<strong>${notification.commenter_name} ${notification.commenter_surname}</strong> commented on your job post.`;
+            profilePicture = notification.commenter_profile_picture || '/assets/default-profile.png';
+            commentPreview = `<div class="notification-preview">
+                                <p class="notification-preview-text">${notification.comment}</p>
+                              </div>`;
+            break;
+
+          case 'job_like':
+            iconHTML = `<i class="fa-solid fa-briefcase notification-icon"></i>`;
+            message = `<strong>${notification.liker_name} ${notification.liker_surname}</strong> liked your job post.`;
+            profilePicture = notification.liker_profile_picture || '/assets/default-profile.png';
+            break;
+
+          case 'job_application':
+            iconHTML = `<i class="fa-solid fa-file-alt notification-icon"></i>`;
+            message = `<strong>${notification.applicant_name} ${notification.applicant_surname}</strong> applied for your job post.`;
+            profilePicture = notification.applicant_profile_picture || '/assets/default-profile.png';
+            break;
+
+          default:
+            message = 'Unknown notification type.';
+        }
+
+        card.innerHTML = `
+          <div class="notification-left">
+            <img src="${profilePicture}" alt="Profile" class="notification-profile-pic" />
+            ${iconHTML}
+          </div>
+          <div class="notification-message">
+            <p>${message}</p>
+            <span class="notification-time">${new Date(notification.created_at).toLocaleString()}</span>
+            ${commentPreview}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    } else {
+      console.error("Failed to fetch notifications:", data.message);
+    }
+  })
+  .catch(err => {
+    console.error("Fetch error:", err);
+  });
 
 
-      } else {
-        document.getElementById('notifications-container').innerHTML = 'Error: ' + data.message;
-      }
-    })
-    .catch(err => {
-      document.getElementById('notifications-container').innerHTML = 'Error fetching notifications: ' + err;
-    });
 </script>
 </body>
 </html>
