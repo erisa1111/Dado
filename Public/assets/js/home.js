@@ -1081,3 +1081,33 @@ async function handleEditJobComment(commentId) {
         commentBody.innerHTML = currentText;
     });
 }
+
+document.querySelectorAll('.apply-btn').forEach(button => {
+    button.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const form = e.target.closest('form');
+        const jobId = form.querySelector('input[name="job_id"]').value;
+
+        try {
+            const response = await fetch('/views/jobpost_controller.php?action=applyToJobPost', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ job_post_id: jobId })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message); // or update UI accordingly
+            } else {
+                alert('Failed to apply: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while applying.');
+        }
+    });
+});

@@ -65,6 +65,47 @@ class JobPostController
 
         return $id;
     }
+    public function applyToJobPost($data)
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+        exit;
+    }
+
+    $nannyId = $_SESSION['user_id'] ?? null;
+    $jobPostId = $data['job_post_id'] ?? null;
+    if (!$nannyId) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'User not logged in.']);
+        exit;
+    }
+
+   
+
+    if (!$jobPostId) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Job post ID is required.']);
+        exit;
+    }
+
+    
+    try {
+        $result = $this->jobPostModel->applyToJobPost($nannyId, $jobPostId, 'pending');
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Application submitted successfully.',
+            'result' => $result
+        ]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Failed to submit application: ' . $e->getMessage()
+        ]);
+    }
+}
 
     public function updateJob($id, $data)
     {
@@ -111,6 +152,25 @@ class JobPostController
                     echo json_encode(['success' => false, 'message' => 'Job ID required']);
                 }
                 break;
+
+            case 'applyToJobPost':
+                $postData = json_decode(file_get_contents('php://input'), true);
+                $this->applyToJobPost($postData);
+            break;
+            case 'checkIfApplied':
+               $input = json_decode(file_get_contents('php://input'), true);
+               $jobPostId = $input['job_post_id'] ?? null;
+               $nannyId = $_SESSION['user_id'] ?? null;
+
+                 if (!$nannyId || !$jobPostId) {
+                 echo json_encode(['success' => false, 'message' => 'Missing data']);
+                 exit;
+             }
+
+             $alreadyApplied = $this->jobPostModel->hasAlreadyApplied($nannyId, $jobPostId);
+             echo json_encode(['success' => true, 'already_applied' => $alreadyApplied]);
+              break;
+
 
             // You can add more actions like search, filter etc.
 
