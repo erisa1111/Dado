@@ -331,11 +331,8 @@ function openRatingModal(nannyName, details,job_type) {
                 <strong>Job Type:</strong> ${job_type} <br>
             </div>
             <div class="star-rating">
-                <span class="star" data-value="1">&#9733;</span>
-                <span class="star" data-value="2">&#9733;</span>
-                <span class="star" data-value="3">&#9733;</span>
-                <span class="star" data-value="4">&#9733;</span>
-                <span class="star" data-value="5">&#9733;</span>
+                    <input type="number" step="0.1" min="1" max="5" placeholder="Rate (e.g. 4.5)" class="rating-number" />
+
             </div>
             <textarea placeholder="Write your review here..." class="review-text"></textarea>
             <button class="submit-review">Submit</button>

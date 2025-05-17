@@ -26,7 +26,9 @@ class JobController
     }
 
     try {
+        $this->jobModel->updateJobStatuses();
         $jobs = $this->jobModel->getJobsForUser($userId);
+       
 
         if ($jobs) {
     echo json_encode([
@@ -45,7 +47,8 @@ class JobController
                 'other_person_name' => $otherPersonName,
                 'start_date' => $job['start_date'] ?? 'Unknown Date',
                 'end_date' => $job['end_date'] ?? 'Unknown Date',
-                'job_type' => $job['job_type'] ?? 'Unknown Type'
+                'job_type' => $job['job_type'] ?? 'Unknown Type',
+                'status' => $job['status'] ?? 'Unknown Status',
             ];
         }, $jobs)
     ]);

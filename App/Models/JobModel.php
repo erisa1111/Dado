@@ -54,6 +54,33 @@ public function getJobsForUser($userId) {
         return [];
     }
 }
+// App/Models/JobModel.php
+public function updateJobStatuses() {
+    try {
+
+        $this->db->beginTransaction();
+
+        $sql = "UPDATE jobs
+                SET status = CASE 
+                    WHEN end_date < CURDATE() THEN 'closed'
+                    ELSE 'ongoing'
+                END";
+
+        $stmt = $this->db->prepare($sql);
+        $result = $stmt->execute();
+
+        $this->db->commit();
+
+        return $result;
+    } catch (\PDOException $e) {
+        $this->db->rollBack();
+        error_log("Failed updating job statuses: " . $e->getMessage());
+        echo "Error updating statuses: " . $e->getMessage();
+        return false;
+    }
+}
+
+
 
 }
 
