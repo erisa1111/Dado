@@ -220,31 +220,102 @@ function openChatWindow(userName, userImg) {
     });
 }
 
-function initializeRatingDropdown() {
+async function initializeRatingDropdown() {
     const ratingIcon = document.querySelector('.rating-icon');
     const ratingDropdown = document.getElementById('ratingDropdown');
 
     if (ratingIcon && ratingDropdown) {
-        ratingIcon.addEventListener('click', () => {
+        ratingIcon.addEventListener('click', async () => {
+            // Only fetch contracts if dropdown is being opened and hasn't been loaded yet
+            if (!ratingDropdown.classList.contains('open') && !ratingDropdown.dataset.loaded) {
+                try {
+                    // Get the logged-in user ID (you'll need to make this available)
+                    const userId = getUserId(); // You'll need to implement this function
+                    
+                    // Fetch contracts from server
+                    const response = await fetch('http://localhost:4000/views/get_jobs.php');
+                    if (!response.ok) throw new Error('Failed to fetch contracts');
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.jobs.length > 0) {
+                        // Clear existing hardcoded contracts (keep header and footer)
+                        const contractsContainer = ratingDropdown;
+                        const header = contractsContainer.querySelector('.header');
+                        const footer = contractsContainer.querySelector('.footer');
+                        
+                        contractsContainer.innerHTML = '';
+                        contractsContainer.appendChild(header);
+                        
+                        // Add each contract from the database
+                       data.jobs.forEach(job => {
+    // Extract only the date part, ignore the time
+    const startDate = job.start_date.split(' ')[0];
+    const endDate = job.end_date ? job.end_date.split(' ')[0] : '';  // in case end_date is missing
+
+    const contractDiv = document.createElement('div');
+    contractDiv.className = 'contract';
+    contractDiv.dataset.id = job.id;
+
+    contractDiv.innerHTML = `
+        <div class="name">${job.other_person_name || 'Unknown'}</div>
+        <div class="details">${startDate}${endDate ? ' - ' + endDate : ''} | ${job.job_type}</div>
+    `;
+
+    contractsContainer.appendChild(contractDiv);
+});
+
+                        
+                        contractsContainer.appendChild(footer);
+                        
+                        // Mark as loaded to prevent refetching
+                        ratingDropdown.dataset.loaded = 'true';
+                        
+                        // Reattach click handlers to the new contracts
+                        attachContractClickHandlers();
+                    }
+                } catch (error) {
+                    console.error('Error loading contracts:', error);
+                    // Optionally show an error message in the dropdown
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error';
+                    errorDiv.textContent = 'Failed to load contracts';
+                    ratingDropdown.appendChild(errorDiv);
+                }
+            }
+            
             ratingDropdown.classList.toggle('open');
         });
     } else {
         console.error("Rating icon or dropdown not found.");
     }
 
+    // Initial attachment of click handlers
+    attachContractClickHandlers();
+}
+
+function attachContractClickHandlers() {
     // Handle click on a contract to open the review section
     const contracts = document.querySelectorAll('.contract');
     contracts.forEach(contract => {
         contract.addEventListener('click', () => {
             const nannyName = contract.querySelector('.name').textContent;
-            const details = contract.querySelector('.details').textContent;
+            const details = contract.querySelector('.details').textContent.split('|')[0].trim();
+            const job_type = contract.querySelector('.details').textContent.split('|')[1].trim();
             
-            openRatingModal(nannyName, details);
+            openRatingModal(nannyName, details, job_type);
         });
     });
 }
 
-function openRatingModal(nannyName, details) {
+// You'll need to implement this function to get the current user's ID
+function getUserId() {
+    // This depends on how you store user info in the frontend
+    // Could be from a global variable, localStorage, or a meta tag
+    return localStorage.getItem('userId') || document.querySelector('meta[name="user-id"]')?.content;
+}
+
+function openRatingModal(nannyName, details,job_type) {
     const modal = document.createElement('div');
     modal.classList.add('rating-modal');
     modal.innerHTML = `
@@ -255,8 +326,9 @@ function openRatingModal(nannyName, details) {
             <div class="contract-details">
            
             
-                <strong>Nanny:</strong> ${nannyName} <br>
-                <strong>Details:</strong> ${details}
+                <strong>Person:</strong> ${nannyName} <br>
+                <strong>Date:</strong> ${details} <br>
+                <strong>Job Type:</strong> ${job_type} <br>
             </div>
             <div class="star-rating">
                 <span class="star" data-value="1">&#9733;</span>

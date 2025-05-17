@@ -427,6 +427,8 @@ nav a {
   top: 50px;
   right: 80px;
   width: 300px;
+   max-height: 700px;   
+    overflow-y: auto;   
   background: white;
   border: 1px solid #ccc;
   border-radius: 8px;
