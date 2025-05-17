@@ -145,6 +145,60 @@ class User
         }
     }
 
+    public function searchUsersWithFilters($username, $location = null, $roleId = null, $minRating = null)
+    {
+        $query = "
+            SELECT u.*, r.name AS role_name
+            FROM users u
+            INNER JOIN roles r ON u.role_id = r.id
+            WHERE u.username LIKE :searchTerm
+        ";
+
+        // Build dynamic filters
+        $params = [
+            ':searchTerm' => '%' . $username . '%',
+            ':exact' => $username,
+            ':startsWith' => $username . '%',
+            ':contains' => '%' . $username . '%'
+        ];
+
+        if (!empty($location)) {
+            $query .= " AND u.location = :location";
+            $params[':location'] = $location;
+        }
+
+        if (isset($roleId) && $roleId !== '') {
+            $query .= " AND u.role_id = :roleId";
+            $params[':roleId'] = $roleId;
+        }
+
+
+        // GROUP BY only if you're aggregating ratings (currently not using JOIN, so skip)
+        if (!empty($minRating)) {
+            // Uncomment and implement when ratings table is ready
+            // $query .= " GROUP BY u.id HAVING AVG(rat.rating) >= :minRating";
+            // $params[':minRating'] = $minRating;
+        }
+
+        // Best match ordering
+        $query .= "
+            ORDER BY 
+                CASE
+                    WHEN u.username = :exact THEN 1
+                    WHEN u.username LIKE :startsWith THEN 2
+                    WHEN u.username LIKE :contains THEN 3
+                    ELSE 4
+                END,
+                u.username ASC
+        ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    }
+
 
 
 
