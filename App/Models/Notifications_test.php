@@ -48,3 +48,14 @@ $applications = $notifications->getJobPostApplicationsNotifications($userId);
 echo "<pre>";
 print_r($applications);
 echo "</pre>";
+
+$testApplicationId = 21;
+
+echo "<h2>Testing createJobFromApplication({$testApplicationId})</h2>";
+$jobCreated = $notifications->createJobFromApplication($testApplicationId);
+
+if ($jobCreated) {
+    echo "<p style='color:green;'>✅ Job was successfully created from application ID {$testApplicationId}.</p>";
+} else {
+    echo "<p style='color:red;'>❌ Failed to create job from application ID {$testApplicationId}. Check error log.</p>";
+}

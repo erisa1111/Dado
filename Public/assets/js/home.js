@@ -1083,31 +1083,77 @@ async function handleEditJobComment(commentId) {
 }
 
 document.querySelectorAll('.apply-btn').forEach(button => {
+    const form = button.closest('form');
+    const jobId = form.querySelector('input[name="job_id"]').value;
+
+    // Check if already applied
+    fetch('/views/jobpost_controller.php?action=checkIfApplied', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ job_post_id: jobId })
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
+    .then(data => {
+        if (data.success && data.already_applied) {
+            button.textContent = 'Applied';
+            button.disabled = true;
+            button.style.backgroundColor = '#b6e1a3';
+        }
+    })
+    .catch(error => {
+        console.error('Error checking application status:', error);
+    });
+
+    // Handle apply click
     button.addEventListener('click', async (e) => {
         e.preventDefault();
-
-        const form = e.target.closest('form');
-        const jobId = form.querySelector('input[name="job_id"]').value;
+        const jobIdClicked = form.querySelector('input[name="job_id"]').value;
 
         try {
             const response = await fetch('/views/jobpost_controller.php?action=applyToJobPost', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ job_post_id: jobId })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ job_post_id: jobIdClicked })
             });
 
-            const data = await response.json();
+            // First check if the response is OK (status 200-299)
+            if (!response.ok) {
+                // Try to get the error message from the response
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
 
+            const data = await response.json();
+            
             if (data.success) {
-                alert(data.message); // or update UI accordingly
+                button.textContent = 'Applied';
+                button.disabled = true;
+                button.style.backgroundColor = '#b6e1a3';
+                // Use a more user-friendly notification system
+                showNotification('Application submitted successfully!', 'success');
             } else {
-                alert('Failed to apply: ' + data.message);
+                showNotification(data.message || 'Failed to submit application', 'error');
             }
         } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while applying.');
+            console.error('Error while applying:', error);
+            showNotification(error.message || 'An error occurred while applying', 'error');
         }
     });
 });
+
+// Simple notification function (you can replace with a proper notification system)
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}

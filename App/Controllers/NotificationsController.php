@@ -96,4 +96,112 @@ class NotificationsController
         $applications = $this->notificationsModel->getJobPostApplicationsNotifications($userId);
         echo json_encode(['success' => true, 'job_applications' => $applications]);
     }
+     public function acceptApplication()
+    {
+        header('Content-Type: application/json');
+        $userId = $_SESSION['user_id'] ?? null;
+        if (!$userId) {
+            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+            return;
+        }
+
+        // Get application ID from POST (adjust if you use GET)
+        $applicationId = $_POST['application_id'] ?? null;
+
+        if (!$applicationId) {
+            echo json_encode(['success' => false, 'message' => 'Missing application ID']);
+            return;
+        }
+
+        $result = $this->notificationsModel->acceptApplication((int)$applicationId);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Application accepted']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to accept application']);
+        }
+    }
+    public function createJobFromApplication()
+{
+    header('Content-Type: application/json');
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) {
+        echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+        return;
+    }
+
+    $applicationId = $_POST['application_id'] ?? null;
+    if (!$applicationId) {
+        echo json_encode(['success' => false, 'message' => 'Missing application ID']);
+        return;
+    }
+
+    $result = $this->notificationsModel->createJobFromApplication((int)$applicationId);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Job contract created successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to create job contract']);
+    }
+}
+
+public function acceptAndCreateJob()
+{
+    header('Content-Type: application/json');
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) {
+        echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+        return;
+    }
+
+    $applicationId = $_POST['application_id'] ?? null;
+    if (!$applicationId) {
+        echo json_encode(['success' => false, 'message' => 'Missing application ID']);
+        return;
+    }
+
+    $accepted = $this->notificationsModel->acceptApplication((int)$applicationId);
+    if (!$accepted) {
+        echo json_encode(['success' => false, 'message' => 'Failed to accept application']);
+        return;
+    }
+error_log("Attempting to create job from application ID: $applicationId");
+$jobCreated = $this->notificationsModel->createJobFromApplication((int)$applicationId);
+error_log("Job creation result: " . ($jobCreated ? 'SUCCESS' : 'FAILURE'));
+    if (!$jobCreated) {
+        echo json_encode(['success' => false, 'message' => 'Application accepted, but failed to create job']);
+        return;
+    }
+
+    echo json_encode(['success' => true, 'message' => 'Application accepted and job contract created']);
+}
+
+    /**
+     * Decline a job application by changing its status to 'declined'
+     */
+    public function declineApplication()
+    {
+        header('Content-Type: application/json');
+        $userId = $_SESSION['user_id'] ?? null;
+        if (!$userId) {
+            echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+            return;
+        }
+
+        // Get application ID from POST (adjust if you use GET)
+        $applicationId = $_POST['application_id'] ?? null;
+
+        if (!$applicationId) {
+            echo json_encode(['success' => false, 'message' => 'Missing application ID']);
+            return;
+        }
+
+        $result = $this->notificationsModel->declineApplication((int)$applicationId);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Application declined']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to decline application']);
+        }
+    }
 }

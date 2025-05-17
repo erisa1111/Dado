@@ -65,8 +65,10 @@ class JobPostController
 
         return $id;
     }
-    public function applyToJobPost($data)
+  public function applyToJobPost($data)
 {
+    header('Content-Type: application/json'); // Always set header first
+    
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
         echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
@@ -75,13 +77,12 @@ class JobPostController
 
     $nannyId = $_SESSION['user_id'] ?? null;
     $jobPostId = $data['job_post_id'] ?? null;
+    
     if (!$nannyId) {
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'User not logged in.']);
         exit;
     }
-
-   
 
     if (!$jobPostId) {
         http_response_code(400);
@@ -89,14 +90,18 @@ class JobPostController
         exit;
     }
 
-    
+    if ($this->jobPostModel->hasAlreadyApplied($nannyId, $jobPostId)) {
+        echo json_encode(['success' => false, 'message' => 'You have already applied to this job.']);
+        exit;
+    }
+
     try {
         $result = $this->jobPostModel->applyToJobPost($nannyId, $jobPostId, 'pending');
-
+        
         echo json_encode([
             'success' => true,
             'message' => 'Application submitted successfully.',
-            'result' => $result
+            'application' => $result
         ]);
     } catch (Exception $e) {
         http_response_code(500);
@@ -105,6 +110,7 @@ class JobPostController
             'message' => 'Failed to submit application: ' . $e->getMessage()
         ]);
     }
+    exit; // Ensure no further output
 }
 
     public function updateJob($id, $data)

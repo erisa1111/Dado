@@ -36,4 +36,23 @@ $controller->index(); // this will include the notifications.php view
 $viewOutput = ob_get_clean();
 echo "<div style='border:1px solid #ccc;padding:10px;'>" . $viewOutput . "</div>";
 
+// // ✅ TEST: createJobFromApplication()
+echo "<h2>Test createJobFromApplication()</h2>";
+$_POST['application_id'] = 21; // ✅ Replace with a valid application ID from your DB
+ob_start();
+$controller->createJobFromApplication();
+$jobOutput = ob_get_clean();
+echo "<pre style='color:blue;'>" . htmlspecialchars($jobOutput) . "</pre>";
+
+// ✅ TEST: acceptAndCreateJob()
+echo "<h2>Test acceptAndCreateJob()</h2>";
+$_POST['application_id'] = 22; // ✅ Replace with another valid application ID
+ob_start();
+$controller->acceptAndCreateJob();
+$acceptOutput = ob_get_clean();
+echo "<pre style='color:green;'>" . htmlspecialchars($acceptOutput) . "</pre>";
+
+// ------------------------------------------------------------
+
+
 ob_end_flush(); // send all buffered output
