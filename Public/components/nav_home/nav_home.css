@@ -474,6 +474,7 @@ nav a {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 1100;
+
   padding: 20px;
 }
 
@@ -485,7 +486,7 @@ nav a {
 
 .rating-modal .close-modal {
   align-self: flex-end;
-  font-size: 18px;
+  font-size: 30px;
   cursor: pointer;
   background-color:white;
   color: #e2687e;

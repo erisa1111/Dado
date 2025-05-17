@@ -248,8 +248,9 @@ function openRatingModal(nannyName, details) {
     const modal = document.createElement('div');
     modal.classList.add('rating-modal');
     modal.innerHTML = `
+    <span class="close-modal">&times;</span>
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            
             <h3>Rate & Review</h3>
             <div class="contract-details">
            
