@@ -132,14 +132,12 @@ const suggestions = [
 //         }
 //     });
 
-
     // Close the suggestion list if clicking outside of the search input
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.search-container')) {
             suggestionList.style.display = 'none';
         }
     });
-
 function initializeChatDropdown() {
     const chatIcon = document.querySelector('.chat-icon');
     const dropdown = document.getElementById('chatDropdown');
