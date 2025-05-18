@@ -204,4 +204,54 @@ error_log("Job creation result: " . ($jobCreated ? 'SUCCESS' : 'FAILURE'));
             echo json_encode(['success' => false, 'message' => 'Failed to decline application']);
         }
     }
+
+    public function fetchAcceptedApplicationNotification()
+{
+    header('Content-Type: application/json');
+    $userId = $_SESSION['user_id'] ?? null;
+
+    if (!$userId) {
+        echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+        return;
+    }
+
+    // Get nanny ID and job post ID from GET or POST (adjust based on your frontend logic)
+    $nannyId = $_GET['nanny_id'] ?? $_POST['nanny_id'] ?? null;
+    $jobPostId = $_GET['job_post_id'] ?? $_POST['job_post_id'] ?? null;
+
+    if (!$nannyId || !$jobPostId) {
+        echo json_encode(['success' => false, 'message' => 'Missing nanny ID or job post ID']);
+        return;
+    }
+
+    $notification = $this->notificationsModel->getAcceptedApplicationNotification((int)$nannyId, (int)$jobPostId);
+
+    if ($notification) {
+        echo json_encode(['success' => true, 'notification' => $notification]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'No accepted application notification found']);
+    }
+}
+
+public function checkApplicationAcceptance()
+{
+    header('Content-Type: application/json');
+    
+    // You can validate the session here, or skip it if not necessary
+    $nannyId = $_GET['nanny_id'] ?? null;
+    $jobPostId = $_GET['job_post_id'] ?? null;
+
+    if (!$nannyId || !$jobPostId) {
+        echo json_encode(['success' => false, 'message' => 'Missing parameters']);
+        return;
+    }
+
+    $notification = $this->notificationsModel->getAcceptedApplicationNotification((int)$nannyId, (int)$jobPostId);
+
+    if ($notification) {
+        echo json_encode(['success' => true, 'notification' => $notification]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'No acceptance notification found']);
+    }
+}
 }

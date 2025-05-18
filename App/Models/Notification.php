@@ -238,4 +238,36 @@ public function declineApplication(int $applicationId): bool
     }
 }
 
+public function getAcceptedApplicationNotification(int $nannyId, int $jobPostId): ?array
+{
+    try {
+        // Përgatit thirrjen e procedurës me parametra IN dhe OUT
+        $stmt = $this->db->prepare("CALL isApplicationAccepted(:inNannyId, :inJobPostId, @outResult)");
+        $stmt->bindParam(':inNannyId', $nannyId, PDO::PARAM_INT);
+        $stmt->bindParam(':inJobPostId', $jobPostId, PDO::PARAM_INT);
+        $stmt->execute();
+        while ($stmt->nextRowset()) {} // pastron multi-results
+
+        // Lexon rezultatin nga variabla OUT
+        $resultQuery = $this->db->query("SELECT @outResult as isAccepted");
+        $result = $resultQuery->fetch(PDO::FETCH_ASSOC);
+
+        if ($result && $result['isAccepted'] == 1) {
+            return [
+                'message' => 'Your application has been accepted!',
+                'nanny_id' => $nannyId,
+                'job_post_id' => $jobPostId,
+                'type' => 'application_status',
+                'status' => 'accepted',
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+        } else {
+            return null; // nuk ka pranim, nuk kthehet notif
+        }
+    } catch (PDOException $e) {
+        error_log("Database error in getAcceptedApplicationNotification: " . $e->getMessage());
+        return null;
+    }
+}
+
 }
