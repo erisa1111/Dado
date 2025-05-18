@@ -258,8 +258,13 @@ async function initializeRatingDropdown() {
     contractDiv.dataset.id = job.id;
 
     contractDiv.innerHTML = `
+        <div class=det>
+        <div class="in_det">
         <div class="name">${job.other_person_name || 'Unknown'}</div>
         <div class="details">${startDate}${endDate ? ' - ' + endDate : ''} | ${job.job_type}</div>
+        </div>
+        <div class=status>${job.status}</div>   
+        </div>
     `;
 
     contractsContainer.appendChild(contractDiv);
@@ -295,18 +300,57 @@ async function initializeRatingDropdown() {
 }
 
 function attachContractClickHandlers() {
-    // Handle click on a contract to open the review section
     const contracts = document.querySelectorAll('.contract');
     contracts.forEach(contract => {
         contract.addEventListener('click', () => {
-            const nannyName = contract.querySelector('.name').textContent;
-            const details = contract.querySelector('.details').textContent.split('|')[0].trim();
-            const job_type = contract.querySelector('.details').textContent.split('|')[1].trim();
-            
-            openRatingModal(nannyName, details, job_type);
+            const status = contract.querySelector('.status').textContent.trim().toLowerCase();
+
+            if (status === 'closed') {
+                const nannyName = contract.querySelector('.name').textContent;
+                const details = contract.querySelector('.details').textContent.split('|')[0].trim();
+                const job_type = contract.querySelector('.details').textContent.split('|')[1].trim();
+
+                openRatingModal(nannyName, details, job_type);
+            } else if (status === 'ongoing') {
+                showPopupMessage('This contract is still ongoing. You can only rate after it is closed.');
+            } else {
+                showPopupMessage('Unknown contract status.');
+            }
         });
     });
 }
+function showPopupMessage(message) {
+    const overlay = document.createElement('div');
+    overlay.classList.add('popup-overlay');
+
+    const popup = document.createElement('div');
+    popup.classList.add('popup-message');
+
+    // Create close button as a span with × symbol
+    const closeBtn = document.createElement('span');
+    closeBtn.classList.add('popup-close-btn');
+    closeBtn.innerHTML = '&times;';  // × symbol
+
+    // Append close button and message text
+    popup.appendChild(closeBtn);
+    const messageP = document.createElement('p');
+    messageP.textContent = message;
+    popup.appendChild(messageP);
+
+    closeBtn.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+    });
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            document.body.removeChild(overlay);
+        }
+    });
+
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+}
+
+
 
 // You'll need to implement this function to get the current user's ID
 function getUserId() {
