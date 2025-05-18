@@ -16,7 +16,9 @@
                  src="<?= htmlspecialchars($profile_image ?? 'https://w7.pngwing.com/pngs/584/113/png-transparent-pink-user-icon.png') ?>"
                  alt="<?= htmlspecialchars($sender_name . ' ' . $sender_surname) ?> profile">
             <div class="connection-details">
-                <p class="connection-username"><?= htmlspecialchars($sender_name . ' ' . $sender_surname) ?></p>
+               <a href="profile.php?user_id=<?= $connection['user_two_id'] ?>" class="connection-username-link">
+                    <p class="connection-username"><?= htmlspecialchars($sender_name . ' ' . $sender_surname) ?></p>
+                </a>
                 <p class="connection-action">
                     <?php if ($status === 'pending'): ?>
                         <?= htmlspecialchars($message ?? 'sent you a connection request') ?>

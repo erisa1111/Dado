@@ -362,10 +362,15 @@ body {
   color: #e2687e;
 }
 
-.notification-icon {
-  font-size: 15px;
-  color: #555;
-  margin-right: 12px;
+.notification-body {
+  flex: 1 1 auto;
+  min-width: 0; /* allows text truncation */
+}
+.notification-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0; /* don't shrink */
+  white-space: nowrap;
 }
 #notifications-container {
   display: flex;
@@ -373,25 +378,70 @@ body {
   gap: 1rem;
   /*padding: 6px;*/
 }
-
-.notification-profile-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
+.notification-card-flex {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between; /* profile | message | buttons */
+  padding: 0px;
+  background-color: #fff;
+  border-radius: 12px;
+ 
 }
-
+.notification-profile-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e2687e;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+}
 .notification-card {
   display: flex;
-  align-items: flex-start;
+  justify-content: space-between; /* content left, buttons right */
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
   background-color: #fff;
-  border: 1px solid #ddd;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  padding: 12px 16px;
+}
+.notification-card-flex {
+  display: flex;
   gap: 15px;
-  transition: box-shadow 0.3s ease;
+  width: 100%;
+}
+
+.notification-body {
+  flex: 1;
+}
+
+.notification-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* .notification-icon {
+  font-size: 18px;
+  color: #007bff;
+} */
+
+ .notification-time {
+  font-size: 12px;
+  color: gray;
+} 
+
+.notification-preview-text {
+  margin-top: 5px;
+  background: #f1f1f1;
+  padding: 8px;
+  border-radius: 8px;
+}
+.notification-message {
+  margin: 0;
+  font-size: 15px;
 }
 
 .notification-card:hover {
@@ -407,22 +457,19 @@ body {
   align-items: center;
 }
 
-.notification-profile-pic {
+/* .notification-profile-pic {
   width: 50px;
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 8px;
   border: 2px solid #e2687e;
-}
+} */
 
 .notification-center {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0; /* allows content to shrink inside flex */
 }
-
 .notification-header {
   font-weight: 600;
   color: #333;
@@ -459,18 +506,32 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.notification-content {
+  flex: 1; /* take all available width */
+  /* ensure this area doesn't shrink buttons out */
+  min-width: 0; /* important for text truncation inside flex */
+}
 
-.notification-time {
+/* .notification-time {
   font-size: 11px;
   color: #999;
   margin-top: auto;
-}
+} */
 
-.notification-actions {
+/* .notification-actions {
   display: flex;
   gap: 10px;
   align-items: center;
   flex-shrink: 0;
+  margin-top:8px;
+} */
+
+
+.notification-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0; /* don't shrink */
+  white-space: nowrap; /* prevent buttons wrapping */
 }
 
 .accept-btn,
@@ -481,6 +542,7 @@ body {
   cursor: pointer;
   border: 1.5px solid transparent;
   transition: background-color 0.3s, color 0.3s;
+  white-space: nowrap; /* prevent button text wrap */
 }
 
 .accept-btn {
