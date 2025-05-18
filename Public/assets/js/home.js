@@ -477,21 +477,25 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Like button functionality
+
+    // Add click handlers
     document.querySelectorAll('.like-btn').forEach(button => {
         button.addEventListener('click', function() {
             const postId = this.getAttribute('data-post-id');
-            toggleLike(postId);
+            toggleLike(postId, this); // Pass the button element
         });
     });
-
-    
 });
 
-
-
-async function toggleLike(postId) {
+async function toggleLike(postId, button) {
     try {
+        const heartIcon = button.querySelector('i');
+        const isCurrentlyLiked = heartIcon.classList.contains('fa-solid');
+        
+        // Optimistic UI update
+        heartIcon.className = isCurrentlyLiked ? 'fa-regular fa-heart' : 'fa-solid fa-heart';
+        heartIcon.style.color = isCurrentlyLiked ? '' : 'red';
+
         const response = await fetch('like_post.php', {
             method: 'POST',
             headers: {
@@ -500,44 +504,30 @@ async function toggleLike(postId) {
             body: JSON.stringify({ post_id: postId })
         });
 
-        // First check if response is OK
         if (!response.ok) {
-            const errorData = await response.text();
-            console.error('Server responded with:', errorData);
-            throw new Error(`Server error: ${response.status}`);
+            throw new Error('Network response was not ok');
         }
 
-        // Then try to parse as JSON
         const data = await response.json();
         
         if (!data.success) {
+            // Revert if failed
+            heartIcon.className = isCurrentlyLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+            heartIcon.style.color = isCurrentlyLiked ? 'red' : '';
             throw new Error(data.message || 'Action failed');
         }
 
-        // Update UI
-        const postElement = document.getElementById(`post-${postId}`);
-        if (postElement) {
-            const likesCountElement = postElement.querySelector('.likes');
-            if (likesCountElement) {
-                likesCountElement.textContent = `${data.like_count} likes`;
-            }
-            
-            const likeButton = postElement.querySelector('.like-btn i');
-            if (likeButton) {
-                likeButton.classList.toggle('fa-regular', !data.is_liked);
-                likeButton.classList.toggle('fa-solid', data.is_liked);
-                likeButton.style.color = data.is_liked ? 'red' : '';
-            }
+        // Update like count
+        const likesCountElement = button.closest('.post').querySelector('.likes');
+        if (likesCountElement) {
+            likesCountElement.textContent = `${data.like_count} likes`;
         }
 
     } catch (error) {
         console.error('Error in toggleLike:', error);
-        // Show user-friendly error message
         alert('Failed to update like. Please try again.');
     }
 }
-
-
 
 
 

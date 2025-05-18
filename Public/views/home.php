@@ -14,6 +14,13 @@ require_once __DIR__ . '/../../Config/Database.php';
 // Initialize the controller
 $postController = new App\Controllers\PostsController(); // No arguments for the constructor now
 $posts = $postController->getPosts();
+// Debug output that will be printed to console
+echo '<script>';
+echo 'console.log("Debugging Like Status:");';
+echo 'console.log("Current User ID: ' . ($_SESSION['user_id'] ?? 'not set') . '");';
+echo 'console.log("First Post Like Status: ' . ($posts[0]['is_liked'] ?? 'undefined') . '");';
+echo 'console.log(' . json_encode($posts, JSON_PRETTY_PRINT) . ');';
+echo '</script>';
 
 $jobPostController = new App\Controllers\JobPostController(); // No arguments for the constructor now
 $jobPosts = $jobPostController->getJobPosts();
@@ -271,7 +278,8 @@ usort($allPosts, function ($a, $b) {
 
       <div class="feed-container">
         <?php foreach ($allPosts as $item): ?>
-          <?php if ($item['type'] === 'post'): $post = $item['data']; ?>
+          <?php if ($item['type'] === 'post'): $post = $item['data'];        error_log("Post ID: {$item['data']['id']} | Is Liked: {$item['data']['is_liked']}");
+ ?>
             <div class="post" id="post-<?php echo $post['id']; ?>">
               <div class="post-header">
                 <img class="profile-img"
@@ -306,9 +314,10 @@ usort($allPosts, function ($a, $b) {
               <?php endif; ?>
               <div class="post-actions">
                 <button class="act like-btn" data-post-id="<?php echo $post['id']; ?>">
-                  <i class="fa-regular fa-heart"></i>
-                </button>
-                <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
+    <i class="<?php echo $post['is_liked'] ? 'fa-solid' : 'fa-regular'; ?> fa-heart" 
+       style="<?php echo $post['is_liked'] ? 'color: red;' : ''; ?>"></i>
+</button>
+    <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
                   <i class="fa-regular fa-comment"></i>
                 </button>
               </div>

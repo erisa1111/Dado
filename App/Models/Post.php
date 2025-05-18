@@ -1,6 +1,6 @@
 <?php
 namespace App\Models;
-
+require_once __DIR__ . '/../../Config/Database.php';
 use Config\Database;
 
 class Post
@@ -13,11 +13,11 @@ class Post
         $this->db = $database->connect(); 
     }
 
-    public function getAll()
+    public function getAll($userId)
     {
-        $stmt = $this->db->prepare("CALL get_all_posts_with_users()");
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt = $this->db->prepare("CALL get_all_posts_with_user_info(?)");
+    $stmt->execute([$userId]);
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function create($userId, $title, $body, $imageUrl = null)
