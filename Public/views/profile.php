@@ -16,6 +16,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
 $loggedInUserId = $_SESSION['user_id'];
 $viewingUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : $loggedInUserId;
 $isOwnProfile = ($loggedInUserId === $viewingUserId);
@@ -53,6 +54,11 @@ foreach ($jobPosts as $jobPost) {
 usort($allPosts, function ($a, $b) {
   return $b['sort_date'] - $a['sort_date'];
 });
+
+$ratingData = $userModel->getUserAverageRating($viewingUserId);
+
+$averageRating = $ratingData ? $ratingData['average_rating'] : 0;
+$ratingPercentage = ($averageRating / 5) * 100; // for the star-front width
 
 
 if (!$userData) {
@@ -101,8 +107,11 @@ if (!$userData) {
                     </div>
                     <div class="profile_info">
                         <div class="rating-container">
-                            <span class="review-rating">★★★★★</span>
-                            <span class="rating-number">5.0</span>
+                        <div class="star-rating">
+                            <div class="star-back">★★★★★</div>
+                            <div class="star-front" style="width: <?= $ratingPercentage ?>%;">★★★★★</div>
+                        </div>
+                        <span class="rating-number"><?= $averageRating ?></span>
                         </div>
     
                         <h5 id="username"> <?= htmlspecialchars($userData['username']) ?></h5>
