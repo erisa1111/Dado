@@ -264,5 +264,7 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
     </script>
 
     <script src="../components/nav_home/nav_home.js"></script>
+    <script src="/assets/js/home.js"></script>
+
 </body>
 </html>
