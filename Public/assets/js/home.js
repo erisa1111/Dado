@@ -112,7 +112,7 @@ document.getElementById('jobpost-form').addEventListener('submit', async functio
 
         alert('Job post created successfully!');
         toggleModalVisibility(false);  // Assuming same modal function
-        location.reload();
+        window.location.reload(true); // The true forces a reload from server
 
     } catch (error) {
         console.error("Job Post Error:", error);
