@@ -77,9 +77,17 @@ class Post
     }
 
    public function searchPosts($query) {
-        $sql = "SELECT p.*, u.username, u.profile_picture 
-                FROM posts p 
-                JOIN users u ON p.user_id = u.id 
+        $sql = "SELECT 
+                p.*,
+                u.id AS user_id,
+                u.name,
+                u.surname,
+                u.profile_picture,
+                u.username,
+                (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
+                (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count
+                FROM posts p
+                JOIN users u ON p.user_id = u.id
                 WHERE p.body LIKE :queryBody OR p.title LIKE :queryTitle OR u.username LIKE :queryUsername 
                 ORDER BY p.created_at DESC";
 
