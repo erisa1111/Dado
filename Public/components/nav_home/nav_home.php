@@ -1,9 +1,17 @@
+<?php
+session_start();  // if not started already
+
+// Assuming user ID is stored in session like this:
+$loggedInUserId = $_SESSION['user_id'] ?? null;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="user-id" content="<?php echo htmlspecialchars($loggedInUserId); ?>">
+
     <title>Updated Navbar</title>
     <link rel="stylesheet" href="/components/nav_home/nav_home.css">
 
