@@ -63,8 +63,8 @@ if ($jobCreated) {
 $testNannyId = 94; // replace with a real nanny_id from your DB
 $testJobPostId = 3; // replace with a job_post_id they applied to
 
-echo "<h2>Testing getAcceptedApplicationNotification(nannyId: {$testNannyId}, jobPostId: {$testJobPostId})</h2>";
-$acceptedNotification = $notifications->getAcceptedApplicationNotification($testNannyId, $testJobPostId);
+echo "<h2>Testing getAcceptedApplicationsForNanny(nannyId: {$testNannyId})</h2>";
+$acceptedNotification = $notifications->getAcceptedApplicationsForNanny($testNannyId);
 echo "<pre>";
 print_r($acceptedNotification);
 echo "</pre>";

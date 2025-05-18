@@ -236,12 +236,12 @@ data.notifications.forEach(notification => {
 `;
       break;
 
-      case 'application_status':
+    case 'application_acceptance':
   iconHTML = `<i class="fa-solid fa-check-circle notification-icon" style="color: green;"></i>`;
-  message = `🎉 <strong>Your application</strong> for a job has been <strong>accepted</strong>!`;
-  profilePicture = '/assets/default-profile.png'; // or fetch parent profile pic if available
+  const jobTitle = notification.job_title || 'a job'; // Fallback in case it's undefined
+  message = `<strong style ="Color:green;">Congrats!</strong> <strong>Your application</strong> for <strong>"${jobTitle}"</strong> has been <strong>accepted</strong>!`;
+  profilePicture = '/assets/default-profile.png';
   break;
-
     default:
       message = 'Unknown notification type.';
   }

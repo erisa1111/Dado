@@ -189,10 +189,22 @@ class Notifications
         $ja['type'] = 'job_application';
     }
 
-    $all = array_merge($comments, $likes,  $jobComments, $jobLikes, $jobApplications);
+   $applicationAcceptances = $this->getAcceptedApplicationsForNanny($userId); // Assuming $userId is nanny
+
+foreach ($applicationAcceptances as &$aa) {
+    $aa['type'] = 'application_acceptance';
+}
+
+$all = array_merge(
+    $comments, $likes, 
+    $jobComments, $jobLikes, 
+    $jobApplications,
+    $applicationAcceptances // ⬅️ add this
+);
     usort($all, function($a, $b) {
         return strtotime($b['created_at']) <=> strtotime($a['created_at']);
     });
+
 
     return $all;
     }
@@ -238,35 +250,31 @@ public function declineApplication(int $applicationId): bool
     }
 }
 
-public function getAcceptedApplicationNotification(int $nannyId, int $jobPostId): ?array
+public function getAcceptedApplicationsForNanny(int $nannyId): array
 {
     try {
-        // Përgatit thirrjen e procedurës me parametra IN dhe OUT
-        $stmt = $this->db->prepare("CALL isApplicationAccepted(:inNannyId, :inJobPostId, @outResult)");
-        $stmt->bindParam(':inNannyId', $nannyId, PDO::PARAM_INT);
-        $stmt->bindParam(':inJobPostId', $jobPostId, PDO::PARAM_INT);
-        $stmt->execute();
-        while ($stmt->nextRowset()) {} // pastron multi-results
+        $stmt = $this->db->prepare("CALL GetAcceptedApplicationsForNanny(?)");
+        $stmt->execute([$nannyId]);
+        $acceptedApps = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        while ($stmt->nextRowset()) {}
 
-        // Lexon rezultatin nga variabla OUT
-        $resultQuery = $this->db->query("SELECT @outResult as isAccepted");
-        $result = $resultQuery->fetch(PDO::FETCH_ASSOC);
+        $notifications = [];
+foreach ($acceptedApps as $app) {
+    $notifications[] = [
+        'message' => 'Your application for "' . $app['job_title'] . '" has been accepted!',
+        'nanny_id' => $app['nanny_id'],
+        'job_post_id' => $app['job_post_id'],
+        'job_title' => $app['job_title'], // ✅ Add this line
+        'type' => 'application_acceptance',
+        'status' => 'accepted',
+        'created_at' => $app['accepted_at'],
+    ];
+}
 
-        if ($result && $result['isAccepted'] == 1) {
-            return [
-                'message' => 'Your application has been accepted!',
-                'nanny_id' => $nannyId,
-                'job_post_id' => $jobPostId,
-                'type' => 'application_status',
-                'status' => 'accepted',
-                'created_at' => date('Y-m-d H:i:s'),
-            ];
-        } else {
-            return null; // nuk ka pranim, nuk kthehet notif
-        }
+        return $notifications;
     } catch (PDOException $e) {
-        error_log("Database error in getAcceptedApplicationNotification: " . $e->getMessage());
-        return null;
+        error_log("DB error in getAcceptedApplicationsForNanny: " . $e->getMessage());
+        return [];
     }
 }
 
