@@ -100,6 +100,16 @@ if (!$userData) {
                                 <button class="follow-btn" style="margin: 0;" data-recipient-id="<?= $viewingUserId ?>">Connect</button>
                             <?php endif; ?>
                             <button class="follow-btn">Share</button>
+                           <?php if ($isOwnProfile): ?>
+    <div id="connections-count" data-user-id="<?php echo $loggedInUserId; ?>">
+        Connections: <a href="/views/connections.php" id="connections-link"><span id="connections-number">0</span></a>
+    </div>
+<?php else: ?>
+    <div id="connections-count" data-user-id="<?php echo $viewingUserId; ?>">
+        Connections: <span id="connections-number">0</span>
+    </div>
+<?php endif; ?>
+
                         </div>
 
                       
@@ -373,6 +383,13 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+    const connectionsCountDiv = document.getElementById('connections-count');
+    if (connectionsCountDiv) {
+        const profileUserId = connectionsCountDiv.getAttribute('data-user-id');
+        if (profileUserId) {
+            loadConnectionCount(profileUserId);
+        }
+    }
 
     // Function to check connection status
     async function checkConnectionStatus(senderId, recipientId, button) {
@@ -446,6 +463,27 @@ document.addEventListener("DOMContentLoaded", function() {
             alert('An error occurred while trying to unfollow.');
         }
     }
+   async function loadConnectionCount(userId) {
+    try {
+        console.log(`Fetching connection count for user ID: ${userId}`);
+        const response = await fetch(`/api/connection_count.php?user_id=${userId}`);
+        console.log('Raw response object:', response);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        console.log('Parsed JSON data:', data);
+        
+        const countElem = document.getElementById('connections-number');
+        if (countElem) {
+            console.log('Setting connection count in DOM:', data.connection_count ?? 0);
+            countElem.textContent = data.connection_count ?? 0;
+        } else {
+            console.warn('Element with id "connections-number" not found');
+        }
+    } catch (error) {
+        console.error('Failed to load connection count:', error);
+    }
+}
 });
 
 

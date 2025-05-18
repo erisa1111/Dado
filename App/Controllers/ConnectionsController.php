@@ -155,7 +155,23 @@ public function handleSendConnectionRequest() {
         echo json_encode(['success' => false, 'message' => 'Failed to send connection request']);
     }
 }
+public function getConnectionCount($user_id)
+{
+    return $this->connectionsModel->getConnectionCount($user_id);
+}
 
+// Method 2: outputs JSON and exits (useful for direct controller response)
+public function outputConnectionCountJson($user_id)
+{
+    $count = $this->getConnectionCount($user_id);
+
+    if (php_sapi_name() !== 'cli') {
+        header('Content-Type: application/json');
+    }
+
+    echo json_encode(['user_id' => $user_id, 'connection_count' => $count]);
+    exit;
+}
     private function isAjaxRequest()
     {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
