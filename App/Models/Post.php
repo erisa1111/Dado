@@ -95,6 +95,28 @@ class Post
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    public function getPostsByUserId($userId) {
+        $query = "
+            SELECT 
+                p.*,
+                u.id AS user_id,
+                u.name,
+                u.surname,
+                u.profile_picture,
+                u.username,
+                (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
+                (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.user_id = ?
+            ORDER BY p.created_at DESC;
+        ";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+
 
 
 }
