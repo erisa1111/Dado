@@ -76,9 +76,10 @@ error_log("All connections: " . print_r($allConnections, true));
                     </div>
                     <h3>You don't have any connections yet!</h3>
                     <p>Start growing your network by connecting with other users.</p>
-                    <button class="find-connections-btn" onclick="window.location.href='/search'">
-                        <i class="fas fa-search"></i> Find connections
+                    <button class="find-connections-btn" onclick="window.location.href='search_results.php'">
+                      <i class="fas fa-search"></i> Find connections
                     </button>
+
                 </div>
             </div>
         </div>

@@ -9,6 +9,7 @@ require_once dirname(__DIR__) . '/../Config/Database.php'; // Adjust the path if
 
 class User
 {
+    public int $lastId;
     private $conn;
 
     public function __construct()
@@ -20,7 +21,8 @@ class User
     public function createUser($data)
     {
         try {
-            $stmt = $this->conn->prepare("CALL CreateUser(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            //qetu  e bon qe me tu kthy id e userit qe sa u ba signup
+            $stmt = $this->conn->prepare("CALL CreateUser(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_id)");
     
             $stmt->execute([
                 $data['name'],
@@ -37,6 +39,11 @@ class User
                 $data['schedule']
             ]);
     
+             $row = $this->conn
+                ->query("SELECT @new_id AS id")
+                ->fetch(PDO::FETCH_ASSOC);
+
+            $this->lastId = isset($row['id']) ? (int)$row['id'] : null;
             return true;
     
         } catch (PDOException $e) {
@@ -71,6 +78,7 @@ class User
         
         return $result;
     }
+
     public function updateProfile($userId, $data){
         try {
             // Prepare the SQL query
@@ -107,6 +115,156 @@ class User
         }
     }
 
+  public function isUsernameTaken($username) {
+    // Use the already established connection ($this->conn)
+    $stmt = $this->conn->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    return $stmt->fetchColumn() > 0;
+  }
 
+    public function searchUsersByUsername($username)
+    {
+        try {
+               $searchTerm = '%' . $username . '%';
+                $startsWithTerm = $username . '%';
+
+                $stmt = $this->conn->prepare("
+                    SELECT 
+                        u.*, 
+                        r.name AS role_name
+                    FROM 
+                        users u
+                    INNER JOIN 
+                        roles r ON u.role_id = r.id
+                    WHERE 
+                        u.username LIKE :searchTerm
+                    ORDER BY 
+                        CASE
+                            WHEN u.username = :exact THEN 1
+                            WHEN u.username LIKE :startsWith THEN 2
+                            ELSE 3
+                        END,
+                        u.username ASC
+                ");
+
+                $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+                $stmt->bindParam(':exact', $username, PDO::PARAM_STR);
+                $stmt->bindParam(':startsWith', $startsWithTerm, PDO::PARAM_STR);
+
+                $stmt->execute();
+
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new \Exception("Search failed: " . $e->getMessage());
+        }
+    }
+
+    public function searchUsersWithFilters($username, $location = null, $roleId = null, $minRating = null)
+    {
+        $query = "
+            SELECT u.*, r.name AS role_name
+            FROM users u
+            INNER JOIN roles r ON u.role_id = r.id
+            WHERE u.username LIKE :searchTerm
+        ";
+
+        // Build dynamic filters
+        $params = [
+            ':searchTerm' => '%' . $username . '%',
+            ':exact' => $username,
+            ':startsWith' => $username . '%',
+            ':contains' => '%' . $username . '%'
+        ];
+
+        if (!empty($location)) {
+            $query .= " AND u.location = :location";
+            $params[':location'] = $location;
+        }
+
+        if (isset($roleId) && $roleId !== '') {
+            $query .= " AND u.role_id = :roleId";
+            $params[':roleId'] = $roleId;
+        }
+
+
+        // GROUP BY only if you're aggregating ratings (currently not using JOIN, so skip)
+        if (!empty($minRating)) {
+            // Uncomment and implement when ratings table is ready
+            // $query .= " GROUP BY u.id HAVING AVG(rat.rating) >= :minRating";
+            // $params[':minRating'] = $minRating;
+        }
+
+        // Best match ordering
+        $query .= "
+            ORDER BY 
+                CASE
+                    WHEN u.username = :exact THEN 1
+                    WHEN u.username LIKE :startsWith THEN 2
+                    WHEN u.username LIKE :contains THEN 3
+                    ELSE 4
+                END,
+                u.username ASC
+        ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    }
+
+
+
+
+
+
+
+
+public function storeVerificationToken($userId, $token)
+    {
+        try {
+            $stmt = $this->conn->prepare("UPDATE users SET verification_token = ? WHERE id = ?");
+            return $stmt->execute([$token, $userId]);
+        } catch (PDOException $e) {
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get user by verification token
+     */
+    public function getUserByVerificationToken($token)
+    {
+        try {
+            $stmt = $this->conn->prepare("SELECT * FROM users WHERE verification_token = ?");
+            $stmt->execute([$token]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Verify user by token
+     */
+    public function verifyUser($token)
+    {
+        try {
+            $stmt = $this->conn->prepare("UPDATE users SET is_verified = TRUE, verification_token = NULL WHERE verification_token = ?");
+            return $stmt->execute([$token]);
+        } catch (PDOException $e) {
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get the last inserted user ID
+     * Needed because your createUser uses a stored procedure
+     */
+    public function getLastInsertId(): int
+    {
+        // return the ID captured from the OUT parameter
+        return $this->lastId ?? 0;
+    }
 
 }

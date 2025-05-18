@@ -1,5 +1,6 @@
 <?php
 namespace App\Controllers;
+use Exception; 
 
 require_once __DIR__ . '/../../App/Models/Post.php';
 require_once __DIR__ . '/../../Config/Database.php';
@@ -10,106 +11,111 @@ use Config\Database;
 class PostsController
 {
     private $postModel;
+    private $db;
 
     public function __construct()
     {
+
+        if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}// Add this line
+
+
         $database = new Database();
-        $db = $database->connect();
-        $this->postModel = new Post($db);
+        $this->db = $database->connect();
+        $this->postModel = new Post($this->db);
+   
     }
+  
 
     public function getPosts()
     {
         return $this->postModel->getAll();
     }
 
-    public function createPost()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Get current user ID from session
-            $userId = $_SESSION['user_id'] ?? null;
-            $title = $_POST['title'] ?? 'New Post'; // Default title if not provided
-            $content = $_POST['content'] ?? '';
-            
-            // Handle image upload
-            $imageUrl = $this->handleImageUpload($_FILES['images'] ?? null);
+  public function editPost($postId, $content, $imageUrl = null) {
+    $stmt = $this->db->prepare("CALL update_post(:post_id, :new_content, :new_image)");
+    $stmt->bindParam(':post_id', $postId);
+    $stmt->bindParam(':new_content', $content);
+    $stmt->bindParam(':new_image', $imageUrl);
+    return $stmt->execute();
+}
 
-            $this->postModel->create($userId, $title, $content, $imageUrl);
-            
-            if ($this->isAjaxRequest()) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
-                exit;
-            } else {
-                header('Location: /home');
-                exit;
-            }
-        }
+
+
+public function deletePost($postId) {
+   
+    return $this->postModel->deletePost($postId);
+}
+   
+
+  public function createPost($title, $content, $images)
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo "Invalid request method.";
+        exit;
     }
 
-    public function toggleLike()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $postId = $_POST['post_id'] ?? null;
-            $userId = $_SESSION['user_id'] ?? null;
-            
-            if (!$postId || !$userId) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'error' => 'Invalid request']);
-                exit;
-            }
+    // Start session if needed
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-            // Check if already liked (you might need to add a method in Post model for this)
-            $isLiked = $this->isPostLiked($postId, $userId);
-            
-            if ($isLiked) {
-                $this->postModel->unlike($postId, $userId);
-                $action = 'unliked';
-            } else {
-                $this->postModel->like($postId, $userId);
-                $action = 'liked';
-            }
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) {
+        throw new Exception('User not logged in.');
+    }
 
-            // Get updated like count
-            $likeCount = $this->getLikeCount($postId);
+    $imageUrl = $this->handleImageUpload($_FILES['images'] ?? null);
 
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'action' => $action,
-                'like_count' => $likeCount
+    // Call model's create method
+    $postId = $this->postModel->create($userId, $title, $content, $imageUrl);
+
+    return $postId;
+}
+
+public function toggleLike()
+{
+    try {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $postId = $input['post_id'] ?? null;
+        
+        $userId = $_SESSION['user_id'] ?? null;
+
+        if (!$postId || !$userId) {
+            return json_encode([
+                'success' => false,
+                'message' => 'Invalid data'
             ]);
-            exit;
         }
-    }
 
-    public function addComment()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $postId = $_POST['post_id'] ?? null;
-            $userId = $_SESSION['user_id'] ?? null;
-            $comment = $_POST['comment'] ?? '';
-            $parentCommentId = $_POST['parent_comment_id'] ?? null;
+        // Your existing like logic here...
+        $isLiked = $this->isPostLiked($postId, $userId);
 
-            if (!$postId || !$userId || empty($comment)) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'error' => 'Invalid request']);
-                exit;
-            }
-
-            $this->postModel->comment($postId, $userId, $comment, $parentCommentId);
-
-            // Get updated comments
-            $comments = $this->postModel->getComments($postId);
-
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'comments' => $comments
-            ]);
-            exit;
+        if ($isLiked) {
+            $stmt = $this->db->prepare("DELETE FROM likes WHERE post_id = ? AND user_id = ?");
+            $stmt->execute([$postId, $userId]);
+        } else {
+            $stmt = $this->db->prepare("INSERT INTO likes (post_id, user_id) VALUES (?, ?)");
+            $stmt->execute([$postId, $userId]);
         }
+
+        $likeCount = $this->getLikeCount($postId);
+
+        return json_encode([
+            'success' => true,
+            'like_count' => $likeCount,
+            'is_liked' => !$isLiked
+        ]);
+
+    } catch (Exception $e) {
+        return json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
     }
+}
 
     private function isPostLiked($postId, $userId)
     {
@@ -164,9 +170,70 @@ class PostsController
         return !empty($uploadedImages)? $publicPath . $newFileName : null;
     }
 
+public function handleRequest()
+{
+    $action = $_GET['action'] ?? '';
+    
+    switch ($action) {
+        case 'getCommentsForPost':
+            $postId = $_GET['post_id'] ?? null;
+            if ($postId) {
+                $this->getCommentsForPost($postId);
+            } else {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Post ID required']);
+            }
+            break;
+            
+        // Add other actions here...
+            
+        default:
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Action not found']);
+    }
+}
+
+public function getCommentsForPost($postId)
+{
+    header('Content-Type: application/json');
+    
+    try {
+        // Verify post exists without throwing error if it doesn't
+        $postCheck = $this->db->prepare("SELECT id FROM posts WHERE id = ?");
+        $postCheck->execute([$postId]);
+        
+        if (!$postCheck->fetch()) {
+            // Return empty array instead of 404
+            echo json_encode([
+                'success' => true,
+                'comments' => []
+            ]);
+            return;
+        }
+
+        $stmt = $this->db->prepare("CALL get_comments_for_post(?)");
+        $stmt->execute([$postId]);
+        $comments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            'success' => true,
+            'comments' => $comments ?: []
+        ]);
+    } catch (Exception $e) {
+        // Still return empty array on error
+        echo json_encode([
+            'success' => true,
+            'comments' => []
+        ]);
+    }
+}
+
     private function isAjaxRequest()
     {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
+
+
 }
+

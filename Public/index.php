@@ -1,16 +1,20 @@
 <?php
 use App\Controllers\AuthController;
+use App\Controllers\PostsController;
 use App\Controllers\LogOutController;
 
-// Debugging: Show errors
 ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 
 // Manually include files
 require_once dirname(__DIR__) . '/App/Models/User.php';
 require_once dirname(__DIR__) . '/App/Controllers/AuthController.php';
+require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php';
+require_once dirname(__DIR__) . '/App/Controllers/PostsController.php';
+require_once dirname(__DIR__) . '/App/vendor/autoload.php';
 
-require_once dirname(__DIR__) . '/App/Controllers/LogOutController.php';
 
 // Get the current URL path
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -31,6 +35,8 @@ switch ($request_uri) {
 
     case '/login':
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $verified = $_GET['verified'] ?? null;
+            $error = $_GET['error'] ?? null;
             include __DIR__ . '/views/login.php'; 
             exit();
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -38,24 +44,23 @@ switch ($request_uri) {
            
         }
         break;
+     case '/verify-email':
+        (new AuthController())->verifyEmail();
+        break;
 
-        case '/logout':
-            require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php'; // make sure it's included
-            (new LogOutController())->logout();
-            break;    
+    case '/logout':
+        require_once dirname(__DIR__) . '/App/Controllers/LogoutController.php'; // make sure it's included
+
+        (new \App\Controllers\LogoutController())->logout();
+        break;  
+            
         
     default:
         header("HTTP/1.0 404 Not Found");
         break;
 }
 
-
 ?>
-
-
-
-
-
 
 
 <!DOCTYPE html>
