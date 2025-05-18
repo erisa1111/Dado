@@ -3,6 +3,7 @@ session_start();
 
 use App\Models\User;
 
+
 require_once __DIR__ . '/../../App/Models/User.php';
 // Include Post.php and Job.php when you create them
 // require_once __DIR__ . '/../../App/Models/Post.php';
@@ -75,68 +76,71 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
 
         <!-- FILTER FORM -->
         <div class="filter-container">
-        <form method="GET" action="search_results.php" class="filter-form">
-            <input type="hidden" name="search_category" id="search_category" value="<?= htmlspecialchars($searchCategory) ?>">
+            <h2>Search Results</h2>
+            <hr>
+            <h3 style="margin-top: 1.5rem; color:#8f5a6b;">Filters</h3>
+            <form method="GET" action="search_results.php" class="filter-form">
+                <input type="hidden" name="search_category" id="search_category" value="<?= htmlspecialchars($searchCategory) ?>">
 
-            <!-- PEOPLE -->
-            <div class="filter-category">
-                <button type="button" onclick="toggleSection('people-section')">People</button>
-                <div id="people-section" class="filter-section" <?= $searchCategory === 'people' ? '' : 'style="display:none;"' ?>>
-                    <input type="text" name="username" placeholder="Username" value="<?= htmlspecialchars($usernameSearch) ?>">
+                <!-- PEOPLE -->
+                <div class="filter-category">
+                    <button type="button" onclick="toggleSection('people-section')"><i class="fa-solid fa-circle-user"></i> People</button>
+                    <div id="people-section" class="filter-section" <?= $searchCategory === 'people' ? '' : 'style="display:none;"' ?>>
+                        <input type="text" name="username" placeholder="Username" value="<?= htmlspecialchars($usernameSearch) ?>">
 
-                    <select name="location">
-                        <option value="">All Locations</option>
-                        <?php foreach ($cities as $city): ?>
-                            <option value="<?= htmlspecialchars($city) ?>" <?= $location === $city ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($city) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                        <select name="location">
+                            <option value="">All Locations</option>
+                            <?php foreach ($cities as $city): ?>
+                                <option value="<?= htmlspecialchars($city) ?>" <?= $location === $city ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($city) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
 
-                    <select name="role_id">
-                        <option value="">All Roles</option>
-                        <option value="1" <?= $roleId === '1' ? 'selected' : '' ?>>Admin</option>
-                        <option value="2" <?= $roleId === '2' ? 'selected' : '' ?>>Nanny</option>
-                        <option value="0" <?= $roleId === '0' ? 'selected' : '' ?>>Parent</option>
-                    </select>
+                        <select name="role_id">
+                            <option value="">All Roles</option>
+                            <option value="1" <?= $roleId === '1' ? 'selected' : '' ?>>Admin</option>
+                            <option value="2" <?= $roleId === '2' ? 'selected' : '' ?>>Nanny</option>
+                            <option value="0" <?= $roleId === '0' ? 'selected' : '' ?>>Parent</option>
+                        </select>
 
-                    <select name="min_rating">
-                        <option value="">Any Rating</option>
-                        <option value="5" <?= $minRating === '5' ? 'selected' : '' ?>>5 stars</option>
-                        <option value="4" <?= $minRating === '4' ? 'selected' : '' ?>>4+ stars</option>
-                        <option value="3" <?= $minRating === '3' ? 'selected' : '' ?>>3+ stars</option>
-                    </select>
+                        <select name="min_rating">
+                            <option value="">Any Rating</option>
+                            <option value="5" <?= $minRating === '5' ? 'selected' : '' ?>>5 stars</option>
+                            <option value="4" <?= $minRating === '4' ? 'selected' : '' ?>>4+ stars</option>
+                            <option value="3" <?= $minRating === '3' ? 'selected' : '' ?>>3+ stars</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
 
-            <!-- POSTS -->
-            <div class="filter-category">
-                <button type="button" onclick="toggleSection('posts-section')">Posts</button>
-                <div id="posts-section" class="filter-section" <?= $searchCategory === 'posts' ? '' : 'style="display:none;"' ?>>
-                    <input type="text" name="post_keywords" placeholder="Post Keywords" value="<?= htmlspecialchars($postKeywords) ?>">
-                    <input type="date" name="post_date" value="<?= htmlspecialchars($postDate) ?>">
+                <!-- POSTS -->
+                <div class="filter-category">
+                    <button type="button" onclick="toggleSection('posts-section')"><i class="fa-solid fa-rectangle-list"></i> Posts</button>
+                    <div id="posts-section" class="filter-section" <?= $searchCategory === 'posts' ? '' : 'style="display:none;"' ?>>
+                        <input type="text" name="post_keywords" placeholder="Post Keywords" value="<?= htmlspecialchars($postKeywords) ?>">
+                        <input type="date" name="post_date" value="<?= htmlspecialchars($postDate) ?>">
+                    </div>
                 </div>
-            </div>
 
-            <!-- JOBS -->
-            <div class="filter-category">
-                <button type="button" onclick="toggleSection('jobs-section')">Jobs</button>
-                <div id="jobs-section" class="filter-section" <?= $searchCategory === 'jobs' ? '' : 'style="display:none;"' ?>>
-                    <input type="text" name="job_keywords" placeholder="Job Keywords" value="<?= htmlspecialchars($jobKeywords) ?>">
+                <!-- JOBS -->
+                <div class="filter-category">
+                    <button type="button" onclick="toggleSection('jobs-section')"><i class="fa-solid fa-briefcase"></i> Jobs</button>
+                    <div id="jobs-section" class="filter-section" <?= $searchCategory === 'jobs' ? '' : 'style="display:none;"' ?>>
+                        <input type="text" name="job_keywords" placeholder="Job Keywords" value="<?= htmlspecialchars($jobKeywords) ?>">
 
-                    <select name="job_location">
-                        <option value="">All Locations</option>
-                        <?php foreach ($cities as $city): ?>
-                            <option value="<?= htmlspecialchars($city) ?>" <?= $jobLocation === $city ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($city) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                        <select name="job_location">
+                            <option value="">All Locations</option>
+                            <?php foreach ($cities as $city): ?>
+                                <option value="<?= htmlspecialchars($city) ?>" <?= $jobLocation === $city ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($city) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit">Search</button>
-        </form>
+                <button type="submit">Search</button>
+            </form>
         </div>
 
         <!-- RESULTS -->
@@ -186,7 +190,7 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
             'jobs-section': 'jobs'
         };
         sections.forEach(section => {
-            document.getElementById(section).style.display = (section === id) ? 'block' : 'none';
+            document.getElementById(section).style.display = (section === id) ? 'flex' : 'none';
         });
         document.getElementById('search_category').value = categoryMap[id];
     }

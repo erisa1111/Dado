@@ -71,4 +71,18 @@ class Post
         return $stmt->execute();
     }
 
+    public function searchPosts($query){
+        $stmt = $this->db->prepare("SELECT p.*, u.username, u.profile_picture 
+            FROM posts p 
+            JOIN users u ON p.user_id = u.id 
+            WHERE p.body LIKE :query OR p.title LIKE :query OR u.username LIKE :query 
+            ORDER BY p.created_at DESC");
+
+        $likeQuery = '%' . $query . '%';
+        $stmt->bindParam(':query', $likeQuery);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+
 }
