@@ -71,7 +71,8 @@ if (!$userData) {
     <title>Home Page</title>
     <link rel="stylesheet" href="/assets/css/profile.css">
     <link rel="stylesheet" href="../components/nav_home/nav_home.css">
-    <link rel="stylesheet" href="/assets/css/search_results.css">
+    <link rel="stylesheet" href="/assets/css/home.css">
+    <!-- <link rel="stylesheet" href="/assets/css/search_results.css"> -->
     <link rel="stylesheet" href="/components/postcard/postcard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -314,7 +315,7 @@ if (!$userData) {
 
                                 <?php if ($_SESSION['user_id'] != $jobpost['parent_id']) : ?>
                                 <div class="job-post-actions">
-                                    <form method="POST" action="apply.php" class="apply-form">
+                                    <form method="POST" action="" class="apply-form">
                                     <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
                                     <button type="submit" class="apply-btn">Apply</button>
                                     </form>
