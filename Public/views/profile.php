@@ -41,7 +41,7 @@ if (!$userData) {
 
 <body>
 
-<header>
+    <header>
         <div id="nav-placeholder"></div>
     </header>
     <br><br><br><br>

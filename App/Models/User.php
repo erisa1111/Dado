@@ -78,6 +78,7 @@ class User
         
         return $result;
     }
+
     public function updateProfile($userId, $data){
         try {
             // Prepare the SQL query
@@ -119,7 +120,105 @@ class User
     $stmt = $this->conn->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
     $stmt->execute([$username]);
     return $stmt->fetchColumn() > 0;
-}
+  }
+
+    public function searchUsersByUsername($username)
+    {
+        try {
+               $searchTerm = '%' . $username . '%';
+                $startsWithTerm = $username . '%';
+
+                $stmt = $this->conn->prepare("
+                    SELECT 
+                        u.*, 
+                        r.name AS role_name
+                    FROM 
+                        users u
+                    INNER JOIN 
+                        roles r ON u.role_id = r.id
+                    WHERE 
+                        u.username LIKE :searchTerm
+                    ORDER BY 
+                        CASE
+                            WHEN u.username = :exact THEN 1
+                            WHEN u.username LIKE :startsWith THEN 2
+                            ELSE 3
+                        END,
+                        u.username ASC
+                ");
+
+                $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+                $stmt->bindParam(':exact', $username, PDO::PARAM_STR);
+                $stmt->bindParam(':startsWith', $startsWithTerm, PDO::PARAM_STR);
+
+                $stmt->execute();
+
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new \Exception("Search failed: " . $e->getMessage());
+        }
+    }
+
+    public function searchUsersWithFilters($username, $location = null, $roleId = null, $minRating = null)
+    {
+        $query = "
+            SELECT u.*, r.name AS role_name
+            FROM users u
+            INNER JOIN roles r ON u.role_id = r.id
+            WHERE u.username LIKE :searchTerm
+        ";
+
+        // Build dynamic filters
+        $params = [
+            ':searchTerm' => '%' . $username . '%',
+            ':exact' => $username,
+            ':startsWith' => $username . '%',
+            ':contains' => '%' . $username . '%'
+        ];
+
+        if (!empty($location)) {
+            $query .= " AND u.location = :location";
+            $params[':location'] = $location;
+        }
+
+        if (isset($roleId) && $roleId !== '') {
+            $query .= " AND u.role_id = :roleId";
+            $params[':roleId'] = $roleId;
+        }
+
+
+        // GROUP BY only if you're aggregating ratings (currently not using JOIN, so skip)
+        if (!empty($minRating)) {
+            // Uncomment and implement when ratings table is ready
+            // $query .= " GROUP BY u.id HAVING AVG(rat.rating) >= :minRating";
+            // $params[':minRating'] = $minRating;
+        }
+
+        // Best match ordering
+        $query .= "
+            ORDER BY 
+                CASE
+                    WHEN u.username = :exact THEN 1
+                    WHEN u.username LIKE :startsWith THEN 2
+                    WHEN u.username LIKE :contains THEN 3
+                    ELSE 4
+                END,
+                u.username ASC
+        ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    }
+
+
+
+
+
+
+
 
 public function storeVerificationToken($userId, $token)
     {
