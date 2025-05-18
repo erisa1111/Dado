@@ -112,7 +112,7 @@ document.getElementById('jobpost-form').addEventListener('submit', async functio
 
         alert('Job post created successfully!');
         toggleModalVisibility(false);  // Assuming same modal function
-        location.reload();
+        window.location.reload(true); // The true forces a reload from server
 
     } catch (error) {
         console.error("Job Post Error:", error);
@@ -288,6 +288,120 @@ function closeAllMenus() {
     });
 }
 
+////// for jjobs post handling
+
+
+
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    
+    setupJobPostHandler();
+});
+
+
+function setupJobPostHandler() {
+    // Event delegation for post actions
+    document.addEventListener('click', async function(e) {
+        // Post menu toggle
+        if (e.target.classList.contains('job-post-menu-toggle')) {
+            handleJobPostMenuToggle(e);
+            return;
+        }
+
+        // Edit post
+        const editBtn = e.target.closest('.edit-job-post');
+        if (editBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            await handleEditJobPost(e);
+            return;
+        }
+
+
+        // Close menus when clicking outside
+        if (!e.target.closest('.job-post-menu-wrapper')) {
+            closeAllMenus();
+        }
+    });
+}
+
+// Edit Post Handler
+let currentEditJobPostId = null;
+
+
+async function handleEditJobPost(e) {
+    const jobPostId = e.target.getAttribute('data-job-id');
+    const parentId = e.target.getAttribute('data-parent-id');
+    
+    if (!jobPostId || !parentId) return;
+
+    try {
+        const response = await fetch('close_job.php?action=closeJobPost', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `job_post_id=${encodeURIComponent(jobPostId)}&parent_id=${encodeURIComponent(parentId)}`
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            const jobPost = document.querySelector(`#job-post-${jobPostId}`);
+
+            // Update the actions section completely
+            const jobActions = jobPost.querySelector('.job-post-actions');
+            if (jobActions) {
+                jobActions.innerHTML = '<div class="closed-message">Closed!</div>';
+            }
+
+            // Hide the close button
+            const closeBtn = jobPost.querySelector('.edit-job-post');
+            if (closeBtn) {
+                closeBtn.style.display = 'none';
+            }
+
+            // Also update any status indicators if they exist
+            const statusIndicators = jobPost.querySelectorAll('.job-status, .status-indicator');
+            statusIndicators.forEach(indicator => {
+                indicator.textContent = 'Closed';
+                indicator.classList.add('closed');
+            });
+        } else {
+            alert(result.message || 'Failed to close job.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error closing job.');
+    }
+}
+
+// Handle Post Menu Toggle
+function handleJobPostMenuToggle(e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const postDiv = e.target.closest('.job-post');
+    const actionsMenu = postDiv.querySelector('.job-post-act');
+
+    // Close other menus
+    document.querySelectorAll('.job-post-act').forEach(menu => {
+        if (menu !== actionsMenu) {
+            menu.style.display = 'none';
+        }
+    });
+
+    // Toggle current menu
+    actionsMenu.style.display = actionsMenu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Close all menus
+function closeAllMenus() {
+    document.querySelectorAll('.job-post-act').forEach(menu => {
+        menu.style.display = 'none';
+    });
+}
+
+
 // Edit Post Handler
 let currentEditPostId = null;
 let currentDeletePostId = null;
@@ -363,21 +477,25 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Like button functionality
+
+    // Add click handlers
     document.querySelectorAll('.like-btn').forEach(button => {
         button.addEventListener('click', function() {
             const postId = this.getAttribute('data-post-id');
-            toggleLike(postId);
+            toggleLike(postId, this); // Pass the button element
         });
     });
-
-    
 });
 
-
-
-async function toggleLike(postId) {
+async function toggleLike(postId, button) {
     try {
+        const heartIcon = button.querySelector('i');
+        const isCurrentlyLiked = heartIcon.classList.contains('fa-solid');
+        
+        // Optimistic UI update
+        heartIcon.className = isCurrentlyLiked ? 'fa-regular fa-heart' : 'fa-solid fa-heart';
+        heartIcon.style.color = isCurrentlyLiked ? '' : 'red';
+
         const response = await fetch('like_post.php', {
             method: 'POST',
             headers: {
@@ -386,44 +504,30 @@ async function toggleLike(postId) {
             body: JSON.stringify({ post_id: postId })
         });
 
-        // First check if response is OK
         if (!response.ok) {
-            const errorData = await response.text();
-            console.error('Server responded with:', errorData);
-            throw new Error(`Server error: ${response.status}`);
+            throw new Error('Network response was not ok');
         }
 
-        // Then try to parse as JSON
         const data = await response.json();
         
         if (!data.success) {
+            // Revert if failed
+            heartIcon.className = isCurrentlyLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+            heartIcon.style.color = isCurrentlyLiked ? 'red' : '';
             throw new Error(data.message || 'Action failed');
         }
 
-        // Update UI
-        const postElement = document.getElementById(`post-${postId}`);
-        if (postElement) {
-            const likesCountElement = postElement.querySelector('.likes');
-            if (likesCountElement) {
-                likesCountElement.textContent = `${data.like_count} likes`;
-            }
-            
-            const likeButton = postElement.querySelector('.like-btn i');
-            if (likeButton) {
-                likeButton.classList.toggle('fa-regular', !data.is_liked);
-                likeButton.classList.toggle('fa-solid', data.is_liked);
-                likeButton.style.color = data.is_liked ? 'red' : '';
-            }
+        // Update like count
+        const likesCountElement = button.closest('.post').querySelector('.likes');
+        if (likesCountElement) {
+            likesCountElement.textContent = `${data.like_count} likes`;
         }
 
     } catch (error) {
         console.error('Error in toggleLike:', error);
-        // Show user-friendly error message
         alert('Failed to update like. Please try again.');
     }
 }
-
-
 
 
 

@@ -29,8 +29,9 @@ class PostsController
   
 
     public function getPosts()
-    {
-        return $this->postModel->getAll();
+    { 
+         $userId = $_SESSION['user_id'] ?? null;
+        return $this->postModel->getAll($userId);
     }
 
   public function editPost($postId, $content, $imageUrl = null) {

@@ -2,7 +2,7 @@
 namespace App\Models;
 
 use Config\Database;
-use PDO; // ✅ ADD THIS LINE
+use PDO; 
 use PDOException;
 
 class JobPost{
@@ -102,22 +102,11 @@ class JobPost{
     $stmt->closeCursor();
     return $result ?? true; // return result if any, or just true
 }
-public function getJobPostsByUserId($userId) {
-    $query = "
-        SELECT 
-            jp.*,
-            u.username,
-            u.profile_picture,
-            (SELECT COUNT(*) FROM job_post_likes WHERE job_post_id = jp.id) AS job_like_count,
-            (SELECT COUNT(*) FROM job_post_comments WHERE job_post_id = jp.id) AS job_comment_count
-        FROM job_posts jp
-        JOIN users u ON jp.parent_id = u.id
-        WHERE jp.parent_id = ?
-        ORDER BY jp.created_at DESC;
-    ";
-    $stmt = $this->db->prepare($query);
-    $stmt->execute([$userId]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+public function closeJobPost($jobPostId, $parentId) {
+    $stmt = $this->db->prepare("CALL close_job_post(?, ?)");
+    $stmt->execute([$jobPostId, $parentId]);
+    $stmt->closeCursor();
+    return true;
 }
 
 

@@ -219,102 +219,219 @@ function openChatWindow(userName, userImg) {
     });
 }
 
-function initializeRatingDropdown() {
+async function initializeRatingDropdown() {
     const ratingIcon = document.querySelector('.rating-icon');
     const ratingDropdown = document.getElementById('ratingDropdown');
 
     if (ratingIcon && ratingDropdown) {
-        ratingIcon.addEventListener('click', () => {
+        ratingIcon.addEventListener('click', async () => {
+            // Only fetch contracts if dropdown is being opened and hasn't been loaded yet
+            if (!ratingDropdown.classList.contains('open') && !ratingDropdown.dataset.loaded) {
+                try {
+                    // Get the logged-in user ID (you'll need to make this available)
+                    const userId = getUserId(); // You'll need to implement this function
+                    
+                    // Fetch contracts from server
+                    const response = await fetch('http://localhost:4000/views/get_jobs.php');
+                    if (!response.ok) throw new Error('Failed to fetch contracts');
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.jobs.length > 0) {
+                        // Clear existing hardcoded contracts (keep header and footer)
+                        const contractsContainer = ratingDropdown;
+                        const header = contractsContainer.querySelector('.header');
+                        const footer = contractsContainer.querySelector('.footer');
+                        
+                        contractsContainer.innerHTML = '';
+                        contractsContainer.appendChild(header);
+                        
+                        // Add each contract from the database
+                       data.jobs.forEach(job => {
+    // Extract only the date part, ignore the time
+    const startDate = job.start_date.split(' ')[0];
+    const endDate = job.end_date ? job.end_date.split(' ')[0] : '';  // in case end_date is missing
+
+    const contractDiv = document.createElement('div');
+    contractDiv.className = 'contract';
+    contractDiv.dataset.id = job.id;
+
+    contractDiv.innerHTML = `
+        <div class=det>
+        <div class="in_det">
+        <div class="name">${job.other_person_name || 'Unknown'}</div>
+        <div class="details">${startDate}${endDate ? ' - ' + endDate : ''} | ${job.job_type}</div>
+        </div>
+        <div class=status>${job.status}</div>   
+        </div>
+    `;
+
+    contractsContainer.appendChild(contractDiv);
+});
+
+                        
+                        contractsContainer.appendChild(footer);
+                        
+                        // Mark as loaded to prevent refetching
+                        ratingDropdown.dataset.loaded = 'true';
+                        
+                        // Reattach click handlers to the new contracts
+                        attachContractClickHandlers();
+                    }
+                } catch (error) {
+                    console.error('Error loading contracts:', error);
+                    // Optionally show an error message in the dropdown
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error';
+                    errorDiv.textContent = 'Failed to load contracts';
+                    ratingDropdown.appendChild(errorDiv);
+                }
+            }
+            
             ratingDropdown.classList.toggle('open');
         });
     } else {
         console.error("Rating icon or dropdown not found.");
     }
 
-    // Handle click on a contract to open the review section
+    // Initial attachment of click handlers
+    attachContractClickHandlers();
+}
+
+function attachContractClickHandlers() {
     const contracts = document.querySelectorAll('.contract');
     contracts.forEach(contract => {
         contract.addEventListener('click', () => {
-            const nannyName = contract.querySelector('.name').textContent;
-            const details = contract.querySelector('.details').textContent;
-            
-            openRatingModal(nannyName, details);
+            const status = contract.querySelector('.status').textContent.trim().toLowerCase();
+
+            if (status === 'closed') {
+                const nannyName = contract.querySelector('.name').textContent;
+                const details = contract.querySelector('.details').textContent.split('|')[0].trim();
+                const job_type = contract.querySelector('.details').textContent.split('|')[1].trim();
+                const jobId = contract.dataset.id;  // <--- get job id here
+
+                openRatingModal(nannyName, details, job_type, jobId);  // pass jobId
+            } else if (status === 'ongoing') {
+                showPopupMessage('This contract is still ongoing. You can only rate after it is closed.');
+            } else {
+                showPopupMessage('Unknown contract status.');
+            }
         });
     });
 }
 
-function openRatingModal(nannyName, details) {
+function showPopupMessage(message) {
+    const overlay = document.createElement('div');
+    overlay.classList.add('popup-overlay');
+
+    const popup = document.createElement('div');
+    popup.classList.add('popup-message');
+
+    // Create close button as a span with × symbol
+    const closeBtn = document.createElement('span');
+    closeBtn.classList.add('popup-close-btn');
+    closeBtn.innerHTML = '&times;';  // × symbol
+
+    // Append close button and message text
+    popup.appendChild(closeBtn);
+    const messageP = document.createElement('p');
+    messageP.textContent = message;
+    popup.appendChild(messageP);
+
+    closeBtn.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+    });
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            document.body.removeChild(overlay);
+        }
+    });
+
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+}
+
+
+
+// You'll need to implement this function to get the current user's ID
+
+    // This depends on how you store user info in the frontend
+    // Could be from a global variable, localStorage, or a meta tag
+function getUserId() {
+    return document.querySelector('meta[name="user-id"]')?.content;
+}
+
+
+function openRatingModal(nannyName, details, job_type, jobId) {
     const modal = document.createElement('div');
     modal.classList.add('rating-modal');
     modal.innerHTML = `
     <span class="close-modal">&times;</span>
-        <div class="modal-content">
-            
-            <h3>Rate & Review</h3>
-            <div class="contract-details">
-           
-            
-                <strong>Nanny:</strong> ${nannyName} <br>
-                <strong>Details:</strong> ${details}
-            </div>
-            <div class="star-rating">
-                <span class="star" data-value="1">&#9733;</span>
-                <span class="star" data-value="2">&#9733;</span>
-                <span class="star" data-value="3">&#9733;</span>
-                <span class="star" data-value="4">&#9733;</span>
-                <span class="star" data-value="5">&#9733;</span>
-            </div>
-            <textarea placeholder="Write your review here..." class="review-text"></textarea>
-            <button class="submit-review">Submit</button>
+    <div class="modal-content">
+        <h3>Rate & Review</h3>
+        <div class="contract-details">
+            <strong>Person:</strong> ${nannyName} <br>
+            <strong>Date:</strong> ${details} <br>
+            <strong>Job Type:</strong> ${job_type} <br>
         </div>
+        <div class="star-rating">
+            <input type="number" step="0.1" min="1" max="5" placeholder="Rate (e.g. 4.5)" class="rating-number" />
+        </div>
+        <textarea placeholder="Write your review here..." class="review-text"></textarea>
+        <button class="submit-review">Submit</button>
+        <div class="message"></div> <!-- add a place for error messages -->
+    </div>
     `;
 
-    // Append modal to the body
     document.body.appendChild(modal);
 
-    // Handle star rating
-    const stars = modal.querySelectorAll('.star');
-    stars.forEach(star => {
-        star.addEventListener('click', (e) => {
-            const rating = e.target.getAttribute('data-value');
-            stars.forEach(s => s.classList.remove('selected'));
-            for (let i = 0; i < rating; i++) {
-                stars[i].classList.add('selected');
-            }
-        });
-    });
-
-    // Handle review submission
-    modal.querySelector('.submit-review').addEventListener('click', () => {
-        const selectedStars = modal.querySelectorAll('.star.selected').length;
-        const reviewText = modal.querySelector('.review-text').value.trim();
-
-        if (selectedStars > 0 || reviewText) {
-            console.log(`Nanny: ${nannyName}`);
-            console.log(`Details: ${details}`);
-            console.log(`Submitted Rating: ${selectedStars}`);
-            console.log(`Submitted Review: ${reviewText}`);
-            alert("Thank you for your feedback!");
-            modal.remove(); // Close modal
-        } else {
-            alert("Please provide a rating or review before submitting.");
-        }
-    });
-
-    // Close modal functionality
     modal.querySelector('.close-modal').addEventListener('click', () => {
         modal.remove();
     });
+
+    const reviewerId = getUserId(); // Get the logged-in user ID
+  
+    const reviewTextarea = modal.querySelector('.review-text');
+    const ratingInput = modal.querySelector('.rating-number');
+    const submitBtn = modal.querySelector('.submit-review');
+    const messageDiv = modal.querySelector('.message');
+
+    submitBtn.addEventListener('click', async () => {
+        const rating = parseFloat(ratingInput.value);
+        const comment = reviewTextarea.value.trim();
+
+        if ((!rating || rating < 1 || rating > 5) && comment.length === 0) {
+            messageDiv.textContent = "Please provide a rating between 1 and 5 or write a review.";
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append('job_id', jobId);
+        formData.append('reviewer_id', reviewerId);
+        formData.append('rating', rating || '');  // allow empty if no rating but comment exists
+        formData.append('comment', comment);
+
+        try {
+            const response = await fetch('http://localhost:4000/views/create_rating.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+               showPopupMessage("Thank you for your review!");
+                modal.remove();
+            } else {
+                messageDiv.textContent = result.error || 'Failed to submit rating.';
+            }
+        } catch (error) {
+            messageDiv.textContent = 'Network error. Please try again.';
+            console.error('Submit rating error:', error);
+        }
+    });
 }
-
-//     // Close the suggestion list if clicking outside of the search input
-//     document.addEventListener('click', (e) => {
-//         if (!e.target.closest('.search-container')) {
-//             suggestionList.style.display = 'none';
-//         }
-//     });
-// }
-
 
 // Load navigation on page load
 document.addEventListener("DOMContentLoaded", loadNav);
