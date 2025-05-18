@@ -344,15 +344,13 @@ usort($allPosts, function ($a, $b) {
                 </div>
 
                 <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $jobpost['parent_id']): ?>
-                  <div class="post-menu-wrapper">
-                    <button type="button" class="post-menu-toggle">⋮</button>
-                    <div class="post-act">
+                  <div class="job-post-menu-wrapper">
+                    <button type="button" class="job-post-menu-toggle">⋮</button>
+                    <div class="job-post-act">
                       <button type="button" class="edit-job-post" data-post-id="<?php echo $jobpost['id']; ?>">
-                        <i class="fas fa-edit"></i> Edit
+                      Close Job
                       </button>
-                      <button type="button" class="delete-job-post" data-post-id="<?php echo $jobpost['id']; ?>">
-                        <i class="fas fa-trash"></i> Delete
-                      </button>
+                     
                     </div>
                   </div>
                 <?php endif; ?>

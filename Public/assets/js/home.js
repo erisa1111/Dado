@@ -288,6 +288,70 @@ function closeAllMenus() {
     });
 }
 
+////// for jjobs post handling
+
+
+
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    
+    setupJobPostHandler();
+});
+
+
+function setupJobPostHandler() {
+    // Event delegation for post actions
+    document.addEventListener('click', async function(e) {
+        // Post menu toggle
+        if (e.target.classList.contains('job-post-menu-toggle')) {
+            handleJobPostMenuToggle(e);
+            return;
+        }
+
+        // Edit post
+        const editBtn = e.target.closest('.edit-job-post');
+        if (editBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            await handleEditJobPost(e);
+            return;
+        }
+
+
+        // Close menus when clicking outside
+        if (!e.target.closest('.job-post-menu-wrapper')) {
+            closeAllMenus();
+        }
+    });
+}
+
+// Handle Post Menu Toggle
+function handleJobPostMenuToggle(e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const postDiv = e.target.closest('.job-post');
+    const actionsMenu = postDiv.querySelector('.job-post-act');
+
+    // Close other menus
+    document.querySelectorAll('.job-post-act').forEach(menu => {
+        if (menu !== actionsMenu) {
+            menu.style.display = 'none';
+        }
+    });
+
+    // Toggle current menu
+    actionsMenu.style.display = actionsMenu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Close all menus
+function closeAllMenus() {
+    document.querySelectorAll('.job-post-act').forEach(menu => {
+        menu.style.display = 'none';
+    });
+}
+
+
 // Edit Post Handler
 let currentEditPostId = null;
 let currentDeletePostId = null;

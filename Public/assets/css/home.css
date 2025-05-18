@@ -542,7 +542,7 @@ button.cancel-edit:hover{
 
 .comment-menu-toggle,
 .post-menu-toggle,
-.job-post-menu-wrapper {
+.job-post-menu-toggle {
  
     background: none;
     border: none;
@@ -590,7 +590,8 @@ button.cancel-edit:hover{
 }
 
 .comment-actions button i,
-.post-act button i {
+.post-act button i,
+.job-post-act button i{
     margin-right: 5px;
 }
 
