@@ -6,56 +6,19 @@ require_once __DIR__ . '/../../Config/Database.php'; // adjust path as needed
 
 use App\Models\Notifications;
 
-echo "<h1>Testing Notifications model</h1>";
+echo "<h1>Testing getUserProfilePicture method in Notifications</h1>";
 
 $notifications = new Notifications();
 
-// replace with a real user ID who owns some posts in your DB
-$userId = 46;
+$testUserId = 46; // replace with a real user ID from your DB
 
-echo "<h2>getCommentsNotifications({$userId})</h2>";
-$comments = $notifications->getCommentsNotifications($userId);
-echo "<pre>";
-print_r($comments);
-echo "</pre>";
+echo "<h2>Testing getUserProfilePicture({$testUserId})</h2>";
+$profilePic = $notifications->getUserProfilePicture($testUserId);
 
-echo "<h2>getLikesNotifications({$userId})</h2>";
-$likes = $notifications->getLikesNotifications($userId);
-echo "<pre>";
-print_r($likes);
-echo "</pre>";
-
-echo "<h2>getAllNotifications({$userId})</h2>";
-$all = $notifications->getAllNotifications($userId);
-echo "<pre>";
-print_r($all);
-echo "</pre>";
-
-echo "<h2>getJobPostCommentsNotifications({$userId})</h2>";
-$jobComments = $notifications->getJobPostCommentsNotifications($userId);
-echo "<pre>";
-print_r($jobComments);
-echo "</pre>";
-
-echo "<h2>getJobPostLikesNotifications({$userId})</h2>";
-$jobLikes = $notifications->getJobPostLikesNotifications($userId);
-echo "<pre>";
-print_r($jobLikes);
-echo "</pre>";
-
-echo "<h2>getJobPostApplicationsNotifications({$userId})</h2>";
-$applications = $notifications->getJobPostApplicationsNotifications($userId);
-echo "<pre>";
-print_r($applications);
-echo "</pre>";
-
-$testApplicationId = 21;
-
-echo "<h2>Testing createJobFromApplication({$testApplicationId})</h2>";
-$jobCreated = $notifications->createJobFromApplication($testApplicationId);
-
-if ($jobCreated) {
-    echo "<p style='color:green;'>✅ Job was successfully created from application ID {$testApplicationId}.</p>";
+if ($profilePic !== null) {
+    echo "<p style='color:green;'>✅ Profile picture path: {$profilePic}</p>";
+    echo "<img src='{$profilePic}' alt='Profile Picture' style='max-width:200px;' />";
 } else {
-    echo "<p style='color:red;'>❌ Failed to create job from application ID {$testApplicationId}. Check error log.</p>";
+    echo "<p style='color:red;'>❌ No profile picture found or an error occurred.</p>";
 }
+?>

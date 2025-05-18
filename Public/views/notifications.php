@@ -78,6 +78,42 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
   border-radius: 6px;
   cursor: pointer;
 }
+.notification-user-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.notification-user-link:hover {
+    text-decoration: underline;
+}
+
+.notification-profile-link {
+    display: inline-block;
+   // border-radius: 50%;
+    overflow: hidden;
+}
+
+/* .notification-profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: transform 0.2s;
+} */
+ .notification-card.empty-notifications {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  background-color: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  margin: 10px 0;
+}
+
+.notification-profile-link:hover .notification-profile-pic {
+    transform: scale(1.05);
+}
 </style>
 </head>
 <body>
@@ -180,140 +216,209 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
 fetch(fetchUrl, { credentials: 'include' })
   .then(res => res.json())
   .then(data => {
+
+    const container = document.getElementById('notifications-container');
+container.innerHTML = ''; // Clear previous
+
+if (data.notifications.length === 0) {
+  // Show empty message card
+  const emptyCard = document.createElement('div');
+  emptyCard.className = 'notification-card empty-notifications';
+  emptyCard.textContent = "There aren't any notifications to show yet!";
+  container.appendChild(emptyCard);
+} else {
+  data.notifications.forEach(notification => {
+    // ... your existing notification card creation code
+  });
+}
     if (data.success) {
       const container = document.getElementById('notifications-container');
       container.innerHTML = ''; // Clear previous
-data.notifications.forEach(notification => {
-  const card = document.createElement('div');
-  card.className = 'notification-card';
 
-  let iconHTML = '';
-  let message = '';
-  let profilePicture = '/assets/default-profile.png';
-  let commentPreview = '';
-  let buttonsHTML = '';  // Declare here
+      data.notifications.forEach(notification => {
+        const card = document.createElement('div');
+        card.className = 'notification-card';
 
-  switch (notification.type) {
-    case 'comment':
-      iconHTML = `<i class="fa-regular fa-comment notification-icon"></i>`;
-      profilePicture = notification.commenter_profile_picture;
-      message = `<strong>${notification.commenter_name} ${notification.commenter_surname}</strong> commented on your post.`;
-      commentPreview = `<div class="notification-preview">
-                          <p class="notification-preview-text">${notification.comment}</p>
-                        </div>`;
-      break;
+        let iconHTML = '';
+        let message = '';
+        let profilePicture = '/assets/default-profile.png';
+        let commentPreview = '';
+        let buttonsHTML = '';
+        let userId = '';
 
-    case 'like':
-      iconHTML = `<i class="fa-regular fa-heart notification-icon"></i>`;
-      profilePicture = notification.liker_profile_picture;
-      message = `<strong>${notification.liker_name} ${notification.liker_surname}</strong> liked your post.`;
-      break;
+        function getProfilePicturePath(rawPath) {
+          return rawPath && typeof rawPath === 'string'
+            ? '/' + rawPath.replace(/^[\/\\]+/, '')
+            : '/assets/img/dado_profile.webp';
+        }
 
-    case 'job_comment':
-      iconHTML = `<i class="fa-solid fa-briefcase notification-icon"></i>`;
-      message = `<strong>${notification.commenter_name} ${notification.commenter_surname}</strong> commented on your job post.`;
-      profilePicture = notification.commenter_profile_picture || '/assets/default-profile.png';
-      commentPreview = `<div class="notification-preview">
-                          <p class="notification-preview-text">${notification.comment}</p>
-                        </div>`;
-      break;
+        switch (notification.type) {
+          case 'comment':
+            iconHTML = `<i class="fa-regular fa-comment notification-icon"></i>`;
+            profilePicture = getProfilePicturePath(notification.commenter_profile_picture);
+            userId = notification.commenter_id;
+            message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
+                        <strong>${notification.commenter_name} ${notification.commenter_surname}</strong>
+                      </a> commented on your post.`;
+            commentPreview = `<div class="notification-preview">
+                                <p class="notification-preview-text">${notification.comment}</p>
+                              </div>`;
+            break;
 
-    case 'job_like':
-      iconHTML = `<i class="fa-solid fa-briefcase notification-icon"></i>`;
-      message = `<strong>${notification.liker_name} ${notification.liker_surname}</strong> liked your job post.`;
-      profilePicture = notification.liker_profile_picture || '/assets/default-profile.png';
-      break;
+          case 'like':
+            iconHTML = `<i class="fa-regular fa-heart notification-icon"></i>`;
+            profilePicture = getProfilePicturePath(notification.liker_profile_picture);
+            userId = notification.liker_id;
+            message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
+                        <strong>${notification.liker_name} ${notification.liker_surname}</strong>
+                      </a> liked your post.`;
+            break;
 
-    case 'job_application':
-      iconHTML = `<i class="fa-solid fa-file-alt notification-icon"></i>`;
-      message = `<strong>${notification.applicant_name} ${notification.applicant_surname}</strong> applied for your job post.`;
-      profilePicture = notification.applicant_profile_picture || '/assets/default-profile.png';
-      buttonsHTML = `
-  <div class="notification-actions">
-    <button class="btn accept-btn" data-application-id="${notification.application_id}">Accept</button>
-    <button class="btn decline-btn" data-application-id="${notification.application_id}">Decline</button>
+          case 'job_comment':
+            iconHTML = `<i class="fa-solid fa-briefcase notification-icon"></i>`;
+            profilePicture = getProfilePicturePath(notification.commenter_profile_picture);
+            userId = notification.commenter_id;
+            message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
+                        <strong>${notification.commenter_name} ${notification.commenter_surname}</strong>
+                      </a> commented on your job post.`;
+            commentPreview = `<div class="notification-preview">
+                                <p class="notification-preview-text">${notification.comment}</p>
+                              </div>`;
+            break;
+
+          case 'job_like':
+            iconHTML = `<i class="fa-solid fa-briefcase notification-icon"></i>`;
+            profilePicture = getProfilePicturePath(notification.liker_profile_picture);
+            userId = notification.liker_id;
+            message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
+                        <strong>${notification.liker_name} ${notification.liker_surname}</strong>
+                      </a> liked your job post.`;
+            break;
+
+          case 'job_application':
+            iconHTML = `<i class="fa-solid fa-file-alt notification-icon"></i>`;
+            profilePicture = getProfilePicturePath(notification.applicant_profile_picture);
+            userId = notification.applicant_id;
+            message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
+                        <strong>${notification.applicant_name} ${notification.applicant_surname}</strong>
+                      </a> applied for your job post.`;
+            buttonsHTML = `
+              <div class="notification-actions">
+                <button class="btn accept-btn" data-application-id="${notification.application_id}">Accept</button>
+                <button class="btn decline-btn" data-application-id="${notification.application_id}">Decline</button>
+              </div>
+            `;
+            break;
+
+ case 'application_acceptance':
+            iconHTML = `<i class="fa-solid fa-check-circle notification-icon" style="color: green;"></i>`;
+            profilePicture = getProfilePicturePath(notification.parent_profile_picture);
+            userId = notification.parent_id;
+            const jobTitle = notification.job_title || 'a job';
+            const parentName = notification.parent_name || 'the parent';
+            const parentSurname = notification.parent_surname || '';
+            message = `<strong style="color:green;">Congrats!</strong> <strong>Your application</strong> for 
+                        <strong>"${jobTitle}"</strong> has been <strong>accepted</strong> by 
+                        <a href="profile.php?user_id=${userId}" class="notification-user-link">
+                          <strong>${parentName} ${parentSurname}</strong>
+                        </a>!`;
+
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+              if (!e.target.closest('a')) {
+                window.location.href = `profile.php?user_id=${userId}`;
+              }
+            });
+            break;
+          default:
+            message = 'Unknown notification type.';
+        }
+
+        // Make the profile picture clickable too
+        const profilePicLink = `<a href="profile.php?user_id=${userId}" class="notification-profile-link">
+                              <img src="${profilePicture}" alt="Profile" class="notification-profile-pic" />
+                            </a>`;
+card.innerHTML = `
+  <div class="notification-card-flex">
+    <a href="profile.php?user_id=${userId}" class="notification-profile-link">
+      <img src="${profilePicture}" alt="User profile" class="notification-profile-pic" onerror="this.onerror=null;this.src='/assets/img/default_profile.webp';" />
+    </a>
+    <div class="notification-body">
+      <div class="notification-top">
+        ${iconHTML}
+        <p class="notification-message">${message}</p>
+      </div>
+      <span class="notification-time">${new Date(notification.created_at).toLocaleString()}</span>
+      ${commentPreview}
+    </div>
+    ${buttonsHTML}   <!-- moved outside .notification-body -->
   </div>
 `;
-      break;
 
-    default:
-      message = 'Unknown notification type.';
-  }
 
-  card.innerHTML = `
-    <div class="notification-left">
-      <img src="${profilePicture}" alt="Profile" class="notification-profile-pic" />
-      ${iconHTML}
-    </div>
-    <div class="notification-message">
-      <p>${message}</p>
-      <span class="notification-time">${new Date(notification.created_at).toLocaleString()}</span>
-      ${commentPreview || ''}
-    </div>
-    ${buttonsHTML}
-  `;
+        container.appendChild(card);
 
-  container.appendChild(card);const acceptBtn = card.querySelector('.accept-btn');
-  if (acceptBtn) {
-    acceptBtn.addEventListener('click', () => {
-      const applicationId = acceptBtn.getAttribute('data-application-id');
-      if (!applicationId) return;
-      
- showConfirmationModal("Are you sure you want to accept this application? This will be added into Your Jobs Contracts!", () => {
-      fetch('/acceptApplication.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        credentials: 'include',
-        body: new URLSearchParams({ application_id: applicationId })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert('Application accepted!');
-          card.remove();
-        } else {
-          alert('Failed to accept application: ' + data.message);
+        // Event listeners for buttons
+        const acceptBtn = card.querySelector('.accept-btn');
+        if (acceptBtn) {
+          acceptBtn.addEventListener('click', () => {
+            const applicationId = acceptBtn.getAttribute('data-application-id');
+            if (!applicationId) return;
+            
+            showConfirmationModal("Are you sure you want to accept this application? This will be added into Your Jobs Contracts!", () => {
+              fetch('/acceptApplication.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                credentials: 'include',
+                body: new URLSearchParams({ application_id: applicationId })
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  alert('Application accepted!');
+                  card.remove();
+                } else {
+                  alert('Failed to accept application: ' + data.message);
+                }
+              })
+              .catch(err => {
+                alert('Error accepting application');
+                console.error(err);
+              });
+            });
+          });
         }
-      })
-      .catch(err => {
-        alert('Error accepting application');
-        console.error(err);
-      });
-    });
-    });
-  }
 
-  const declineBtn = card.querySelector('.decline-btn');
-  if (declineBtn) {
-    
-  showConfirmationModal("Are you sure you want to decline this application?", () => {
-    declineBtn.addEventListener('click', () => {
-      const applicationId = declineBtn.getAttribute('data-application-id');
-      if (!applicationId) return;
+        const declineBtn = card.querySelector('.decline-btn');
+        if (declineBtn) {
+          declineBtn.addEventListener('click', () => {
+            const applicationId = declineBtn.getAttribute('data-application-id');
+            if (!applicationId) return;
 
-      fetch('/declineApplication.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        credentials: 'include',
-        body: new URLSearchParams({ application_id: applicationId })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert('Application declined!');
-          card.remove();
-        } else {
-          alert('Failed to decline application: ' + data.message);
+            showConfirmationModal("Are you sure you want to decline this application?", () => {
+              fetch('/declineApplication.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                credentials: 'include',
+                body: new URLSearchParams({ application_id: applicationId })
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  alert('Application declined!');
+                  card.remove();
+                } else {
+                  alert('Failed to decline application: ' + data.message);
+                }
+              })
+              .catch(err => {
+                alert('Error declining application');
+                console.error(err);
+              });
+            });
+          });
         }
-      })
-      .catch(err => {
-        alert('Error declining application');
-        console.error(err);
       });
-    });
-    });
-  }
-});
     } else {
       console.error("Failed to fetch notifications:", data.message);
     }
@@ -349,8 +454,6 @@ function showConfirmationModal(message, onConfirm) {
   confirmBtn.addEventListener('click', handleConfirm);
   cancelBtn.addEventListener('click', handleCancel);
 }
-
-
 </script>
 </body>
 </html>

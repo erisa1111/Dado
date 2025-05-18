@@ -633,8 +633,9 @@ function createCommentElement(comment) {
     commentDiv.innerHTML = `
         <div class="comment-header">
             <div id="userDetail">
-            <img src="${comment.profile_picture || '/assets/img/profile.jpg'}" 
-                 alt="${comment.username}" class="comment-profile-pic">
+            <img src="/${comment.profile_picture || 'assets/img/profile.jpg'}" 
+            alt="${comment.username}" class="comment-profile-pic">
+
             <strong>${comment.name} ${comment.surname}</strong>
             </div>
            <div id="time-act"> 
@@ -1041,8 +1042,8 @@ function createJobCommentElement(comment) {
     commentDiv.innerHTML = `
         <div class="comment-header">
             <div id="userDetail">
-            <img src="${comment.profile_picture || '/assets/img/profile.jpg'}" 
-                 alt="${comment.username}" class="comment-profile-pic">
+            <img src="/${comment.profile_picture || 'assets/img/profile.jpg'}" 
+            alt="${comment.username}" class="comment-profile-pic">
             <strong>${comment.name} ${comment.surname}</strong>
             </div>
            <div id="time-act"> 

@@ -23,10 +23,13 @@ $loggedInUserId = $_SESSION['user_id'] ?? null;
     <nav class="stroke">
 
         <div class="search-container">
-            <i class="fa-solid fa-magnifying-glass" id="search_icon"></i>
-            <input type="text" placeholder="Search..." id="search-bar">
-            <ul id="suggestion-list"></ul> <!-- This will hold the suggestions -->
+            <form id="search-form" action="search_results.php" method="GET">
+                <i class="fa-solid fa-magnifying-glass" id="search_icon"></i>
+                <input type="text" name="username" placeholder="Search..." id="search-bar">
+            </form>
+            <ul id="suggestion-list"></ul>
         </div>
+
 
 
 

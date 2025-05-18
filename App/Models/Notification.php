@@ -34,12 +34,11 @@ class Notifications
         while ($stmt->nextRowset()) {}
 
         foreach ($notifications as &$notification) {
-            if (!empty($notification['commenter_profile_picture'])) {
-                $notification['commenter_profile_picture'] = $this->profilePicBaseUrl . $notification['commenter_profile_picture'];
-            } else {
-                $notification['commenter_profile_picture'] = '/assets/img/default-profile.png'; // fallback image url
-            }
-        }
+    $profilePic = $this->getUserProfilePicture($notification['commenter_id']);
+    $notification['commenter_profile_picture'] = $profilePic 
+        ? '/' . ltrim($profilePic, '/\\') 
+        : '/assets/img/default-profile.png';
+}
 
         return $notifications;
     }
@@ -58,13 +57,12 @@ class Notifications
         while ($stmt->nextRowset()) {}
         
         // prepend profile picture url for each notification
-        foreach ($notifications as &$notification) {
-            if (!empty($notification['liker_profile_picture'])) {
-                $notification['liker_profile_picture'] = $this->profilePicBaseUrl . $notification['liker_profile_picture'];
-            } else {
-                $notification['liker_profile_picture'] = '/assets/img/default-profile.png'; // fallback
-            }
-        }
+       foreach ($notifications as &$notification) {
+    $profilePic = $this->getUserProfilePicture($notification['liker_id']);
+    $notification['liker_profile_picture'] = $profilePic 
+        ? '/' . ltrim($profilePic, '/\\') 
+        : '/assets/img/default-profile.png';
+}
         
         return $notifications;
     } catch (PDOException $e) {
@@ -80,13 +78,12 @@ class Notifications
             $stmt->execute([$userId]);
             $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             while ($stmt->nextRowset()) {}
-
-            foreach ($notifications as &$notification) {
-                $notification['commenter_profile_picture'] = !empty($notification['commenter_profile_picture']) 
-                    ? $this->profilePicBaseUrl . $notification['commenter_profile_picture'] 
-                    : '/assets/img/default-profile.png';
-            }
-
+foreach ($notifications as &$notification) {
+    $profilePic = $this->getUserProfilePicture($notification['commenter_id']);
+    $notification['commenter_profile_picture'] = $profilePic 
+        ? '/' . ltrim($profilePic, '/\\') 
+        : '/assets/img/default-profile.png';
+}
             return $notifications;
         } catch (PDOException $e) {
             error_log("Database error in getJobPostCommentsNotifications: " . $e->getMessage());
@@ -104,10 +101,11 @@ class Notifications
             while ($stmt->nextRowset()) {}
 
             foreach ($notifications as &$notification) {
-                $notification['liker_profile_picture'] = !empty($notification['liker_profile_picture']) 
-                    ? $this->profilePicBaseUrl . $notification['liker_profile_picture'] 
-                    : '/assets/img/default-profile.png';
-            }
+    $profilePic = $this->getUserProfilePicture($notification['liker_id']);
+    $notification['liker_profile_picture'] = $profilePic 
+        ? '/' . ltrim($profilePic, '/\\') 
+        : '/assets/img/default-profile.png';
+}
 
             return $notifications;
         } catch (PDOException $e) {
@@ -125,20 +123,18 @@ class Notifications
             $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             while ($stmt->nextRowset()) {}
 
-           foreach ($notifications as &$notification) {
-    $notification['nanny_profile_picture'] = !empty($notification['nanny_profile_picture']) 
-        ? $this->profilePicBaseUrl . $notification['nanny_profile_picture'] 
+        foreach ($notifications as &$notification) {
+    $profilePic = $this->getUserProfilePicture($notification['nanny_id']);
+    $profilePicPath = $profilePic 
+        ? '/' . ltrim($profilePic, '/\\') 
         : '/assets/img/default-profile.png';
 
-    // 🛠 Rename fields for frontend compatibility
-    $notification['applicant_name'] = $notification['nanny_name'];
-    $notification['applicant_surname'] = $notification['nanny_surname'];
-    $notification['applicant_profile_picture'] = $notification['nanny_profile_picture'];
+    $notification['applicant_name'] = $notification['nanny_name'] ?? 'Nanny';
+    $notification['applicant_surname'] = $notification['nanny_surname'] ?? '';
+    $notification['applicant_profile_picture'] = $profilePicPath;
 
-    // (Optional) unset if you want to clean up
     unset($notification['nanny_name'], $notification['nanny_surname'], $notification['nanny_profile_picture']);
 }
-
             return $notifications;
         } catch (PDOException $e) {
             error_log("Database error in getJobPostApplicationsNotifications: " . $e->getMessage());
@@ -157,17 +153,17 @@ class Notifications
     $comments = $this->getCommentsNotifications($userId);
     foreach ($comments as &$c) {
         $c['type'] = 'comment';
-        $c['commenter_profile_picture'] = $c['commenter_profile_picture'] 
-            ? '/../../Public/assets/uploads/pfps/' . $c['commenter_profile_picture'] 
-            : '/assets/default-profile.png';
+        // $c['commenter_profile_picture'] = $c['commenter_profile_picture'] 
+        //     ? '/../../Public/assets/uploads/pfps/' . $c['commenter_profile_picture'] 
+        //     : '/assets/default-profile.png';
     }
 
     $likes = $this->getLikesNotifications($userId);
     foreach ($likes as &$l) {
         $l['type'] = 'like';
-        $l['liker_profile_picture'] = $l['liker_profile_picture'] 
-            ? '/../../Public/assets/uploads/pfps/' . $l['liker_profile_picture'] 
-            : '/assets/default-profile.png';
+        // $l['liker_profile_picture'] = $l['liker_profile_picture'] 
+        //     ? '/../../Public/assets/uploads/pfps/' . $l['liker_profile_picture'] 
+        //     : '/assets/default-profile.png';
     }
 
     
@@ -189,10 +185,31 @@ class Notifications
         $ja['type'] = 'job_application';
     }
 
-    $all = array_merge($comments, $likes,  $jobComments, $jobLikes, $jobApplications);
+   $applicationAcceptances = $this->getAcceptedApplicationsForNanny($userId); // Assuming $userId is nanny
+   foreach ($applicationAcceptances as &$aa) {
+        $aa['type'] = 'application_acceptance';
+        
+        // Just add this line to format the parent's profile pic:
+       $aa['parent_profile_picture'] = $aa['parent_profile_picture'] 
+    ? $aa['parent_profile_picture'] 
+    : '/assets/img/dado_profile.webp'; // Match your default
+    }
+
+
+// foreach ($applicationAcceptances as &$aa) {
+//     $aa['type'] = 'application_acceptance';
+// }
+
+$all = array_merge(
+    $comments, $likes, 
+    $jobComments, $jobLikes, 
+    $jobApplications,
+    $applicationAcceptances // ⬅️ add this
+);
     usort($all, function($a, $b) {
         return strtotime($b['created_at']) <=> strtotime($a['created_at']);
     });
+
 
     return $all;
     }
@@ -235,6 +252,59 @@ public function declineApplication(int $applicationId): bool
     } catch (PDOException $e) {
         error_log("Database error in declineApplication: " . $e->getMessage());
         return false;
+    }
+}
+public function getUserProfilePicture(int $userId): ?string
+{
+    try {
+        $stmt = $this->db->prepare("CALL GetUserProfilePicture(?)");
+        $stmt->execute([$userId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Clear any additional result sets
+        while ($stmt->nextRowset()) {}
+        
+        return $result['profile_picture'] ?? null;
+    } catch (PDOException $e) {
+        error_log("Error fetching profile picture: " . $e->getMessage());
+        return null;
+    }
+}
+
+
+public function getAcceptedApplicationsForNanny(int $nannyId): array
+{
+    try {
+        $stmt = $this->db->prepare("CALL GetAcceptedApplicationsForNanny(?)");
+        $stmt->execute([$nannyId]);
+        $acceptedApps = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        while ($stmt->nextRowset()) {}
+
+        $notifications = [];
+        foreach ($acceptedApps as $app) {
+            // Get profile picture for this specific parent
+            $profilePic = $this->getUserProfilePicture($app['parent_id']);
+          $profilePicPath = $profilePic 
+    ? '/' . ltrim($profilePic, '/\\')  // ensures '/assets/uploads/pfps/...' format
+    : '/assets/img/dado_profile.webp'; // default image
+            $notifications[] = [
+                'message' => 'Your application for "' . ($app['job_title'] ?? 'a job') . '" has been accepted!',
+                'nanny_id' => $app['nanny_id'] ?? null,
+                'job_post_id' => $app['job_post_id'] ?? null,
+                'job_title' => $app['job_title'] ?? null,
+                'parent_id' => $app['parent_id'] ?? null,
+                'parent_name' => $app['parent_name'] ?? 'Parent',
+                'parent_surname' => $app['parent_surname'] ?? '',
+              'parent_profile_picture' => $profilePicPath,
+                'type' => 'application_acceptance',
+                'status' => 'accepted',
+                'created_at' => $app['accepted_at'] ?? date('Y-m-d H:i:s'),
+            ];
+        }
+        return $notifications;
+    } catch (PDOException $e) {
+        error_log("Database error in getAcceptedApplicationsForNanny: " . $e->getMessage());
+        return [];
     }
 }
 

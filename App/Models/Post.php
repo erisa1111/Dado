@@ -7,11 +7,16 @@ class Post
 {
     private $db;
 
-    public function __construct($db)
-    {
+    public function __construct($db = null)
+{
+    if ($db !== null) {
+        $this->db = $db;
+    } else {
         $database = new Database();
-        $this->db = $database->connect(); 
+        $this->db = $database->connect();
     }
+}
+
 
     public function getAll($userId)
     {
@@ -70,5 +75,48 @@ class Post
         $stmt->bindParam(':post_id', $postId);
         return $stmt->execute();
     }
+
+   public function searchPosts($query) {
+        $sql = "SELECT p.*, u.username, u.profile_picture 
+                FROM posts p 
+                JOIN users u ON p.user_id = u.id 
+                WHERE p.body LIKE :queryBody OR p.title LIKE :queryTitle OR u.username LIKE :queryUsername 
+                ORDER BY p.created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+
+        $likeQuery = '%' . $query . '%';
+        $stmt->bindValue(':queryBody', $likeQuery, \PDO::PARAM_STR);
+        $stmt->bindValue(':queryTitle', $likeQuery, \PDO::PARAM_STR);
+        $stmt->bindValue(':queryUsername', $likeQuery, \PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getPostsByUserId($userId) {
+        $query = "
+            SELECT 
+                p.*,
+                u.id AS user_id,
+                u.name,
+                u.surname,
+                u.profile_picture,
+                u.username,
+                (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
+                (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.user_id = ?
+            ORDER BY p.created_at DESC;
+        ";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+
+
 
 }
