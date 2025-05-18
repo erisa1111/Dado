@@ -398,19 +398,16 @@ usort($allPosts, function ($a, $b) {
                   </div>
                 </div>
 
-                <?php if ($_SESSION['user_id'] != $jobpost['parent_id'] && $jobpost['status'] !== 'closed'): ?>
-
-                  <div class="job-post-actions">
-                    <?php if ($_SESSION['user_id'] != $jobpost['parent_id'] && $jobpost['status'] !== 'closed'): ?>
-                      <form method="POST" action="apply.php" class="apply-form">
-                        <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
-                        <button type="submit" class="apply-btn">Apply</button>
-                      </form>
-                    <?php elseif ($jobpost['status'] === 'closed'): ?>
-                      <div class="closed-message">Closed!</div>
-                    <?php endif; ?>
-                  </div>
-                <?php endif; ?>
+                <div class="job-post-actions">
+                  <?php if ($_SESSION['user_id'] != $jobpost['parent_id'] && $jobpost['status'] !== 'closed'): ?>
+                    <form method="POST" action="apply.php" class="apply-form">
+                      <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
+                      <button type="submit" class="apply-btn">Apply</button>
+                    </form>
+                  <?php elseif ($jobpost['status'] === 'closed'): ?>
+                    <div class="closed-message">Closed!</div>
+                  <?php endif; ?>
+                </div>
 
               </div>
               <div class="job-post-actions2">
@@ -425,7 +422,8 @@ usort($allPosts, function ($a, $b) {
                 <div class="job-likes"><?php echo isset($jobpost['job_like_count']) ? $jobpost['job_like_count'] : 0; ?>
                   likes</div>
                 <div class="job-comments">
-                  <?php echo isset($jobpost['job_comment_count']) ? $jobpost['job_comment_count'] : 0; ?> comments</div>
+                  <?php echo isset($jobpost['job_comment_count']) ? $jobpost['job_comment_count'] : 0; ?> comments
+                </div>
               </div>
 
 

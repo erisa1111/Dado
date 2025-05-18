@@ -331,7 +331,7 @@ let currentEditJobPostId = null;
 
 async function handleEditJobPost(e) {
     const jobPostId = e.target.getAttribute('data-job-id');
-    const parentId = e.target.getAttribute('data-parent-id'); // Get parent_id from data attribute
+    const parentId = e.target.getAttribute('data-parent-id');
     
     if (!jobPostId || !parentId) return;
 
@@ -346,32 +346,26 @@ async function handleEditJobPost(e) {
 
         const result = await response.json();
         if (result.success) {
-            // Change button to "Closed!" and remove apply form
             const jobPost = document.querySelector(`#job-post-${jobPostId}`);
 
-            // Remove the "Apply" button
-            const applyForm = jobPost.querySelector('.apply-form');
-            if (applyForm) {
-                applyForm.remove();
-            }
-
-            // Show "Closed!" message
+            // Update the actions section completely
             const jobActions = jobPost.querySelector('.job-post-actions');
             if (jobActions) {
                 jobActions.innerHTML = '<div class="closed-message">Closed!</div>';
             }
 
-            // Hide the "Close Job" button
+            // Hide the close button
             const closeBtn = jobPost.querySelector('.edit-job-post');
             if (closeBtn) {
                 closeBtn.style.display = 'none';
             }
 
-            // Update the status in the UI if needed
-            const statusElement = jobPost.querySelector('.job-status');
-            if (statusElement) {
-                statusElement.textContent = 'Closed';
-            }
+            // Also update any status indicators if they exist
+            const statusIndicators = jobPost.querySelectorAll('.job-status, .status-indicator');
+            statusIndicators.forEach(indicator => {
+                indicator.textContent = 'Closed';
+                indicator.classList.add('closed');
+            });
         } else {
             alert(result.message || 'Failed to close job.');
         }
