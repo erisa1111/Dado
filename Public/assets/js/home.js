@@ -325,6 +325,62 @@ function setupJobPostHandler() {
     });
 }
 
+// Edit Post Handler
+let currentEditJobPostId = null;
+
+
+async function handleEditJobPost(e) {
+    const jobPostId = e.target.getAttribute('data-job-id');
+    const parentId = e.target.getAttribute('data-parent-id'); // Get parent_id from data attribute
+    
+    if (!jobPostId || !parentId) return;
+
+    try {
+        const response = await fetch('close_job.php?action=closeJobPost', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `job_post_id=${encodeURIComponent(jobPostId)}&parent_id=${encodeURIComponent(parentId)}`
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            // Change button to "Closed!" and remove apply form
+            const jobPost = document.querySelector(`#job-post-${jobPostId}`);
+
+            // Remove the "Apply" button
+            const applyForm = jobPost.querySelector('.apply-form');
+            if (applyForm) {
+                applyForm.remove();
+            }
+
+            // Show "Closed!" message
+            const jobActions = jobPost.querySelector('.job-post-actions');
+            if (jobActions) {
+                jobActions.innerHTML = '<div class="closed-message">Closed!</div>';
+            }
+
+            // Hide the "Close Job" button
+            const closeBtn = jobPost.querySelector('.edit-job-post');
+            if (closeBtn) {
+                closeBtn.style.display = 'none';
+            }
+
+            // Update the status in the UI if needed
+            const statusElement = jobPost.querySelector('.job-status');
+            if (statusElement) {
+                statusElement.textContent = 'Closed';
+            }
+        } else {
+            alert(result.message || 'Failed to close job.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error closing job.');
+    }
+}
+
 // Handle Post Menu Toggle
 function handleJobPostMenuToggle(e) {
     e.stopPropagation();

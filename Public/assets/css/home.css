@@ -1266,3 +1266,16 @@ input#date-range {
   opacity: 1 !important;
   visibility: visible !important;
 }
+
+.job-closed-label {
+    font-weight: bold;
+    color: red;
+    padding: 8px;
+}
+
+.closed-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+

@@ -176,6 +176,9 @@ class JobPostController
              $alreadyApplied = $this->jobPostModel->hasAlreadyApplied($nannyId, $jobPostId);
              echo json_encode(['success' => true, 'already_applied' => $alreadyApplied]);
               break;
+              case 'closeJobPost':
+              $this->closeJobPost();
+              break;
 
 
             // You can add more actions like search, filter etc.
@@ -247,4 +250,43 @@ class JobPostController
         $result = $stmt->fetch();
         return $result['count'];
     }
+public function closeJobPost() {
+    header('Content-Type: application/json');
+    
+    // Get data from POST
+    $jobId = $_POST['job_post_id'] ?? null;
+    $parentId = $_POST['parent_id'] ?? null;
+    
+    // Validate session and permissions
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'message' => 'User not logged in']);
+        exit;
+    }
+    
+    if (!$jobId || !$parentId) {
+        echo json_encode(['success' => false, 'message' => 'Missing required data']);
+        exit;
+    }
+    
+    // Verify the requesting user is the parent
+    if ($_SESSION['user_id'] != $parentId) {
+        echo json_encode(['success' => false, 'message' => 'Unauthorized action']);
+        exit;
+    }
+
+    try {
+        $result = $this->jobPostModel->closeJobPost($jobId, $parentId);
+        echo json_encode([
+            'success' => $result,
+            'message' => $result ? 'Job post closed successfully.' : 'Failed to close job.'
+        ]);
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage()
+        ]);
+    }
+    exit;
+}
+
 }

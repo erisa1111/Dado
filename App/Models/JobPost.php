@@ -2,7 +2,7 @@
 namespace App\Models;
 
 use Config\Database;
-use PDO; // ✅ ADD THIS LINE
+use PDO; 
 use PDOException;
 
 class JobPost{
@@ -102,5 +102,13 @@ class JobPost{
     $stmt->closeCursor();
     return $result ?? true; // return result if any, or just true
 }
+public function closeJobPost($jobPostId, $parentId) {
+    $stmt = $this->db->prepare("CALL close_job_post(?, ?)");
+    $stmt->execute([$jobPostId, $parentId]);
+    $stmt->closeCursor();
+    return true;
+}
+
+
 }
 
