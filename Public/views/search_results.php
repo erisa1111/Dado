@@ -174,23 +174,68 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
                                 </div>
                             </li>
                         <?php elseif ($searchCategory === 'posts'): ?>
-                            <li class="post">
-                                <?php
-                                    $profilePic = !empty($result['profile_picture']) 
-                                        ? '/' . htmlspecialchars($result['profile_picture']) 
-                                        : '/assets/img/default_profile.webp';
-                                ?>
-                                <div class="post-header">
-                                    <img src="<?= $profilePic ?>" alt="Profile Picture" class="post-avatar">
-                                    <div class="post-user">
-                                        <strong><?= htmlspecialchars($result['username']) ?></strong><br>
-                                        <small><?= date('F j, Y', strtotime($result['created_at'])) ?></small>
+                            <li class="post-card">
+                                <div class="post" id="post-<?php echo $result['id']; ?>">
+                                    <div class="post-header">
+                                        <?php
+                                        $profilePic = !empty($result['profile_picture']) 
+                                        ? '/' . ltrim($result['profile_picture'], '/\\') 
+                                        : '/assets/img/dado_profile.webp';
+                                        ?>
+                                        <img class="profile-img" src="<?php echo htmlspecialchars($profilePic); ?>" alt="User Profile">
+                                        <div class="details">
+                                        <h4 class="username"><?php echo htmlspecialchars($result['username']); ?></h4>
+                                        <p class="location">Posted on <?php echo date('F j, Y', strtotime($result['created_at'])); ?></p>
+                                        </div>
+                                        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $result['user_id']): ?>
+                                        <div class="post-menu-wrapper">
+                                            <button type="button" class="post-menu-toggle">⋮</button>
+                                            <div class="post-act">
+                                            <button type="button" class="edit-post" data-post-id="<?php echo $result['id']; ?>">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button type="button" class="delete-post" data-post-id="<?php echo $result['id']; ?>">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
+
                                     </div>
-                                </div>
-                                <div class="post-content">
-                                    <h4><?= htmlspecialchars($result['title']) ?></h4>
-                                    <p><?= nl2br(htmlspecialchars($result['body'])) ?></p>
-                                </div>
+                                    <div class="post-content">
+                                        <?php echo htmlspecialchars($result['body']); ?>
+                                    </div>
+                                    <?php if (!empty($result['image_url'])): ?>
+                                        <div class="post-images">
+                                        <img src="<?php echo htmlspecialchars($result['image_url']); ?>" alt="Post Image">
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="post-actions">
+                                        <button class="act like-btn" data-post-id="<?php echo $result['id']; ?>">
+                                        <i class="fa-regular fa-heart"></i>
+                                        </button>
+                                        <button class="act comment-btn" data-post-id="<?php echo $result['id']; ?>">
+                                        <i class="fa-regular fa-comment"></i>
+                                        </button>
+                                    </div>
+                                    <!-- <div class="post-footer">
+                                        <div class="likes"><?php echo $result['like_count']; ?> likes</div>
+                                        <div class="comments"><?php echo $result['comment_count']; ?> comments</div>
+                                    </div> -->
+
+
+                                    <div class="comments-list" id="comments-list-<?php echo $result['id']; ?>" style="display:none">
+                                        <div class="no-comments">No comments yet</div>
+                                    </div>
+                                    <div class="post-comment">
+                                        <input type="text" id="comment-<?php echo $result['id']; ?>" name="comment" placeholder="Add a comment..."
+                                        class="comment-input" data-post-id="<?php echo $result['id']; ?>">
+                                        <button id="submit-comment" data-post-id="<?php echo $result['id']; ?>">
+                                        <i class="fa-regular fa-paper-plane"></i>
+                                        </button>
+                                        <div id="current-user-id" data-user-id="<?php echo $_SESSION['user_id'] ?? ''; ?>"></div>
+                                    </div>
+                                    </div>
                             </li>
                         <?php elseif ($searchCategory === 'jobs'): ?>
                             <li class="job-card">Job display placeholder</li>
