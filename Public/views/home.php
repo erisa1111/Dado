@@ -381,13 +381,13 @@ usort($allPosts, function ($a, $b) {
                 </div>
 
                 <?php if ($_SESSION['user_id'] != $jobpost['parent_id']) : ?>
-  <div class="job-post-actions">
-    <form method="POST" action="apply.php" class="apply-form">
-      <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
-      <button type="submit" class="apply-btn">Apply</button>
-    </form>
-  </div>
-<?php endif; ?>
+                  <div class="job-post-actions">
+                    <form method="POST" action="apply.php" class="apply-form">
+                      <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
+                      <button type="submit" class="apply-btn">Apply</button>
+                    </form>
+                  </div>
+                <?php endif; ?>
 
               </div>
               <div class="job-post-actions2">
