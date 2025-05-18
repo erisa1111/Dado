@@ -125,4 +125,22 @@ public function connectionExists($userId1, $userId2)
 
     return count($result) > 0;
 }
+
+public function getConnectionCount($user_id)
+{
+    try {
+        $stmt = $this->db->prepare("CALL GetConnectionCount(?)");
+        $stmt->execute([$user_id]);
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+
+        // Commented out to avoid printing to browser
+        // error_log("Connection count for user $user_id: " . print_r($result, true));
+
+        return $result['connection_count'] ?? 0;
+    } catch (\PDOException $e) {
+        error_log("Error in getConnectionCount for user $user_id: " . $e->getMessage());
+        return 0;
+    }
+}
 }
