@@ -2,12 +2,10 @@
 session_start();
 
 use App\Models\User;
-
+use App\Models\Post;
 
 require_once __DIR__ . '/../../App/Models/User.php';
-// Include Post.php and Job.php when you create them
-// require_once __DIR__ . '/../../App/Models/Post.php';
-// require_once __DIR__ . '/../../App/Models/Job.php';
+require_once __DIR__ . '/../../App/Models/Post.php';
 
 if (!isset($_SESSION['user_id'])) {
     echo "No user logged in!";
@@ -15,7 +13,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $loggedInUserId = $_SESSION['user_id'];
-
 $searchCategory = $_GET['search_category'] ?? 'people';
 
 // Shared filters
@@ -43,19 +40,25 @@ if ($searchCategory === 'people') {
     }
 } elseif ($searchCategory === 'posts') {
     $searchTitle = "Post results for \"$postKeywords\"";
-    // Example: $matchingResults = $postModel->searchPosts($postKeywords, $postDate);
-    $matchingResults = []; // Replace with real logic later
+    if ($postKeywords !== '') {
+        $postModel = new Post();
+        $matchingResults = $postModel->searchPosts($postKeywords);
+        if ($postDate !== '') {
+            $matchingResults = array_filter($matchingResults, function ($post) use ($postDate) {
+                return date('Y-m-d', strtotime($post['created_at'])) === $postDate;
+            });
+        }
+    }
 } elseif ($searchCategory === 'jobs') {
     $searchTitle = "Job results for \"$jobKeywords\"";
-    // Example: $matchingResults = $jobModel->searchJobs($jobKeywords, $jobLocation);
     $matchingResults = []; // Replace with real logic later
 }
 
 $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", "Gjakovë", "Vushtrri",
-            "Podujevë", "Kamenicë", "Viti", "Malishevë", "Suharekë", "Rahovec", "Deçan", "Istog",
-            "Skenderaj", "Dragash", "Klinë", "Kaçanik", "Lipjan", "Obiliq", "Fushë Kosovë", "Shtime",
-            "Shtërpcë", "Leposaviq", "Zubin Potok", "Zvečan", "Graçanicë", "Ranillug", "Kllokot",
-            "Novobërdë", "Parteš", "Mitrovicë e Jugut", "Mitrovicë e Veriut" ];
+    "Podujevë", "Kamenicë", "Viti", "Malishevë", "Suharekë", "Rahovec", "Deçan", "Istog",
+    "Skenderaj", "Dragash", "Klinë", "Kaçanik", "Lipjan", "Obiliq", "Fushë Kosovë", "Shtime",
+    "Shtërpcë", "Leposaviq", "Zubin Potok", "Zvečan", "Graçanicë", "Ranillug", "Kllokot",
+    "Novobërdë", "Parteš", "Mitrovicë e Jugut", "Mitrovicë e Veriut" ];
 ?>
 
 <!DOCTYPE html>
@@ -65,6 +68,8 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
     <title>Search Results</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/search_results.css">
+    <!-- <link rel="stylesheet" href="/assets/css/home.css"> -->
+    <link rel="stylesheet" href="/components/postcard/postcard.css">
 </head>
 <body>
     <header>
@@ -169,7 +174,24 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
                                 </div>
                             </li>
                         <?php elseif ($searchCategory === 'posts'): ?>
-                            <li class="post-card">Post display placeholder</li>
+                            <li class="post">
+                                <?php
+                                    $profilePic = !empty($result['profile_picture']) 
+                                        ? '/' . htmlspecialchars($result['profile_picture']) 
+                                        : '/assets/img/default_profile.webp';
+                                ?>
+                                <div class="post-header">
+                                    <img src="<?= $profilePic ?>" alt="Profile Picture" class="post-avatar">
+                                    <div class="post-user">
+                                        <strong><?= htmlspecialchars($result['username']) ?></strong><br>
+                                        <small><?= date('F j, Y', strtotime($result['created_at'])) ?></small>
+                                    </div>
+                                </div>
+                                <div class="post-content">
+                                    <h4><?= htmlspecialchars($result['title']) ?></h4>
+                                    <p><?= nl2br(htmlspecialchars($result['body'])) ?></p>
+                                </div>
+                            </li>
                         <?php elseif ($searchCategory === 'jobs'): ?>
                             <li class="job-card">Job display placeholder</li>
                         <?php endif; ?>

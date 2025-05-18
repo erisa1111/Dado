@@ -7,11 +7,16 @@ class Post
 {
     private $db;
 
-    public function __construct($db)
-    {
+    public function __construct($db = null)
+{
+    if ($db !== null) {
+        $this->db = $db;
+    } else {
         $database = new Database();
-        $this->db = $database->connect(); 
+        $this->db = $database->connect();
     }
+}
+
 
     public function getAll()
     {
