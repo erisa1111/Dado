@@ -7,6 +7,7 @@
                                     <img 
                                         src="/<?= htmlspecialchars($user['profile_picture'] ?? 'assets/img/default_profile.webp') ?>" 
                                         alt="<?= htmlspecialchars($user['name'] ?? $user['username']) ?>" 
+                                        style="object-fit: cover;"
                                     />
                                 </div>
                                 <div class="rec">
