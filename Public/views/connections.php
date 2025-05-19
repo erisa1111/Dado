@@ -65,6 +65,15 @@ error_log("All connections: " . print_r($allConnections, true));
     <span class="filter-btn active" id="connected-btn">Connected</span>
     <span class="filter-btn" id="pending-btn">Pending Requests</span>
 </div> -->
+<div id="confirm-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="display:none;">
+  <div class="modal-content">
+    <span class="modal-close" id="modal-close">&times;</span>
+    <h2 class="modal-title" id="modal-title">Confirm Action</h2>
+    <p id="confirm-message">Are you sure?</p>
+    <button id="confirm-yes" class="modal-button">Yes</button>
+    <button id="confirm-no" class="modal-button" style="background-color: #ccc; color: #333; margin-left: 10px;">No</button>
+  </div>
+</div>
   <div id="center">
     <div id="current-user-id" data-user-id="<?= htmlspecialchars($_SESSION['user_id']) ?>"></div>
   <?php if (empty($allConnections)): ?>
@@ -87,8 +96,8 @@ error_log("All connections: " . print_r($allConnections, true));
   <div id="connections-list">
     <?php foreach ($allConnections as $connection): 
         // Optional: implement logic to get user image from DB if available
-        $profile_image = 'https://w7.pngwing.com/pngs/584/113/png-transparent-pink-user-icon.png'; // Placeholder
-
+      $profile_image = $connection['profile_picture'] ?? 'https://w7.pngwing.com/pngs/584/113/png-transparent-pink-user-icon.png';
+       
         // Extract and pass variables
         $sender_name = $connection['sender_name'] ?? 'Unknown';
         $sender_surname = $connection['sender_surname'] ?? '';
@@ -126,3 +135,21 @@ error_log("All connections: " . print_r($allConnections, true));
 
 <script src="../components/nav_home/nav_home.js"></script>
 <script src="../components/connections_card/connections_card.js"></script>
+<script>
+    const connections = <?php echo json_encode($allConnections, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    console.log("✅ Raw connections data:", connections);
+
+    connections.forEach(conn => {
+        // Log all possible user ID fields
+        console.log('Connection IDs:', {
+            sender_id: conn.sender_id,
+            user_id: conn.user_id,
+            other_ids: Object.keys(conn).filter(k => k.endsWith('_id') && !['sender_id', 'user_id'].includes(k)).reduce((acc, key) => { acc[key] = conn[key]; return acc; }, {})
+        });
+
+        // Choose which ID to display in log
+        const id = conn.sender_id || conn.user_id || 'No user_id or sender_id found';
+
+        console.log(`🖼️ Raw profile picture for user ${id}: ${conn.profile_picture}`);
+    });
+</script>

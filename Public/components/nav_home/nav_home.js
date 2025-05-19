@@ -46,38 +46,38 @@ function initializeSearchIcon() {
     }
 }
 
-const suggestions = [
-    {
-        name: 'Nanny Anna',
-        profilePic: 'https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ=',
-        description: 'Experienced caregiver with over 5 years of experience.'
-    },
-    {
-        name: 'Nanny Maria',
-        profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&s',
-        description: 'Specialized in early childhood education.'
-    },
-    {
-        name: 'Parent John',
-        profilePic: 'https://a.storyblok.com/f/191576/1200x800/a3640fdc4c/profile_picture_maker_before.webp',
-        description: 'Looking for a nurturing nanny for my 3 kids.'
-    },
-    {
-        name: 'Parent Emily',
-        profilePic: 'https://images.unsplash.com/photo-1619895862022-09114b41f16f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d29tZW4lMjBwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D',
-        description: 'Seeking an experienced nanny for part-time care.'
-    },
-    {
-        name: 'Nanny Lia',
-        profilePic: 'https://imgcdn.stablediffusionweb.com/2024/6/12/4d688bcf-f53b-42b6-a98d-3254619f3b58.jpg',
-        description: 'Passionate about child development activities.'
-    },
-    {
-        name: 'Parent Liam',
-        profilePic: 'https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/50dab922-5d48-4c6b-8725-7fd0755d9334/3a3f2d35-8167-4708-9ef0-bdaa980989f9.png',
-        description: 'Looking for a full-time nanny to help with the newborn.'
-    },
-];
+// const suggestions = [
+//     {
+//         name: 'Nanny Anna',
+//         profilePic: 'https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ=',
+//         description: 'Experienced caregiver with over 5 years of experience.'
+//     },
+//     {
+//         name: 'Nanny Maria',
+//         profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&s',
+//         description: 'Specialized in early childhood education.'
+//     },
+//     {
+//         name: 'Parent John',
+//         profilePic: 'https://a.storyblok.com/f/191576/1200x800/a3640fdc4c/profile_picture_maker_before.webp',
+//         description: 'Looking for a nurturing nanny for my 3 kids.'
+//     },
+//     {
+//         name: 'Parent Emily',
+//         profilePic: 'https://images.unsplash.com/photo-1619895862022-09114b41f16f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d29tZW4lMjBwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D',
+//         description: 'Seeking an experienced nanny for part-time care.'
+//     },
+//     {
+//         name: 'Nanny Lia',
+//         profilePic: 'https://imgcdn.stablediffusionweb.com/2024/6/12/4d688bcf-f53b-42b6-a98d-3254619f3b58.jpg',
+//         description: 'Passionate about child development activities.'
+//     },
+//     {
+//         name: 'Parent Liam',
+//         profilePic: 'https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/50dab922-5d48-4c6b-8725-7fd0755d9334/3a3f2d35-8167-4708-9ef0-bdaa980989f9.png',
+//         description: 'Looking for a full-time nanny to help with the newborn.'
+//     },
+// ];
 
 
 // This function will initialize the search suggestion list
