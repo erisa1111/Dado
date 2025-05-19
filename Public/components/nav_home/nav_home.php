@@ -1,9 +1,17 @@
+<?php
+session_start();  // if not started already
+
+// Assuming user ID is stored in session like this:
+$loggedInUserId = $_SESSION['user_id'] ?? null;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="user-id" content="<?php echo htmlspecialchars($loggedInUserId); ?>">
+
     <title>Updated Navbar</title>
     <link rel="stylesheet" href="/components/nav_home/nav_home.css">
 
@@ -34,56 +42,49 @@
             </ul>
         </div>
         <div class="right_nav">
-            
+
             <ul>
                 <li>
                     <div class="right_icons">
-                       
-                        
+
+
                         <div class="rating-icon">
                             <img src="/../assets/img/rate.png" alt="">
                             <div class="dropdown_rating" id="ratingDropdown">
                                 <div class="header">Past Contracts</div>
-                                <div class="contract" data-id="12345">
-                                    <div class="name">Anna's Nanny Service</div>
-                                    <div class="details">Date: 2024-12-01 | Part-Time</div>
-                                </div>
-                                <div class="contract" data-id="12346">
-                                    <div class="name">Maria's Childcare</div>
-                                    <div class="details">Date: 2024-11-20 | Full-Time</div>
-                                </div>
-                                <div class="contract" data-id="12347">
-                                    <div class="name">Lia's Babysitting</div>
-                                    <div class="details">Date: 2024-10-10 | Part-Time</div>
-                                </div>
+                                <!-- Contracts will be loaded here dynamically -->
                                 <div class="footer">
-                                    <a href="#">See all contracts</a>
+                                    
                                 </div>
                             </div>
                         </div>
-                        
-                        
-                      
-                        <div class="chat-icon" >
-                            <img src="/../assets/img/chat.png" alt="">                            <div class="dropdown_chat" id="chatDropdown">
+
+
+
+                        <div class="chat-icon">
+                            <img src="/../assets/img/chat.png" alt="">
+                            <div class="dropdown_chat" id="chatDropdown">
                                 <div class="header">Messages</div>
                                 <div class="message-list">
                                     <div class="message_">
-                                        <img src="https://a.storyblok.com/f/191576/1200x800/a3640fdc4c/profile_picture_maker_before.webp" alt="User 1">
+                                        <img src="https://a.storyblok.com/f/191576/1200x800/a3640fdc4c/profile_picture_maker_before.webp"
+                                            alt="User 1">
                                         <div class="content_msg">
                                             <div class="name">John Doe</div>
                                             <div class="snippet">Hey! How are you?</div>
                                         </div>
                                     </div>
                                     <div class="message_">
-                                        <img src="https://images.unsplash.com/photo-1619895862022-09114b41f16f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d29tZW4lMjBwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D" alt="User 2">
+                                        <img src="https://images.unsplash.com/photo-1619895862022-09114b41f16f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d29tZW4lMjBwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D"
+                                            alt="User 2">
                                         <div class="content_msg">
                                             <div class="name">Jane Smith</div>
                                             <div class="snippet">Are we still meeting tomorrow?</div>
                                         </div>
                                     </div>
                                     <div class="message_">
-                                        <img src="https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/50dab922-5d48-4c6b-8725-7fd0755d9334/3a3f2d35-8167-4708-9ef0-bdaa980989f9.png" alt="User 3">
+                                        <img src="https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/50dab922-5d48-4c6b-8725-7fd0755d9334/3a3f2d35-8167-4708-9ef0-bdaa980989f9.png"
+                                            alt="User 3">
                                         <div class="content_msg">
                                             <div class="name">Mark Wilson</div>
                                             <div class="snippet">Can you send me the file?</div>
@@ -104,7 +105,7 @@
                             <a href="account_settings.html">Account Settings</a>
                             <a href="privacy.html">Privacy</a>
                             <a href="help.html">Help</a>
-                          
+
                         </div>
                     </div>
                 </li>

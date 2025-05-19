@@ -14,6 +14,13 @@ require_once __DIR__ . '/../../Config/Database.php';
 // Initialize the controller
 $postController = new App\Controllers\PostsController(); // No arguments for the constructor now
 $posts = $postController->getPosts();
+// Debug output that will be printed to console
+echo '<script>';
+echo 'console.log("Debugging Like Status:");';
+echo 'console.log("Current User ID: ' . ($_SESSION['user_id'] ?? 'not set') . '");';
+echo 'console.log("First Post Like Status: ' . ($posts[0]['is_liked'] ?? 'undefined') . '");';
+echo 'console.log(' . json_encode($posts, JSON_PRETTY_PRINT) . ');';
+echo '</script>';
 
 $jobPostController = new App\Controllers\JobPostController(); // No arguments for the constructor now
 $jobPosts = $jobPostController->getJobPosts();
@@ -250,7 +257,8 @@ usort($allPosts, function ($a, $b) {
 
       <div class="feed-container">
         <?php foreach ($allPosts as $item): ?>
-          <?php if ($item['type'] === 'post'): $post = $item['data']; ?>
+          <?php if ($item['type'] === 'post'): $post = $item['data'];        error_log("Post ID: {$item['data']['id']} | Is Liked: {$item['data']['is_liked']}");
+ ?>
             <div class="post" id="post-<?php echo $post['id']; ?>">
               <div class="post-header">
                 <?php
@@ -288,9 +296,10 @@ usort($allPosts, function ($a, $b) {
               <?php endif; ?>
               <div class="post-actions">
                 <button class="act like-btn" data-post-id="<?php echo $post['id']; ?>">
-                  <i class="fa-regular fa-heart"></i>
-                </button>
-                <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
+    <i class="<?php echo $post['is_liked'] ? 'fa-solid' : 'fa-regular'; ?> fa-heart" 
+       style="<?php echo $post['is_liked'] ? 'color: red;' : ''; ?>"></i>
+</button>
+    <button class="act comment-btn" data-post-id="<?php echo $post['id']; ?>">
                   <i class="fa-regular fa-comment"></i>
                 </button>
               </div>
@@ -329,15 +338,14 @@ usort($allPosts, function ($a, $b) {
                 </div>
 
                 <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $jobpost['parent_id']): ?>
-                  <div class="post-menu-wrapper">
-                    <button type="button" class="post-menu-toggle">⋮</button>
-                    <div class="post-act">
-                      <button type="button" class="edit-job-post" data-post-id="<?php echo $jobpost['id']; ?>">
-                        <i class="fas fa-edit"></i> Edit
+                  <div class="job-post-menu-wrapper">
+                    <button type="button" class="job-post-menu-toggle">⋮</button>
+                    <div class="job-post-act">
+                      <button type="button" class="edit-job-post" data-job-id="<?php echo $jobpost['id']; ?>"
+                        data-parent-id="<?php echo $jobpost['parent_id']; ?>">
+                        Close Job
                       </button>
-                      <button type="button" class="delete-job-post" data-post-id="<?php echo $jobpost['id']; ?>">
-                        <i class="fas fa-trash"></i> Delete
-                      </button>
+
                     </div>
                   </div>
                 <?php endif; ?>
@@ -347,47 +355,55 @@ usort($allPosts, function ($a, $b) {
                   <h3 class="job-title"><?php echo htmlspecialchars($jobpost['title']); ?></h3>
                   <div class="job-meta">
                     <div class="m">
-                    <span class="job-type"><?php echo htmlspecialchars($jobpost['schedule']); ?></span> |
-                    <span class="job-location"><?php echo htmlspecialchars($jobpost['location']); ?></span> |
-                    <span class="job-salary"><?php echo '$' . number_format($jobpost['salary'], 2); ?></span></div>
-                    <div class="kids"> <p id="kids_num"><?php echo (int) $jobpost['num_kids']; ?></p> <strong>Kids</strong></div>
+                      <span class="job-type"><?php echo htmlspecialchars($jobpost['schedule']); ?></span> |
+                      <span class="job-location"><?php echo htmlspecialchars($jobpost['location']); ?></span> |
+                      <span class="job-salary"><?php echo '$' . number_format($jobpost['salary'], 2); ?></span>
+                    </div>
+                    <div class="kids">
+                      <p id="kids_num"><?php echo (int) $jobpost['num_kids']; ?></p> <strong>Kids</strong>
+                    </div>
                   </div>
                 </div>
                 <div class="job_desc_content">
 
-                <div class="job-description">
-                  <p><?php echo nl2br(htmlspecialchars($jobpost['description'])); ?></p>
-                </div>
-
-                <div class="job-details-grid">
-                  
-                  <div class="time_date">
-
-                  <div><i class="fa-regular fa-clock"></i>
-                    <?php echo isset($jobpost['start_hour']) ? htmlspecialchars($jobpost['start_hour']) : 'Not set'; ?>
-                    <span> - </span>
-                    <?php echo isset($jobpost['end_hour']) ? htmlspecialchars($jobpost['end_hour']) : 'Not set'; ?></div>
-
-                 
-             
-                  <div><i class="fa-regular fa-calendar"></i>
-                    <?php echo isset($jobpost['date_from']) ? htmlspecialchars($jobpost['date_from']) : 'Not set'; ?>
-                                        <span> - </span>
-
-                    <?php echo isset($jobpost['date_to']) ? htmlspecialchars($jobpost['date_to']) : 'Not set'; ?>
+                  <div class="job-description">
+                    <p><?php echo nl2br(htmlspecialchars($jobpost['description'])); ?></p>
                   </div>
+
+                  <div class="job-details-grid">
+
+                    <div class="time_date">
+
+                      <div><i class="fa-regular fa-clock"></i>
+                        <?php echo isset($jobpost['start_hour']) ? htmlspecialchars($jobpost['start_hour']) : 'Not set'; ?>
+                        <span> - </span>
+                        <?php echo isset($jobpost['end_hour']) ? htmlspecialchars($jobpost['end_hour']) : 'Not set'; ?>
+                      </div>
+
+
+
+                      <div><i class="fa-regular fa-calendar"></i>
+                        <?php echo isset($jobpost['date_from']) ? htmlspecialchars($jobpost['date_from']) : 'Not set'; ?>
+                        <span> - </span>
+
+                        <?php echo isset($jobpost['date_to']) ? htmlspecialchars($jobpost['date_to']) : 'Not set'; ?>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                </div>
 
-                <?php if ($_SESSION['user_id'] != $jobpost['parent_id']) : ?>
-                  <div class="job-post-actions">
+                <div class="job-post-actions">
+                  <?php if ($_SESSION['user_id'] != $jobpost['parent_id'] && $jobpost['status'] !== 'closed'): ?>
+
                     <form method="POST" action="apply.php" class="apply-form">
                       <input type="hidden" name="job_id" value="<?php echo $jobpost['id']; ?>" />
                       <button type="submit" class="apply-btn">Apply</button>
                     </form>
-                  </div>
-                <?php endif; ?>
+
+                  <?php elseif ($jobpost['status'] === 'closed'): ?>
+                    <div class="closed-message">Closed!</div>
+                  <?php endif; ?>
+                </div>
 
               </div>
               <div class="job-post-actions2">
@@ -399,8 +415,11 @@ usort($allPosts, function ($a, $b) {
                 </button>
               </div>
               <div class="job-post-footer">
-              <div class="job-likes"><?php echo isset($jobpost['job_like_count']) ? $jobpost['job_like_count'] : 0; ?> likes</div>
-              <div class="job-comments"><?php echo isset($jobpost['job_comment_count']) ? $jobpost['job_comment_count'] : 0; ?> comments</div>
+                <div class="job-likes"><?php echo isset($jobpost['job_like_count']) ? $jobpost['job_like_count'] : 0; ?>
+                  likes</div>
+                <div class="job-comments">
+                  <?php echo isset($jobpost['job_comment_count']) ? $jobpost['job_comment_count'] : 0; ?> comments
+                </div>
               </div>
 
 
@@ -408,8 +427,8 @@ usort($allPosts, function ($a, $b) {
                 <div class="job-no-comments">No comments yet</div>
               </div>
               <div class="job-post-comment">
-                <input type="text" id="job-comment-<?php echo $jobpost['id']; ?>" name="comment" placeholder="Add a comment..."
-                  class="job-comment-input" data-post-id="<?php echo $jobpost['id']; ?>">
+                <input type="text" id="job-comment-<?php echo $jobpost['id']; ?>" name="comment"
+                  placeholder="Add a comment..." class="job-comment-input" data-post-id="<?php echo $jobpost['id']; ?>">
                 <button id="job-submit-comment" data-post-id="<?php echo $jobpost['id']; ?>">
                   <i class="fa-regular fa-paper-plane"></i>
                 </button>
@@ -453,55 +472,13 @@ usort($allPosts, function ($a, $b) {
 
 
     <div class="right">
-      <div class="recommend">
-        <h2>Add to your feed</h2>
-
-        <div class="recommendation">
-          <div class="logo">
-            <img
-              src="https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ="
-              alt="Nanny 1" />
-          </div>
-          <div class="rec">
-            <div class="info">
-              <h3>Nanny 1</h3>
-              <p>Experienced caregiver</p>
-            </div>
-            <button class="follow-btn">+ Follow</button>
-          </div>
-        </div>
-
-        <div class="recommendation">
-          <div class="logo">
-            <img
-              src="https://media.istockphoto.com/id/1386479313/photo/happy-millennial-afro-american-business-woman-posing-isolated-on-white.jpg?s=612x612&w=0&k=20&c=8ssXDNTp1XAPan8Bg6mJRwG7EXHshFO5o0v9SIj96nY="
-              alt="Parent 1" />
-          </div>
-          <div class="rec">
-            <div class="info">
-              <h3>Parent 1</h3>
-              <p>Looking for a caring nanny</p>
-            </div>
-            <button class="follow-btn">+ Follow</button>
-          </div>
-        </div>
-
-        <div class="recommendation">
-          <div class="logo">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&s"
-              alt="Nanny 2" />
-          </div>
-          <div class="rec">
-            <div class="info">
-              <h3>Nanny 2</h3>
-              <p>Passionate about child development activities.</p>
-            </div>
-            <button class="follow-btn">+ Follow</button>
-          </div>
-        </div>
-
-        <a href="#" class="view-all">View all recommendations →</a>
-      </div>
+      <?php
+        if (isset($_SESSION['user_id'])) {
+            $userId = $_SESSION['user_id'];
+            $suggestedUsers = $userModel->getSuggestedUsers($userId);
+            include '../components/recommend/recommendations.php';
+        }
+      ?>
 
       <div class="about">
         <img src="/assets/img/find_dado.webp" alt="">

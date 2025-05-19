@@ -377,7 +377,7 @@ nav a {
 .message {
   padding: 8px 12px;
   border-radius: 16px;
-  max-width: 80%;
+  max-width: 95%;
 }
 
 .message.received {
@@ -427,6 +427,8 @@ nav a {
   top: 50px;
   right: 80px;
   width: 300px;
+   max-height: 700px;   
+    overflow-y: auto;   
   background: white;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -448,7 +450,9 @@ nav a {
   
 }
 .dropdown_rating .header{
-  background-color: #e2687e;
+  background-color: #f1f1f1;
+  color: black;
+  font-weight: 600;
   padding: 10px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -531,3 +535,47 @@ nav a {
 .rating-modal .submit-review:hover {
   background:  #e2687e;
 }
+.det{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.popup-message {
+    position: relative; /* Needed for absolute positioning of close button */
+    background: white;
+    padding: 100px 20px;
+    border-radius: 8px;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    font-size: 16px;
+}
+
+.popup-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+    user-select: none;
+    cursor: pointer;
+}
+
+

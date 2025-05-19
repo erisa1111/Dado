@@ -237,6 +237,7 @@ body {
   height: 48px;
   border-radius: 50%;
   margin-right: 12px;
+  object-fit: cover;
 }
 
 .recommendation .info h3 {
@@ -542,7 +543,7 @@ button.cancel-edit:hover{
 
 .comment-menu-toggle,
 .post-menu-toggle,
-.job-post-menu-wrapper {
+.job-post-menu-toggle {
  
     background: none;
     border: none;
@@ -590,7 +591,8 @@ button.cancel-edit:hover{
 }
 
 .comment-actions button i,
-.post-act button i {
+.post-act button i,
+.job-post-act button i{
     margin-right: 5px;
 }
 
@@ -1265,3 +1267,23 @@ input#date-range {
   opacity: 1 !important;
   visibility: visible !important;
 }
+
+
+
+.closed-message {
+  
+width: 90px;
+background-color: #e2687e;
+  color: white;
+  border: 1px solid #e2687e;
+  padding: 10px 18px;
+  border-radius: 8px;
+
+  font-weight: bold;
+  display: inline-block;
+  font-size: 15px;
+  transition: background-color 0.3s ease;
+}
+
+
+

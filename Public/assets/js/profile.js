@@ -1,30 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const content = {
-        story: `
-        <p>Hi, my name is <span contenteditable="false" id="user-name">[Your Name]</span>, and caring for children has always been a part of my life.</p>
-        <p>Growing up in a large family, I was often the go-to babysitter for my younger siblings and cousins, which sparked my passion for working with kids.</p>
-        <p>Over the past [X years], I've had the privilege of helping families by providing loving and reliable care to their little ones.</p>
-        `,
-        skills: `
-        <p>First Aid & CPR Certified: Trained to handle emergencies and ensure children's safety.</p>
-        <p>Organizational Skills: Skilled in planning daily routines, activities, and meals.</p>
-        `,
-        experience: `
-        <p>Private Nanny for [X Years]</p>
-        <p>Provided care for children aged [range] by creating safe, engaging environments and fostering developmental growth.</p>
-        `,
-        reviews: `
-        <h3>Reviews</h3>
-        <div class="review">
-            <p><strong>Jane Doe</strong> - <span class="review-rating">★★★★★</span></p>
-            <p>"Amazing nanny! My kids loved spending time with her and learned so much."</p>
-        </div>
-        <div class="review">
-            <p><strong>John Smith</strong> - <span class="review-rating">★★★★☆</span></p>
-            <p>"Very reliable and great with kids. Highly recommend."</p>
-        </div>
-        `
-    };
+    const links = document.querySelectorAll(".summary ul li a");
+    const sections = document.querySelectorAll("#content .section");
+    const title = document.getElementById("title");
 
     const titles = {
         story: "My Story",
@@ -32,182 +9,1218 @@ document.addEventListener("DOMContentLoaded", () => {
         experience: "Experience",
         reviews: "Reviews"
     };
-    
-
-    const links = document.querySelectorAll(".summary ul li a");
-    const contentDiv = document.getElementById("content");
-    const title = document.getElementById("title");
 
     links.forEach(link => {
         link.addEventListener("click", (event) => {
             event.preventDefault();
             const section = event.target.getAttribute("data-section");
 
-            if (content[section]) {
-                contentDiv.innerHTML = content[section];
+            // Hide all sections
+            sections.forEach(sec => sec.style.display = "none");
+
+            // Show selected section
+            const selected = document.getElementById(section);
+            if (selected) {
+                selected.style.display = "block";
                 title.textContent = titles[section];
             } else {
-                console.error(`Section "${section}" does not exist in content object.`);
+                console.error(`Section "${section}" not found in DOM.`);
             }
         });
     });
 });
-async function loadUserPosts() {
-    const postCardPlaceholder = document.getElementById("post-container");
-    const response = await fetch("postcard/postcard.html");
-    const postCardHtml = await response.text();
-    postCardPlaceholder.innerHTML = postCardHtml;
 
-    // Filter posts for the current user
-    const currentUser = "CurrentUser"; // Replace with logic to fetch the logged-in user's username
-    const userPosts = posts.filter(post => post.username === currentUser);
 
-    createPosts(userPosts);
-}
 
-const toggleCommentsDisplay = (postElement) => {
-    const commentList = postElement.querySelector("#comments-list");
-    const commentsToggleButton = postElement.querySelector(".comments-toggle");
-    const comments = Array.from(commentList.children);
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    
+    setupPostHandlers();
+});
 
-    if (commentsToggleButton.textContent === "Show all comments") {
-        comments.forEach((comment) => (comment.style.display = "flex"));
-        commentsToggleButton.textContent = "Show less";
-    } else {
-        comments.forEach((comment, index) => {
-            comment.style.display = index < 2 ? "flex" : "none";
-        });
-        commentsToggleButton.textContent = "Show all comments";
-    }
-};
 
-const handleComment = (post, postElement) => {
-    const commentInput = postElement.querySelector("#comment-input");
-    const commentList = postElement.querySelector("#comments-list");
-    const commentsCount = postElement.querySelector("#comments");
-    const commentsSection = postElement.querySelector(".comments-list");
-
-    const newComment = commentInput.value.trim();
-
-    if (newComment) {
-        const commentElement = document.createElement("div");
-        commentElement.classList.add("comment");
-
-        const commentProfileImg = document.createElement("img");
-        commentProfileImg.classList.add("comment-profile-img");
-        commentProfileImg.src = "../img/profile.jpg";
-        commentProfileImg.alt = "User Profile";
-
-        const commentContent = document.createElement("div");
-        commentContent.classList.add("comment-content");
-
-        const commentUsername = document.createElement("span");
-        commentUsername.classList.add("comment-username");
-        commentUsername.textContent = post.username;
-
-        const commentText = document.createElement("p");
-        commentText.classList.add("comment-text");
-        commentText.textContent = newComment;
-
-        commentContent.appendChild(commentUsername);
-        commentContent.appendChild(commentText);
-
-        const deleteButton = document.createElement("button");
-        deleteButton.classList.add("delete-comment");
-        deleteButton.textContent = "Delete";
-        deleteButton.addEventListener("click", () => {
-            commentList.removeChild(commentElement);
-            post.comments -= 1;
-            commentsCount.textContent = `${post.comments} Comments`;
-        });
-
-        commentElement.appendChild(commentProfileImg);
-        commentElement.appendChild(commentContent);
-        commentElement.appendChild(deleteButton);
-
-        commentList.appendChild(commentElement);
-        commentInput.value = "";
-        post.comments += 1;
-        commentsCount.textContent = `${post.comments} Comments`;
-
-        if (post.comments === 1) {
-            commentsSection.classList.remove("hidden");
+function setupPostHandlers() {
+    // Event delegation for post actions
+    document.addEventListener('click', async function(e) {
+        // Post menu toggle
+        if (e.target.classList.contains('post-menu-toggle')) {
+            handlePostMenuToggle(e);
+            return;
         }
 
-        toggleCommentsDisplay(postElement);
+        // Edit post
+        const editBtn = e.target.closest('.edit-post');
+        if (editBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            await handleEditPost(e);
+            return;
+        }
+
+        // Delete post
+        const deleteBtn = e.target.closest('.delete-post');
+        if (deleteBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            await handleDeletePost(e);
+            return;
+        }
+
+        // Close menus when clicking outside
+        if (!e.target.closest('.post-menu-wrapper')) {
+            closeAllMenus();
+        }
+    });
+}
+
+// Handle Post Menu Toggle
+function handlePostMenuToggle(e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const postDiv = e.target.closest('.post');
+    const actionsMenu = postDiv.querySelector('.post-act');
+
+    // Close other menus
+    document.querySelectorAll('.post-act').forEach(menu => {
+        if (menu !== actionsMenu) {
+            menu.style.display = 'none';
+        }
+    });
+
+    // Toggle current menu
+    actionsMenu.style.display = actionsMenu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Close all menus
+function closeAllMenus() {
+    document.querySelectorAll('.post-act').forEach(menu => {
+        menu.style.display = 'none';
+    });
+}
+
+////// for jjobs post handling
+
+
+
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    
+    setupJobPostHandler();
+});
+
+
+function setupJobPostHandler() {
+    // Event delegation for post actions
+    document.addEventListener('click', async function(e) {
+        // Post menu toggle
+        if (e.target.classList.contains('job-post-menu-toggle')) {
+            handleJobPostMenuToggle(e);
+            return;
+        }
+
+        // Edit post
+        const editBtn = e.target.closest('.edit-job-post');
+        if (editBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            await handleEditJobPost(e);
+            return;
+        }
+
+
+        // Close menus when clicking outside
+        if (!e.target.closest('.job-post-menu-wrapper')) {
+            closeAllMenus();
+        }
+    });
+}
+
+// Edit Post Handler
+let currentEditJobPostId = null;
+
+
+async function handleEditJobPost(e) {
+    const jobPostId = e.target.getAttribute('data-job-id');
+    const parentId = e.target.getAttribute('data-parent-id');
+    
+    if (!jobPostId || !parentId) return;
+
+    try {
+        const response = await fetch('close_job.php?action=closeJobPost', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `job_post_id=${encodeURIComponent(jobPostId)}&parent_id=${encodeURIComponent(parentId)}`
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            const jobPost = document.querySelector(`#job-post-${jobPostId}`);
+
+            // Update the actions section completely
+            const jobActions = jobPost.querySelector('.job-post-actions');
+            if (jobActions) {
+                jobActions.innerHTML = '<div class="closed-message">Closed!</div>';
+            }
+
+            // Hide the close button
+            const closeBtn = jobPost.querySelector('.edit-job-post');
+            if (closeBtn) {
+                closeBtn.style.display = 'none';
+            }
+
+            // Also update any status indicators if they exist
+            const statusIndicators = jobPost.querySelectorAll('.job-status, .status-indicator');
+            statusIndicators.forEach(indicator => {
+                indicator.textContent = 'Closed';
+                indicator.classList.add('closed');
+            });
+        } else {
+            alert(result.message || 'Failed to close job.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error closing job.');
     }
-};
+}
 
-const initializeComments = (postElement) => {
-    const commentList = postElement.querySelector("#comments-list");
-    const commentsToggleButton = document.createElement("button");
-    commentsToggleButton.classList.add("comments-toggle");
-    commentsToggleButton.textContent = "Show all comments";
+// Handle Post Menu Toggle
+function handleJobPostMenuToggle(e) {
+    e.stopPropagation();
+    e.preventDefault();
 
-    commentList.after(commentsToggleButton);
+    const postDiv = e.target.closest('.job-post');
+    const actionsMenu = postDiv.querySelector('.job-post-act');
 
-    commentsToggleButton.addEventListener("click", () => {
-        toggleCommentsDisplay(postElement);
+    // Close other menus
+    document.querySelectorAll('.job-post-act').forEach(menu => {
+        if (menu !== actionsMenu) {
+            menu.style.display = 'none';
+        }
     });
 
-    const comments = Array.from(commentList.children);
-    comments.forEach((comment, index) => {
-        comment.style.display = index < 2 ? "flex" : "none";
+    // Toggle current menu
+    actionsMenu.style.display = actionsMenu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Close all menus
+function closeAllMenus() {
+    document.querySelectorAll('.job-post-act').forEach(menu => {
+        menu.style.display = 'none';
     });
-};
+}
 
-const populatePost = (post, templatePost) => {
-    templatePost.querySelector("#profile-img").src = post.profileImg;
-    templatePost.querySelector("#username").textContent = post.username;
-    templatePost.querySelector("#location").textContent = post.location;
 
-    const contentElement = templatePost.querySelector("#content");
-    const imagesContainer = templatePost.querySelector("#images");
-    imagesContainer.innerHTML = "";
+// Edit Post Handler
+let currentEditPostId = null;
+let currentDeletePostId = null;
 
-    contentElement.textContent = post.content;
+async function handleEditPost(e) {
+  const postDiv = e.target.closest('.post');
+  currentEditPostId = e.target.closest('.edit-post').dataset.postId;
+  const postContent = postDiv.querySelector('.post-content').textContent.trim();
 
-    post.images.forEach((imgSrc) => {
-        const img = document.createElement("img");
-        img.src = imgSrc;
-        imagesContainer.appendChild(img);
+  document.getElementById('editContent').value = postContent;
+  document.getElementById('editModal').style.display = 'flex';
+}
+
+async function handleDeletePost(e) {
+  currentDeletePostId = e.target.closest('.delete-post').dataset.postId;
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+
+document.getElementById('saveEdit').addEventListener('click', async () => {
+  const newContent = document.getElementById('editContent').value;
+  const imageFile = document.getElementById('editImage').files[0];
+
+  const formData = new FormData();
+  formData.append('post_id', currentEditPostId);
+  formData.append('content', newContent);
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
+
+  try {
+    const response = await fetch('http://localhost:4000/views/handle_post.php?action=editPost', {
+      method: 'POST',
+      body: formData
     });
 
-    const likesElement = templatePost.querySelector("#likes");
-    likesElement.textContent = `${post.likes} likes`;
-    templatePost.querySelector("#comments").textContent = `${post.comments} Comments`;
+    const data = await response.json();
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert('Error updating post');
+  }
+});
 
-    const heartButton = templatePost.querySelector(".fa-heart");
-    heartButton.addEventListener("click", () => {
-        toggleLike(post, likesElement, heartButton);
+
+// Confirm Delete
+document.getElementById('confirmDelete').addEventListener('click', async () => {
+  const response = await fetch('http://localhost:4000/views/handle_post.php?action=deletePost', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ post_id: currentDeletePostId })
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    location.reload();
+  } else {
+    alert(data.message);
+  }
+});
+
+// Cancel or close modals
+document.getElementById('editClose').onclick = () => document.getElementById('editModal').style.display = 'none';
+document.getElementById('deleteClose').onclick = () => document.getElementById('deleteModal').style.display = 'none';
+document.getElementById('cancelDelete').onclick = () => document.getElementById('deleteModal').style.display = 'none';
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('post-menu-toggle')) {
+        const menu = e.target.nextElementSibling;
+        menu.classList.toggle('visible');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Add click handlers
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            toggleLike(postId, this); // Pass the button element
+        });
+    });
+});
+
+async function toggleLike(postId, button) {
+    try {
+        const heartIcon = button.querySelector('i');
+        const isCurrentlyLiked = heartIcon.classList.contains('fa-solid');
+        
+        // Optimistic UI update
+        heartIcon.className = isCurrentlyLiked ? 'fa-regular fa-heart' : 'fa-solid fa-heart';
+        heartIcon.style.color = isCurrentlyLiked ? '' : 'red';
+
+        const response = await fetch('like_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post_id: postId })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        
+        if (!data.success) {
+            // Revert if failed
+            heartIcon.className = isCurrentlyLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+            heartIcon.style.color = isCurrentlyLiked ? 'red' : '';
+            throw new Error(data.message || 'Action failed');
+        }
+
+        // Update like count
+        const likesCountElement = button.closest('.post').querySelector('.likes');
+        if (likesCountElement) {
+            likesCountElement.textContent = `${data.like_count} likes`;
+        }
+
+    } catch (error) {
+        console.error('Error in toggleLike:', error);
+        alert('Failed to update like. Please try again.');
+    }
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.post').forEach(post => {
+        const postId = post.id.split('-')[1];
+        initCommentFunctionality(postId);
+    });
+});
+
+function initCommentFunctionality(postId) {
+    const commentBtn = document.querySelector(`.comment-btn[data-post-id="${postId}"]`);
+    const commentsList = document.getElementById(`comments-list-${postId}`);
+    if (!commentBtn || !commentsList) return;
+
+    commentBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        commentsList.classList.toggle('visible');
+        if (commentsList.classList.contains('visible')) {
+            loadComments(postId);
+        }
     });
 
-    const submitCommentButton = templatePost.querySelector("#submit-comment");
-    submitCommentButton.addEventListener("click", () => {
-        handleComment(post, templatePost);
+    const commentInput = document.getElementById(`comment-${postId}`);
+    commentInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            submitComment(postId);
+        }
     });
 
-    initializeComments(templatePost);
-};
+    const submitBtn = document.querySelector(`#submit-comment[data-post-id="${postId}"]`);
+    submitBtn.addEventListener('click', function() {
+        submitComment(postId);
+    });
+}
 
-const createPosts = (postsData) => {
-    const postContainer = document.getElementById("post-container");
-    const templatePost = document.querySelector(".post");
+async function submitComment(postId) {
+    const commentInput = document.getElementById(`comment-${postId}`);
+    const commentText = commentInput.value.trim();
+    
+    if (!commentText) return;
+    
+    // Disable input during submission
+    commentInput.disabled = true;
+    
+    try {
+        const response = await fetch('/views/comment_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                post_id: postId,
+                comment: commentText 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update comment count
+            const commentsCount = document.querySelector(`#post-${postId} .comments`);
+            if (commentsCount) {
+                commentsCount.textContent = `${data.comment_count} comments`;
+            }
+            
+            // Add new comment to list if visible
+            const commentsList = document.getElementById(`comments-list-${postId}`);
+            if (commentsList && commentsList.style.display !== 'none') {
+                if (commentsList.querySelector('.no-comments')) {
+                    commentsList.innerHTML = '';
+                }
+                
+                // Create and append the new comment
+                const div = document.createElement('div');
+                div.classList.add('comment');
+                div.innerHTML = `
+                    <strong>${data.comment.name} ${data.comment.surname}</strong> (${data.comment.username}):<br>
+                    ${data.comment.body} <br>
+                    <small>Posted on ${data.comment.created_at}</small>
+                `;
+                commentsList.appendChild(div);
+            }
+            
+            // Clear input
+            commentInput.value = '';
+        }
+    } catch (error) {
+        console.error('Error adding comment:', error);
+    } finally {
+        commentInput.disabled = false;
+    }
+}
 
-    if (!postContainer || !templatePost) {
-        console.error("Post container or template not found!");
+function createCommentElement(comment) {
+    const commentDiv = document.createElement('div');
+    commentDiv.className = 'comment';
+    commentDiv.id = `comment-${comment.id}`;
+
+    const currentUserId = document.getElementById('current-user-id')?.dataset?.userId || null;
+
+    commentDiv.innerHTML = `
+        <div class="comment-header">
+            <div id="userDetail">
+            <img src="/${comment.profile_picture || 'assets/img/profile.jpg'}" 
+            alt="${comment.username}" class="comment-profile-pic">
+
+            <strong>${comment.name} ${comment.surname}</strong>
+            </div>
+           <div id="time-act"> 
+            <span class="comment-time">${formatCommentTime(comment.created_at)}</span>
+            
+            ${comment.user_id == currentUserId ? `
+            <div class="comment-menu-wrapper">
+                <button class="comment-menu-toggle">⋮</button>
+                <div class="comment-actions">
+                    <button class="edit-comment" data-comment-id="${comment.id}">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="delete-comment" data-comment-id="${comment.id}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+            ` : ''}
+            </div>
+            
+            
+        </div>
+        <div class="comment-body">${comment.body}</div>
+    `;
+
+    if (comment.user_id == currentUserId) {
+
+        const toggleBtn = commentDiv.querySelector('.comment-menu-toggle');
+        const actionsMenu = commentDiv.querySelector('.comment-actions');
+        
+        toggleBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            actionsMenu.style.display = actionsMenu.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', () => {
+            actionsMenu.style.display = 'none';
+        });
+
+        actionsMenu?.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Add edit/delete handlers
+        commentDiv.querySelector('.edit-comment')?.addEventListener('click', () => handleEditComment(comment.id));
+        commentDiv.querySelector('.delete-comment')?.addEventListener('click', () => handleDeleteComment(comment.id, comment.post_id));
+    }
+console.log('Comment data:', comment);
+// Should show: {id: 1, user_id: 123, ...}
+    return commentDiv;
+}
+
+
+
+function formatCommentTime(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleString();
+}
+
+async function handleDeleteComment(commentId, postId) {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    
+    const currentUserId = document.getElementById('current-user-id')?.dataset?.userId;
+    if (!currentUserId) {
+        alert('You must be logged in to delete comments');
         return;
     }
 
-    postsData.forEach((post) => {
-        const newPost = templatePost.cloneNode(true);
-        newPost.style.display = "block";
-        populatePost(post, newPost);
-        postContainer.appendChild(newPost);
+    try {
+        const response = await fetch('http://localhost:4000/views/handle_comment.php?action=deleteComment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                comment_id: commentId,
+                user_id: currentUserId 
+            })
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById(`comment-${commentId}`)?.remove();
+            // Update comment count, etc.
+        } else {
+            alert(data.message || 'Failed to delete comment');
+        }
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        alert('Error deleting comment. Check console for details.');
+    }
+}
+async function handleEditComment(commentId) {
+    const commentElement = document.getElementById(`comment-${commentId}`);
+    const commentBody = commentElement.querySelector('.comment-body');
+    const currentText = commentBody.textContent;
+    const currentUserId = document.getElementById('current-user-id')?.dataset?.userId;
+
+    if (!currentUserId) {
+        alert('You must be logged in to edit comments');
+        return;
+    }
+
+    commentBody.innerHTML = `
+        <textarea class="edit-comment-input">${currentText}</textarea>
+        <div class="edit-comment-buttons">
+            <button class="save-edit">Save</button>
+            <button class="cancel-edit">Cancel</button>
+        </div>
+    `;
+
+    const textarea = commentBody.querySelector('.edit-comment-input');
+    textarea.focus();
+
+    commentBody.querySelector('.save-edit').addEventListener('click', async () => {
+        const newText = textarea.value.trim();
+        if (!newText) return;
+
+        try {
+            const response = await fetch('http://localhost:4000/views/handle_comment.php?action=updateComment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    comment_id: commentId,
+                    new_comment: newText,
+                    user_id: currentUserId
+                })
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const data = await response.json();
+
+            if (data.success) {
+                commentBody.innerHTML = newText;
+            } else {
+                alert(data.message || 'Failed to update comment');
+                commentBody.innerHTML = currentText;
+            }
+        } catch (error) {
+            console.error('Error updating comment:', error);
+            alert('Error updating comment. Check console for details.');
+            commentBody.innerHTML = currentText;
+        }
     });
-};
 
-document.addEventListener("DOMContentLoaded", loadUserPosts);
+    commentBody.querySelector('.cancel-edit').addEventListener('click', () => {
+        commentBody.innerHTML = currentText;
+    });
+}
+async function loadComments(postId) {
+    const commentsList = document.getElementById(`comments-list-${postId}`);
+    if (!commentsList) return;
+
+    commentsList.innerHTML = '<div class="loading-comments">Loading comments...</div>';
+
+    try {
+        const response = await fetch(`http://localhost:4000/views/get_comments.php?post_id=${postId}`);
+        const data = await response.json();
+
+        commentsList.innerHTML = '';
+
+        if (data.success && data.comments?.length > 0) {
+            data.comments.forEach(comment => {
+                const commentElement = createCommentElement(comment);
+                commentsList.appendChild(commentElement);
+            });
+        } else {
+            commentsList.innerHTML = '<div class="no-comments">No comments yet</div>';
+        }
+    } catch (error) {
+        console.error('Error loading comments:', error);
+        commentsList.innerHTML = '<div class="comments-error">Error loading comments</div>';
+    }
+}
 
 
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize functionality for both post types
+   
+    initJobPostFunctionality();
+});
+function initJobPostFunctionality() {
+    // Like button functionality for job posts
+    document.querySelectorAll('.job-like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            toggleJobLike(postId);
+        });
+    });
+
+    // Comment functionality for job posts
+    document.querySelectorAll('.job-post').forEach(post => {
+        const postId = post.id.split('-')[2]; // job-post-ID format
+        initJobCommentFunctionality(postId);
+    });
+}
+async function toggleJobLike(postId) {
+    try {
+        console.log('Attempting to like job post:', postId); // Debug log
+        
+        const response = await fetch('like_job_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ job_post_id: postId })
+        });
+
+        // First check if response is OK
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server responded with status:', response.status, 'Text:', errorText);
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        // Then try to parse as JSON
+        let data;
+        try {
+            data = await response.json();
+            console.log('Response data:', data); // Debug log
+        } catch (jsonError) {
+            console.error('Failed to parse JSON:', jsonError);
+            throw new Error('Invalid JSON response from server');
+        }
+
+        if (!data || typeof data.success === 'undefined') {
+            console.error('Invalid data structure:', data);
+            throw new Error('Invalid data structure from server');
+        }
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Action failed');
+        }
+
+        // Update UI - make sure we're targeting the correct elements
+        const postElement = document.getElementById(`job-post-${postId}`);
+        if (!postElement) {
+            console.error('Could not find job post element with ID:', `job-post-${postId}`);
+            return;
+        }
+
+        const likesCountElement = postElement.querySelector('.job-likes');
+        if (likesCountElement) {
+            likesCountElement.textContent = `${data.job_like_count} likes`;
+        } else {
+            console.error('Could not find likes count element in post:', postId);
+        }
+        
+        const likeButton = postElement.querySelector('.job-like-btn i');
+        if (likeButton) {
+            likeButton.classList.toggle('fa-regular', !data.is_liked);
+            likeButton.classList.toggle('fa-solid', data.is_liked);
+            likeButton.style.color = data.is_liked ? 'red' : '';
+        } else {
+            console.error('Could not find like button in post:', postId);
+        }
+
+    } catch (error) {
+        console.error('Error in toggleJobLike:', error);
+        // Show user-friendly error message
+        alert('Failed to update like. Please try again. Error: ' + error.message);
+    }
+}// Add this to your DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing code...
+    
+    // Add this event delegation for job post comments
+    document.addEventListener('click', function(e) {
+        // Handle job comment submission
+        if (e.target.matches('#job-submit-comment, #job-submit-comment i')) {
+            const postId = e.target.closest('[data-post-id]').getAttribute('data-post-id');
+            submitJobComment(postId);
+        }
+    });
+});
+
+function initJobCommentFunctionality(postId) {
+    const commentBtn = document.querySelector(`.job-comment-btn[data-post-id="${postId}"]`);
+    const commentsList = document.getElementById(`job-comments-list-${postId}`);
+    
+    if (!commentBtn || !commentsList) return;
+
+    commentBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        if (commentsList.style.display === 'none' || commentsList.style.display === '') {
+            commentsList.style.display = 'block';
+            loadJobComments(postId);
+        } else {
+            commentsList.style.display = 'none';
+        }
+    });
+
+    // Keep the input keypress listener (input element isn't recreated)
+    const commentInput = document.getElementById(`job-comment-${postId}`);
+    commentInput?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') submitJobComment(postId);
+    });
+    
+    // Remove the button click listener here since we're using delegation
+}
+async function submitJobComment(postId) {
+    console.log('Attempting to submit job comment for post:', postId); // Debug log
+    
+    const commentInput = document.getElementById(`job-comment-${postId}`);
+    if (!commentInput) {
+        console.error('Job comment input not found for post', postId);
+        return;
+    }
+    
+    const commentText = commentInput.value.trim();
+    if (!commentText) return;
+    
+    commentInput.disabled = true;
+    
+    try {
+        console.log('Submitting job comment:', commentText); // Debug log
+        const response = await fetch('/views/comment_job_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                job_post_id: postId,
+                comment: commentText 
+            })
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Job comment submission failed:', errorText);
+            throw new Error('Failed to submit comment');
+        }
+        
+        const data = await response.json();
+        console.log('Job comment response:', data); // Debug log
+        
+        if (data.success) {
+            // Update comment count
+            const commentsCount = document.querySelector(`#job-post-${postId} .job-comments`);
+            if (commentsCount) {
+                commentsCount.textContent = `${data.comment_count} comments`;
+            }
+            
+            // Add new comment to list if visible
+            const commentsList = document.getElementById(`job-comments-list-${postId}`);
+            if (commentsList && commentsList.style.display !== 'none') {
+                if (commentsList.querySelector('.job-no-comments')) {
+                    commentsList.innerHTML = '';
+                }
+                
+                const commentElement = createJobCommentElement(data.comment);
+                commentsList.appendChild(commentElement);
+            }
+            
+            commentInput.value = '';
+        } else {
+            console.error('Job comment submission failed:', data.message);
+            alert(data.message || 'Failed to submit comment');
+        }
+    } catch (error) {
+        console.error('Error adding job comment:', error);
+        alert('Error submitting comment. Please try again.');
+    } finally {
+        commentInput.disabled = false;
+    }
+}
+
+async function loadJobComments(postId) {
+    const commentsList = document.getElementById(`job-comments-list-${postId}`);
+    if (!commentsList) return;
+
+    commentsList.classList.add('visible');
+    commentsList.innerHTML = '<div class="loading-comments">Loading comments...</div>';
+
+    try {
+        const response = await fetch(`http://localhost:4000/views/get_job_post_comments.php?job_post_id=${postId}`);
+        const data = await response.json();
+
+        commentsList.innerHTML = '';
+
+        if (data.success && data.comments?.length > 0) {
+            data.comments.forEach(comment => {
+                const commentElement = createJobCommentElement(comment);
+                commentsList.appendChild(commentElement);
+            });
+        } else {
+            commentsList.innerHTML = '<div class="job-no-comments">No comments yet</div>';
+        }
+    } catch (error) {
+        console.error('Error loading job comments:', error);
+        commentsList.innerHTML = '<div class="comments-error">Error loading comments</div>';
+    }
+}
+
+function createJobCommentElement(comment) {
+    const commentDiv = document.createElement('div');
+    commentDiv.className = 'comment';
+    commentDiv.id = `job-comment-${comment.id}`;
+
+    const currentUserId = document.getElementById('current-user-id-job')?.dataset?.userId || null;
+
+    commentDiv.innerHTML = `
+        <div class="comment-header">
+            <div id="userDetail">
+            <img src="/${comment.profile_picture || 'assets/img/profile.jpg'}" 
+            alt="${comment.username}" class="comment-profile-pic">
+            <strong>${comment.name} ${comment.surname}</strong>
+            </div>
+           <div id="time-act"> 
+            <span class="comment-time">${formatCommentTime(comment.created_at)}</span>
+            
+            ${comment.user_id == currentUserId ? `
+            <div class="comment-menu-wrapper">
+                <button class="comment-menu-toggle">⋮</button>
+                <div class="comment-actions">
+                    <button class="edit-comment" data-comment-id="${comment.id}">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="delete-comment" data-comment-id="${comment.id}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+            ` : ''}
+            </div>
+        </div>
+        <div class="comment-body">${comment.body}</div>
+    `;
+
+    if (comment.user_id == currentUserId) {
+        const toggleBtn = commentDiv.querySelector('.comment-menu-toggle');
+        const actionsMenu = commentDiv.querySelector('.comment-actions');
+        
+        toggleBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            actionsMenu.style.display = actionsMenu.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', () => {
+            actionsMenu.style.display = 'none';
+        });
+
+        actionsMenu?.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        commentDiv.querySelector('.edit-comment')?.addEventListener('click', () => handleEditJobComment(comment.id));
+        commentDiv.querySelector('.delete-comment')?.addEventListener('click', () => handleDeleteJobComment(comment.id, comment.job_post_id));
+    }
+
+    return commentDiv;
+}
+
+async function handleDeleteJobComment(commentId, postId) {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    
+    const currentUserId = document.getElementById('current-user-id-job')?.dataset?.userId;
+    if (!currentUserId) {
+        alert('You must be logged in to delete comments');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:4000/views/handle_job_post_comment.php?action=deleteComment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                comment_id: commentId,
+                user_id: currentUserId 
+            })
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById(`job-comment-${commentId}`)?.remove();
+            // Update comment count
+            const commentsCount = document.querySelector(`#job-post-${postId} .job-comments`);
+            if (commentsCount) {
+                commentsCount.textContent = `${data.comment_count} comments`;
+            }
+        } else {
+            alert(data.message || 'Failed to delete comment');
+        }
+    } catch (error) {
+        console.error('Error deleting job comment:', error);
+        alert('Error deleting comment. Check console for details.');
+    }
+}
+
+async function handleEditJobComment(commentId) {
+    const commentElement = document.getElementById(`job-comment-${commentId}`);
+    const commentBody = commentElement.querySelector('.comment-body');
+    const currentText = commentBody.textContent;
+    const currentUserId = document.getElementById('current-user-id-job')?.dataset?.userId;
+
+    if (!currentUserId) {
+        alert('You must be logged in to edit comments');
+        return;
+    }
+
+    commentBody.innerHTML = `
+        <textarea class="edit-comment-input">${currentText}</textarea>
+        <div class="edit-comment-buttons">
+            <button class="save-edit">Save</button>
+            <button class="cancel-edit">Cancel</button>
+        </div>
+    `;
+
+    const textarea = commentBody.querySelector('.edit-comment-input');
+    textarea.focus();
+
+    commentBody.querySelector('.save-edit').addEventListener('click', async () => {
+        const newText = textarea.value.trim();
+        if (!newText) return;
+
+        try {
+            const response = await fetch('http://localhost:4000/views/handle_job_post_comment.php?action=updateComment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    comment_id: commentId,
+                    new_comment: newText,
+                    user_id: currentUserId
+                })
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const data = await response.json();
+
+            if (data.success) {
+                commentBody.innerHTML = newText;
+            } else {
+                alert(data.message || 'Failed to update comment');
+                commentBody.innerHTML = currentText;
+            }
+        } catch (error) {
+            console.error('Error updating job comment:', error);
+            alert('Error updating comment. Check console for details.');
+            commentBody.innerHTML = currentText;
+        }
+    });
+
+    commentBody.querySelector('.cancel-edit').addEventListener('click', () => {
+        commentBody.innerHTML = currentText;
+    });
+}
+
+document.querySelectorAll('.apply-btn').forEach(button => {
+    const form = button.closest('form');
+    const jobId = form.querySelector('input[name="job_id"]').value;
+
+    // Check if already applied
+    fetch('/views/jobpost_controller.php?action=checkIfApplied', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ job_post_id: jobId })
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
+    .then(data => {
+        if (data.success && data.already_applied) {
+            button.textContent = 'Applied';
+            button.disabled = true;
+            button.style.backgroundColor = '#b6e1a3';
+        }
+    })
+    .catch(error => {
+        console.error('Error checking application status:', error);
+    });
+
+
+
+
+
+//SEN SVYN HIQ QITO
+// async function loadUserPosts() {
+//     const postCardPlaceholder = document.getElementById("post-container");
+//     const response = await fetch("postcard/postcard.html");
+//     const postCardHtml = await response.text();
+//     postCardPlaceholder.innerHTML = postCardHtml;
+
+//     // Filter posts for the current user
+//     const currentUser = "CurrentUser"; // Replace with logic to fetch the logged-in user's username
+//     const userPosts = posts.filter(post => post.username === currentUser);
+
+//     createPosts(userPosts);
+// }
+
+// const toggleCommentsDisplay = (postElement) => {
+//     const commentList = postElement.querySelector("#comments-list");
+//     const commentsToggleButton = postElement.querySelector(".comments-toggle");
+//     const comments = Array.from(commentList.children);
+
+//     if (commentsToggleButton.textContent === "Show all comments") {
+//         comments.forEach((comment) => (comment.style.display = "flex"));
+//         commentsToggleButton.textContent = "Show less";
+//     } else {
+//         comments.forEach((comment, index) => {
+//             comment.style.display = index < 2 ? "flex" : "none";
+//         });
+//         commentsToggleButton.textContent = "Show all comments";
+//     }
+// };
+
+// const handleComment = (post, postElement) => {
+//     const commentInput = postElement.querySelector("#comment-input");
+//     const commentList = postElement.querySelector("#comments-list");
+//     const commentsCount = postElement.querySelector("#comments");
+//     const commentsSection = postElement.querySelector(".comments-list");
+
+//     const newComment = commentInput.value.trim();
+
+//     if (newComment) {
+//         const commentElement = document.createElement("div");
+//         commentElement.classList.add("comment");
+
+//         const commentProfileImg = document.createElement("img");
+//         commentProfileImg.classList.add("comment-profile-img");
+//         commentProfileImg.src = "../img/profile.jpg";
+//         commentProfileImg.alt = "User Profile";
+
+//         const commentContent = document.createElement("div");
+//         commentContent.classList.add("comment-content");
+
+//         const commentUsername = document.createElement("span");
+//         commentUsername.classList.add("comment-username");
+//         commentUsername.textContent = post.username;
+
+//         const commentText = document.createElement("p");
+//         commentText.classList.add("comment-text");
+//         commentText.textContent = newComment;
+
+//         commentContent.appendChild(commentUsername);
+//         commentContent.appendChild(commentText);
+
+//         const deleteButton = document.createElement("button");
+//         deleteButton.classList.add("delete-comment");
+//         deleteButton.textContent = "Delete";
+//         deleteButton.addEventListener("click", () => {
+//             commentList.removeChild(commentElement);
+//             post.comments -= 1;
+//             commentsCount.textContent = `${post.comments} Comments`;
+//         });
+
+//         commentElement.appendChild(commentProfileImg);
+//         commentElement.appendChild(commentContent);
+//         commentElement.appendChild(deleteButton);
+
+//         commentList.appendChild(commentElement);
+//         commentInput.value = "";
+//         post.comments += 1;
+//         commentsCount.textContent = `${post.comments} Comments`;
+
+//         if (post.comments === 1) {
+//             commentsSection.classList.remove("hidden");
+//         }
+
+//         toggleCommentsDisplay(postElement);
+//     }
+// };
+
+// const initializeComments = (postElement) => {
+//     const commentList = postElement.querySelector("#comments-list");
+//     const commentsToggleButton = document.createElement("button");
+//     commentsToggleButton.classList.add("comments-toggle");
+//     commentsToggleButton.textContent = "Show all comments";
+
+//     commentList.after(commentsToggleButton);
+
+//     commentsToggleButton.addEventListener("click", () => {
+//         toggleCommentsDisplay(postElement);
+//     });
+
+//     const comments = Array.from(commentList.children);
+//     comments.forEach((comment, index) => {
+//         comment.style.display = index < 2 ? "flex" : "none";
+//     });
+// };
+
+// const populatePost = (post, templatePost) => {
+//     templatePost.querySelector("#profile-img").src = post.profileImg;
+//     templatePost.querySelector("#username").textContent = post.username;
+//     templatePost.querySelector("#location").textContent = post.location;
+
+//     const contentElement = templatePost.querySelector("#content");
+//     const imagesContainer = templatePost.querySelector("#images");
+//     imagesContainer.innerHTML = "";
+
+//     contentElement.textContent = post.content;
+
+//     post.images.forEach((imgSrc) => {
+//         const img = document.createElement("img");
+//         img.src = imgSrc;
+//         imagesContainer.appendChild(img);
+//     });
+
+//     const likesElement = templatePost.querySelector("#likes");
+//     likesElement.textContent = `${post.likes} likes`;
+//     templatePost.querySelector("#comments").textContent = `${post.comments} Comments`;
+
+//     const heartButton = templatePost.querySelector(".fa-heart");
+//     heartButton.addEventListener("click", () => {
+//         toggleLike(post, likesElement, heartButton);
+//     });
+
+//     const submitCommentButton = templatePost.querySelector("#submit-comment");
+//     submitCommentButton.addEventListener("click", () => {
+//         handleComment(post, templatePost);
+//     });
+
+//     initializeComments(templatePost);
+// };
+
+// const createPosts = (postsData) => {
+//     const postContainer = document.getElementById("post-container");
+//     const templatePost = document.querySelector(".post");
+
+//     if (!postContainer || !templatePost) {
+//         console.error("Post container or template not found!");
+//         return;
+//     }
+
+//     postsData.forEach((post) => {
+//         const newPost = templatePost.cloneNode(true);
+//         newPost.style.display = "block";
+//         populatePost(post, newPost);
+//         postContainer.appendChild(newPost);
+//     });
+// };
+
+// document.addEventListener("DOMContentLoaded", loadUserPosts);
+
+
+    // Handle apply click
+    button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const jobIdClicked = form.querySelector('input[name="job_id"]').value;
+
+        try {
+            const response = await fetch('/views/jobpost_controller.php?action=applyToJobPost', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ job_post_id: jobIdClicked })
+            });
+
+            // First check if the response is OK (status 200-299)
+            if (!response.ok) {
+                // Try to get the error message from the response
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.success) {
+                button.textContent = 'Applied';
+                button.disabled = true;
+                button.style.backgroundColor = '#b6e1a3';
+                // Use a more user-friendly notification system
+                showNotification('Application submitted successfully!', 'success');
+            } else {
+                showNotification(data.message || 'Failed to submit application', 'error');
+            }
+        } catch (error) {
+            console.error('Error while applying:', error);
+            showNotification(error.message || 'An error occurred while applying', 'error');
+        }
+    });
+});
