@@ -134,6 +134,7 @@ const suggestions = [
 
     // Close the suggestion list if clicking outside of the search input
     document.addEventListener('click', (e) => {
+        const suggestionList = document.getElementById('suggestion-list');
         if (!e.target.closest('.search-container')) {
             suggestionList.style.display = 'none';
         }
