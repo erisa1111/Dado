@@ -56,6 +56,7 @@ usort($allPosts, function ($a, $b) {
 });
 
 $ratingData = $userModel->getUserAverageRating($viewingUserId);
+$userData['reviews'] = $userModel->getUserReviews($viewingUserId);
 
 $average = $ratingData['average_rating'] ?? 0;
 $starWidth = ($average / 5) * 100;
@@ -79,25 +80,19 @@ if (!$userData) {
     <title>Home Page</title>
     <link rel="stylesheet" href="/assets/css/profile.css">
     <link rel="stylesheet" href="../components/nav_home/nav_home.css">
-    <!-- <link rel="stylesheet" href="/assets/css/home.css"> -->
+    <link rel="stylesheet" href="/assets/css/home.css">
     <link rel="stylesheet" href="/assets/css/search_results.css">
     <link rel="stylesheet" href="/components/postcard/postcard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body style="display: block;">
 
     <header>
         <div id="nav-placeholder"></div>
     </header>
     <br><br><br><br>
     <main>
-
-    <pre>
-Average: <?= $average ?>
-
-% Width: <?= $starWidth ?>%
-</pre>
         <div class="container">
             <div class="profile_wrapper">
                 <div class="profile_background"> </div>
@@ -157,45 +152,73 @@ Average: <?= $average ?>
                             <?php endif; ?>
                             <button class="follow-btn">Share</button>
                            <?php if ($isOwnProfile): ?>
-    <div id="connections-count" data-user-id="<?php echo $loggedInUserId; ?>">
-        Connections: <a href="/views/connections.php" id="connections-link"><span id="connections-number">0</span></a>
-    </div>
-<?php else: ?>
-    <div id="connections-count" data-user-id="<?php echo $viewingUserId; ?>">
-        Connections: <span id="connections-number">0</span>
-    </div>
-<?php endif; ?>
+                                <div id="connections-count" data-user-id="<?php echo $loggedInUserId; ?>">
+                                    Connections: <a href="/views/connections.php" id="connections-link"><span id="connections-number">0</span></a>
+                                </div>
+                            <?php else: ?>
+                                <div id="connections-count" data-user-id="<?php echo $viewingUserId; ?>">
+                                    Connections: <span id="connections-number">0</span>
+                                </div>
+                            <?php endif; ?>
 
                         </div>
-
-                      
-    
                     </div>
                 </div>
 
 
     
                 <div class="profile_summary">
-                    <h2 id="title">My Story</h2>
-                    <div class="summary">
-                        <ul>
-                            <li><a href="#" data-section="story">My Story</a></li>
-                            <?php if ($userData['role_name'] === 'Nanny'): ?>
-                            <li><a href="#" data-section="skills">Skills</a></li>
-                            <li><a href="#" data-section="experience">Experience</a></li>
-                            <?php endif; ?>
-                            <!-- <li><a href="#" data-section="reviews" onclick="showSection('reviews')">Reviews</a></li> -->
-    
-                        </ul>
-                        <div id="content">
-                            <!-- My Story Section -->
-                            <div id="story" class="section">
-                                <p><?= htmlspecialchars($userData['bio']) ?></p>
-                            </div>
-    
+    <h2 id="title">My Story</h2>
+    <div class="summary">
+        <ul>
+            <li><a href="#" data-section="story">My Story</a></li>
+            <?php if ($userData['role_name'] === 'Nanny'): ?>
+            <li><a href="#" data-section="skills">Skills</a></li>
+            <li><a href="#" data-section="experience">Experience</a></li>
+            <?php endif; ?>
+            <li><a href="#" data-section="reviews">Reviews</a></li>
+        </ul>
+
+        <div id="content">
+            <!-- Sections -->
+            <div id="story" class="section active">
+                <p><?= htmlspecialchars($userData['bio']) ?></p>
+            </div>
+
+            <?php if ($userData['role_name'] === 'Nanny'): ?>
+            <div id="skills" class="section" style="display:none;">
+                <p>First Aid & CPR Certified: Trained to handle emergencies and ensure children's safety.</p>
+                <p>Organizational Skills: Skilled in planning daily routines, activities, and meals.</p>
+            </div>
+            <div id="experience" class="section" style="display:none;">
+                <p>Private Nanny for <?= htmlspecialchars($userData['years_experience']) ?> years</p>
+                <p>Provided care for children aged <?= htmlspecialchars($userData['age_range']) ?> by creating safe, engaging environments and fostering developmental growth.</p>
+            </div>
+            <?php endif; ?>
+
+            <div id="reviews" class="section" style="display:none;">
+                <?php if (!empty($userData['reviews'])): ?>
+                    <?php foreach ($userData['reviews'] as $review): ?>
+                        <div class="review">
+                            <p>
+                                <strong><?= htmlspecialchars($review['reviewer_name']) ?></strong> -
+                                <span class="review-rating">
+                                    <?= str_repeat('★', (int)$review['rating']) ?>
+                                    <?= str_repeat('☆', 5 - (int)$review['rating']) ?>
+                                </span>
+                                <small style="color: gray;">on <?= date('F j, Y', strtotime($review['created_at'])) ?></small>
+                            </p>
+                            <p>"<?= nl2br(htmlspecialchars($review['comment'])) ?>"</p>
                         </div>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p>No reviews yet.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
                 <!-- <div class="user_posts">
                     <h2>User Posts</h2>
                     <div id="posts-container">
@@ -385,7 +408,7 @@ Average: <?= $average ?>
                 <!-- </div> -->
             </div>
             <div class="right_profile">
-                <div class="right">
+                <div class="right-prof">
                     <div class="recommend">
                         <h2>Add to your feed</h2>
     

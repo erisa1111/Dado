@@ -299,5 +299,44 @@ public function storeVerificationToken($userId, $token)
         return null;
     }
 
+    public function getUserReviews(int $userId): array {
+    $sql = "
+        SELECT 
+            r.id,
+            r.rating,
+            r.comment,
+            r.created_at,
+            u.username,
+            u.name,
+            u.surname
+        FROM 
+            ratings r
+        JOIN 
+            jobs j ON r.job_id = j.id
+        JOIN 
+            users u ON r.reviewer_id = u.id
+        WHERE  
+            (j.nanny_id = :user_id AND r.reviewer_id = j.parent_id)
+            OR 
+            (j.parent_id = :user_id AND r.reviewer_id = j.nanny_id)
+        ORDER BY 
+            r.created_at DESC
+    ";
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute(['user_id' => $userId]);
+    $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Format reviewer name: Prefer full name, fallback to username
+    foreach ($reviews as &$review) {
+        $fullName = trim($review['name'] . ' ' . $review['surname']);
+        $review['reviewer_name'] = $fullName !== '' ? $fullName : $review['username'];
+    }
+
+    return $reviews ?: [];
+}
+
+
+
 
 }
