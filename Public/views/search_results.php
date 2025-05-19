@@ -379,6 +379,7 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
         ?>
     </div>
 
+
     <script>
     function toggleSection(id) {
         const sections = ['people-section', 'posts-section', 'jobs-section'];
@@ -398,6 +399,9 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
     <script src="/components/postcard/postcard.js"></script>
     <script src="/assets/js/home.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    <script src="/assets/js/search_results.js"></script>
+    
 
 </body>
 </html>
