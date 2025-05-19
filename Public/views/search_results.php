@@ -84,6 +84,11 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
     <link rel="stylesheet" href="/assets/css/home.css">
     <link rel="stylesheet" href="/components/postcard/postcard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+    .reccomend{
+        margin-top: 0px;
+    }
+    </style>
 </head>
 <body style="display: block;">
     <header>
@@ -363,6 +368,15 @@ $cities = [ "Prishtina", "Gjilan", "Ferizaj", "Mitrovicë", "Pejë", "Prizren", 
                 <p class="no-results">No results found.</p>
             <?php endif; ?>
         </div>
+
+        <?php
+            if (isset($_SESSION['user_id'])) {
+                $userModel = new User();
+                $userId = $_SESSION['user_id'];
+                $suggestedUsers = $userModel->getSuggestedUsers($userId, null, 6);
+                include '../components/recommend/recommendations.php';
+            }
+        ?>
     </div>
 
     <script>

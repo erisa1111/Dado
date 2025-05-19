@@ -83,6 +83,15 @@ usort($allPosts, function ($a, $b) {
   <link rel="stylesheet" href="/components/postcard/postcard.css">
   <link rel="stylesheet" href="/components/nav_home/nav_home.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+      .recommend,
+      .about,
+      .app {
+
+        margin-top: 4%;
+
+      }
+  </style>
 
 
 </head>
