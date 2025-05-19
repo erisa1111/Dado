@@ -34,16 +34,15 @@ switch ($request_uri) {
         break;
 
     case '/login':
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $verified = $_GET['verified'] ?? null;
-            $error = $_GET['error'] ?? null;
-            include __DIR__ . '/views/login.php'; 
-            exit();
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            (new AuthController())->login(); 
-           
-        }
-        break;
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $verified = $_GET['verified'] ?? null;
+        $error = $_GET['error'] ?? null;
+        include __DIR__ . '/views/login.php'; 
+        exit();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        (new AuthController())->login(); 
+    }
+    break;
      case '/verify-email':
         (new AuthController())->verifyEmail();
         break;
