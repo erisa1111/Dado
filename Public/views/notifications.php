@@ -131,6 +131,52 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
 .notification-profile-link:hover .notification-profile-pic {
     transform: scale(1.05);
 }
+.empty-notifications-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.empty-notifications-container {
+     background: #f8f9fa;;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(161, 157, 157, 0.05);
+}
+
+.empty-notifications .empty-icon {
+    font-size: 40px;
+    color: #e2687e;
+    margin-bottom: 10px;
+}
+
+.empty-notifications h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.empty-notifications p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.explore-btn {
+    padding: 8px 16px;
+    background-color: #e2687e;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.explore-btn i {
+    margin-right: 6px;
+}
+
 </style>
 </head>
 <body>
@@ -156,7 +202,27 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
     </div>
 
     <div id="center">
+      <?php if (empty($allNotifications)): ?>
+    <!-- 🟣 Place your empty notification card here -->
+     <div class="empty-notifications-wrapper">
+    <div class="empty-notifications-container">
+        <div class="empty-notifications">
+            <div class="empty-icon">
+                <i class="fas fa-bell-slash"></i>
+            </div>
+            <h3>No notifications yet</h3>
+            <p>You're all caught up! Check back later for updates.</p>
+            <!-- <button class="explore-btn" onclick="window.location.href='search_results.php'">
+                <i class="fas fa-users"></i> Explore users
+            </button> -->
+        </div>
+    </div>
+</div>
+<?php else: ?>
+    <!-- Render the notification cards here -->
+
      <div id="notifications-container"></div>
+     <?php endif; ?>
     </div> 
 
     <div class="right">
