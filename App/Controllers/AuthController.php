@@ -214,8 +214,11 @@ function login()
     // ← Insert the “verified?” check right here:
      if (empty($user['is_verified'])) {
         // user hasn’t clicked the link yet:
-        echo "Please verify your email before logging in.";
-        return;
+        //echo "Please verify your email before logging in.";
+        //return;
+            header('Location: /login?error=not_verified');
+            exit();
+        
     }
 
         if ($user) {
