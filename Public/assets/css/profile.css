@@ -7,8 +7,13 @@ body{
   
 
 }
+
+a{
+  text-decoration: none;
+  color: #333;
+}
 main{
-  width: 100vw;
+  /* width: 100vw; */
   display: flex;
   margin: 0 auto;
 }
@@ -313,8 +318,8 @@ main{
 .posts_section_scrollable {
   
 
-    padding-left: 10rem;
-    padding-right: 10rem;
+    /* padding-left: 10rem; */
+    /* padding-right: 10rem; */
     padding-top: 1rem;
     
     /* border: 1px solid #ccc; */

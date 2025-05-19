@@ -163,13 +163,13 @@ if (!$userData) {
                             <?php else: ?>
                                 <button class="follow-btn" style="margin: 0;" data-recipient-id="<?= $viewingUserId ?>">Connect</button>
                             <?php endif; ?>
-                            <button class="follow-btn">Share</button>
+                            <button class="follow-btn" style="margin: 0;">Share</button>
                            <?php if ($isOwnProfile): ?>
-                                <div id="connections-count" data-user-id="<?php echo $loggedInUserId; ?>">
+                                <div class="follow-btn" id="connections-count" data-user-id="<?php echo $loggedInUserId; ?>">
                                     Connections: <a href="/views/connections.php" id="connections-link"><span id="connections-number">0</span></a>
                                 </div>
                             <?php else: ?>
-                                <div id="connections-count" data-user-id="<?php echo $viewingUserId; ?>">
+                                <div class="follow-btn" id="connections-count" data-user-id="<?php echo $viewingUserId; ?>">
                                     Connections: <span id="connections-number">0</span>
                                 </div>
                             <?php endif; ?>
