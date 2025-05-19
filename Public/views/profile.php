@@ -61,6 +61,13 @@ $userData['reviews'] = $userModel->getUserReviews($viewingUserId);
 $average = $ratingData['average_rating'] ?? 0;
 $starWidth = ($average / 5) * 100;
 
+if ($userData['role_name'] === 'Nanny') {
+    $nannyDetails = $userModel->getNannyDetails($viewingUserId);
+    if ($nannyDetails) {
+        $userData = array_merge($userData, $nannyDetails);
+    }
+}
+
 
 
 
@@ -168,56 +175,57 @@ if (!$userData) {
 
     
                 <div class="profile_summary">
-    <h2 id="title">My Story</h2>
-    <div class="summary">
-        <ul>
-            <li><a href="#" data-section="story">My Story</a></li>
-            <?php if ($userData['role_name'] === 'Nanny'): ?>
-            <li><a href="#" data-section="skills">Skills</a></li>
-            <li><a href="#" data-section="experience">Experience</a></li>
-            <?php endif; ?>
-            <li><a href="#" data-section="reviews">Reviews</a></li>
-        </ul>
+                    <h2 id="title">My Story</h2>
+                    <div class="summary">
+                        <ul>
+                            <li><a href="#" data-section="story">My Story</a></li>
+                            <?php if ($userData['role_name'] === 'Nanny'): ?>
+                            <li><a href="#" data-section="skills">Skills</a></li>
+                            <li><a href="#" data-section="experience">Experience</a></li>
+                            <?php endif; ?>
+                            <li><a href="#" data-section="reviews">Reviews</a></li>
+                        </ul>
 
-        <div id="content">
-            <!-- Sections -->
-            <div id="story" class="section active">
-                <p><?= htmlspecialchars($userData['bio']) ?></p>
-            </div>
+                        <div id="content">
+                            <!-- Sections -->
+                            <div id="story" class="section active">
+                                <p><?= htmlspecialchars($userData['bio']) ?></p>
+                            </div>
 
-            <?php if ($userData['role_name'] === 'Nanny'): ?>
-            <div id="skills" class="section" style="display:none;">
-                <p>First Aid & CPR Certified: Trained to handle emergencies and ensure children's safety.</p>
-                <p>Organizational Skills: Skilled in planning daily routines, activities, and meals.</p>
-            </div>
-            <div id="experience" class="section" style="display:none;">
-                <p>Private Nanny for <?= htmlspecialchars($userData['years_experience']) ?> years</p>
-                <p>Provided care for children aged <?= htmlspecialchars($userData['age_range']) ?> by creating safe, engaging environments and fostering developmental growth.</p>
-            </div>
-            <?php endif; ?>
+                            <?php if ($userData['role_name'] === 'Nanny'): ?>
+                            <div id="skills" class="section" style="display:none;">
+                                <p>First Aid & CPR Certified: Trained to handle emergencies and ensure children's safety.</p>
+                                <p>Organizational Skills: Skilled in planning daily routines, activities, and meals.</p>
+                            </div>
+                            <div id="experience" class="section" style="display:none;">
+                                <p>Private Nanny for <?= htmlspecialchars($userData['experience']) ?></p>
+                                <p>My usual schedule is <?= htmlspecialchars($userData['schedule']) ?> </p>
+                                <p>My expected salary is around <?= htmlspecialchars($userData['expected_salary']) ?> Euros</p>
+                            </div>
+                            <?php endif; ?>
 
-            <div id="reviews" class="section" style="display:none;">
-                <?php if (!empty($userData['reviews'])): ?>
-                    <?php foreach ($userData['reviews'] as $review): ?>
-                        <div class="review">
-                            <p>
-                                <strong><?= htmlspecialchars($review['reviewer_name']) ?></strong> -
-                                <span class="review-rating">
-                                    <?= str_repeat('★', (int)$review['rating']) ?>
-                                    <?= str_repeat('☆', 5 - (int)$review['rating']) ?>
-                                </span>
-                                <small style="color: gray;">on <?= date('F j, Y', strtotime($review['created_at'])) ?></small>
-                            </p>
-                            <p>"<?= nl2br(htmlspecialchars($review['comment'])) ?>"</p>
+                            <div id="reviews" class="section" style="display:none;">
+                                <?php if (!empty($userData['reviews'])): ?>
+                                    <?php foreach ($userData['reviews'] as $review): ?>
+                                        <div class="review">
+                                            <p>
+                                                <strong><?= htmlspecialchars($review['reviewer_name']) ?></strong> -
+                                                <span class="review-rating">
+                                                    <?= str_repeat('★', (int)$review['rating']) ?>
+                                                    <?= str_repeat('☆', 5 - (int)$review['rating']) ?>
+                                                </span>
+                                                <small style="color: gray;">on <?= date('F j, Y', strtotime($review['created_at'])) ?></small>
+                                            </p>
+                                            <p>"<?= nl2br(htmlspecialchars($review['comment'])) ?>"</p>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p>No reviews yet.</p>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p>No reviews yet.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
+                    </div>
+                </div>
 
                 <!-- <div class="user_posts">
                     <h2>User Posts</h2>

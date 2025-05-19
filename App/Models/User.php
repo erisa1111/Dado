@@ -336,6 +336,16 @@ public function storeVerificationToken($userId, $token)
     return $reviews ?: [];
 }
 
+public function getNannyDetails(int $userId): ?array {
+    $sql = "SELECT * FROM nanny_details WHERE user_id = :user_id";
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute(['user_id' => $userId]);
+    $details = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $details ?: null;
+}
+
 
 
 
