@@ -94,7 +94,7 @@ if (!$userData) {
     <link rel="stylesheet" href="/assets/css/home.css">
 
 
-    <!-- <link rel="stylesheet" href="/assets/css/search_results.css"> -->
+<link rel="stylesheet" href="/assets/css/search_results.css"> 
     <link rel="stylesheet" href="/components/postcard/postcard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
