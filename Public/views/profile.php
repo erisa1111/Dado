@@ -89,8 +89,11 @@ if (!$userData) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <link rel="stylesheet" href="/assets/css/profile.css">
-    <link rel="stylesheet" href="../components/nav_home/nav_home.css">
-    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/components/nav_home/nav_home.css">
+   
+    <!-- <link rel="stylesheet" href="/assets/css/home.css"> -->
+
+
     <link rel="stylesheet" href="/assets/css/search_results.css">
     <link rel="stylesheet" href="/components/postcard/postcard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -414,10 +417,12 @@ if (!$userData) {
                             </div>
                         <?php endif; ?>
                         <?php endforeach; ?>
+                        
                     </div>
 
                 <!-- </div> -->
             </div>
+     
             <div class="right_profile">
                 <div class="right-prof">
                     <?php
@@ -442,11 +447,33 @@ if (!$userData) {
     </main>
      <!-- Add this hidden element to store the current user's ID -->
     <div id="current-user-id" data-user-id="<?= $loggedInUserId ?>" style="display: none;"></div>
+           <!-- Edit Post Modal -->
+      <div id="editModal" class="modal2" style="display:none;">
+        <div class="modal2-content">
+          <span class="close" id="editClose">&times;</span>
+          <h3>Edit Post</h3>
+          <textarea id="editContent"></textarea>
+          <input type="file" id="editImage">
+          <button id="saveEdit">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- Delete Post Modal -->
+      <div id="deleteModal" class="modal2" style="display:none;">
+        <div class="modal2-content">
+          <span class="close" id="deleteClose">&times;</span>
+          <h3>Are you sure you want to delete this post?</h3>
+          <button id="confirmDelete">Yes, Delete</button>
+          <button id="cancelDelete">Cancel</button>
+        </div>
+      </div>
+    </div>
+
 
     <script src="../components/nav_home/nav_home.js"></script>
-    <script src="../assets/js/profile.js"></script>
-    <script src="/components/postcard/postcard.js"></script>
-    <script src="/assets/js/home.js"></script>
+    <script src="/assets/js/profile.js"></script>
+  
+    
       <script>
 document.addEventListener("DOMContentLoaded", function() {
     const connectButtons = document.querySelectorAll('.follow-btn[data-recipient-id]');

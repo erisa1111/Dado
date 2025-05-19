@@ -81,59 +81,60 @@ const suggestions = [
 
 
 // This function will initialize the search suggestion list
-// function initializeSuggestionList() {
-//     const searchInput = document.getElementById('search-bar');
-//     const suggestionList = document.getElementById('suggestion-list');
+ function initializeSuggestionList() {
+     const searchInput = document.getElementById('search-bar');
+     const suggestionList = document.getElementById('suggestion-list');
 
-//     // Handle search input and filter suggestions
-//     searchInput.addEventListener('input', (e) => {
-//         const query = e.target.value.toLowerCase();
-//         suggestionList.innerHTML = ''; // Clear previous suggestions
+     // Handle search input and filter suggestions
+     searchInput.addEventListener('input', (e) => {
+         const query = e.target.value.toLowerCase();
+         suggestionList.innerHTML = ''; // Clear previous suggestions
 
-//         if (query) {
-//             // Filter suggestions based on input
-//             const filteredSuggestions = suggestions.filter((item) =>
-//                 item.name.toLowerCase().includes(query)
-//             );
+         if (query) {
+             // Filter suggestions based on input
+             const filteredSuggestions = suggestions.filter((item) =>
+                 item.name.toLowerCase().includes(query)
+             );
 
-//             // Add filtered suggestions to the list
-//             filteredSuggestions.forEach((item) => {
-//                 const li = document.createElement('li');
-//                 li.classList.add('suggestion-item');
+             // Add filtered suggestions to the list
+             filteredSuggestions.forEach((item) => {
+                 const li = document.createElement('li');
+                 li.classList.add('suggestion-item');
 
-//                 const img = document.createElement('img');
-//                 img.src = item.profilePic;
-//                 img.alt = item.name;
+                 const img = document.createElement('img');
+                 img.src = item.profilePic;
+                 img.alt = item.name;
 
-//                 const infoDiv = document.createElement('div');
-//                 infoDiv.classList.add('info');
-//                 const name = document.createElement('h4');
-//                 name.textContent = item.name;
-//                 const description = document.createElement('p');
-//                 description.textContent = item.description;
+                 const infoDiv = document.createElement('div');
+                 infoDiv.classList.add('info');
+                 const name = document.createElement('h4');
+                 name.textContent = item.name;
+                 const description = document.createElement('p');
+                 description.textContent = item.description;
 
-//                 infoDiv.appendChild(name);
-//                 infoDiv.appendChild(description);
+                 infoDiv.appendChild(name);
+                 infoDiv.appendChild(description);
 
-//                 li.appendChild(img);
-//                 li.appendChild(infoDiv);
+                 li.appendChild(img);
+                 li.appendChild(infoDiv);
 
-//                 li.addEventListener('click', () => {
-//                     searchInput.value = item.name;
-//                     suggestionList.style.display = 'none'; // Hide suggestions on selection
-//                 });
+                 li.addEventListener('click', () => {
+                     searchInput.value = item.name;
+                     suggestionList.style.display = 'none'; // Hide suggestions on selection
+                 });
 
-//                 suggestionList.appendChild(li);
-//             });
+                 suggestionList.appendChild(li);
+             });
 
-//             suggestionList.style.display = 'block'; // Show suggestions
-//         } else {
-//             suggestionList.style.display = 'none'; // Hide suggestions if input is empty
-//         }
-//     });
+             suggestionList.style.display = 'block'; // Show suggestions
+         } else {
+           suggestionList.style.display = 'none'; // Hide suggestions if input is empty
+        }
+    });}
 
     // Close the suggestion list if clicking outside of the search input
     document.addEventListener('click', (e) => {
+        const suggestionList = document.getElementById('suggestion-list');
         if (!e.target.closest('.search-container')) {
             suggestionList.style.display = 'none';
         }

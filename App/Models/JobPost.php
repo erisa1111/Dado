@@ -125,6 +125,7 @@ public function getJobPostsByUserId($userId) {
     $stmt = $this->db->prepare($query);
     $stmt->execute([$userId]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 }
 
 public function searchJobs($query) {
