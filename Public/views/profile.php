@@ -57,8 +57,10 @@ usort($allPosts, function ($a, $b) {
 
 $ratingData = $userModel->getUserAverageRating($viewingUserId);
 
-$averageRating = $ratingData ? $ratingData['average_rating'] : 0;
-$ratingPercentage = ($averageRating / 5) * 100; // for the star-front width
+$average = $ratingData['average_rating'] ?? 0;
+$starWidth = ($average / 5) * 100;
+
+
 
 
 if (!$userData) {
@@ -90,6 +92,12 @@ if (!$userData) {
     </header>
     <br><br><br><br>
     <main>
+
+    <pre>
+Average: <?= $average ?>
+
+% Width: <?= $starWidth ?>%
+</pre>
         <div class="container">
             <div class="profile_wrapper">
                 <div class="profile_background"> </div>
@@ -109,9 +117,10 @@ if (!$userData) {
                         <div class="rating-container">
                         <div class="star-rating">
                             <div class="star-back">★★★★★</div>
-                            <div class="star-front" style="width: <?= $ratingPercentage ?>%;">★★★★★</div>
+                            <div class="star-front" style="width: <?= $starWidth ?>%;">★★★★★</div>
                         </div>
-                        <span class="rating-number"><?= $averageRating ?></span>
+
+                        <span class="rating-number"><?= $average ?></span>
                         </div>
     
                         <h5 id="username"> <?= htmlspecialchars($userData['username']) ?></h5>

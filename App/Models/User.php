@@ -277,10 +277,11 @@ public function storeVerificationToken($userId, $token)
                 ratings r
             JOIN 
                 jobs j ON r.job_id = j.id
-            WHERE 
-                (r.reviewer_id = j.parent_id AND j.nanny_id = :user_id)
+            WHERE  
+                (j.nanny_id = :user_id AND r.reviewer_id = j.parent_id)
                 OR 
-                (r.reviewer_id = j.nanny_id AND j.parent_id = :user_id)
+                (j.parent_id = :user_id AND r.reviewer_id = j.nanny_id)
+
         ";
 
         $stmt = $this->conn->prepare($sql);
