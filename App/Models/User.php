@@ -267,4 +267,36 @@ public function storeVerificationToken($userId, $token)
         return $this->lastId ?? 0;
     }
 
+
+    function getUserAverageRating(int $userId): ?array {
+        $sql = "
+            SELECT 
+                AVG(r.rating) AS average_rating,
+                COUNT(r.id) AS total_reviews
+            FROM 
+                ratings r
+            JOIN 
+                jobs j ON r.job_id = j.id
+            WHERE 
+                (r.reviewer_id = j.parent_id AND j.nanny_id = :user_id)
+                OR 
+                (r.reviewer_id = j.nanny_id AND j.parent_id = :user_id)
+        ";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['user_id' => $userId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result && $result['total_reviews'] > 0) {
+            return [
+                'average_rating' => round((float)$result['average_rating'], 2),
+                'total_reviews' => (int)$result['total_reviews']
+            ];
+        }
+
+        // No ratings yet
+        return null;
+    }
+
+
 }
