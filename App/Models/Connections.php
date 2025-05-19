@@ -6,56 +6,87 @@ use Config\Database;
 class Connections
 {
     private $db;
-
     public function __construct()
     {
         $database = new Database();
         $this->db = $database->connect();
     }
+    public function getUserProfilePicture(int $userId): ?string
+{
+    try {
+        $stmt = $this->db->prepare("CALL GetUserProfilePicture(?)");
+        $stmt->execute([$userId]);
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        // Clear any additional result sets to avoid issues with subsequent calls
+        while ($stmt->nextRowset()) {}
+        return $result['profile_picture'] ?? null;
+    } catch (\PDOException $e) {
+        error_log("Error fetching profile picture: " . $e->getMessage());
+        return null;
+    }
+}
 
-    public function getPendingRequests($user_id)
+   public function getPendingRequests($user_id)
 {
     $stmt = $this->db->prepare("CALL GetPendingRequests(?)");
     $stmt->execute([$user_id]);
     $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    
-    // Log for debugging
+    while ($stmt->nextRowset()) {} // Clear any extra result sets
+
+    foreach ($result as &$conn) {
+        if (isset($conn['user_one_id'])) {
+            $pic = $this->getUserProfilePicture((int)$conn['user_one_id']);
+            error_log("Raw profile picture path for user {$conn['user_one_id']}: " . print_r($pic, true));
+            if ($pic) {
+                $conn['profile_picture'] = '/' . ltrim($pic, '/\\');
+            } else {
+                $conn['profile_picture'] = '/assets/img/dado_profile.webp';
+            }
+        } else {
+            $conn['profile_picture'] = '/assets/img/dado_profile.webp';
+        }
+        $conn['status'] = 'pending';
+    }
+
     error_log("Pending requests for user $user_id: " . print_r($result, true));
     
     return $result;
 }
-
 public function getUserConnections($user_id)
 {
     $stmt = $this->db->prepare("CALL GetUserConnections(?)");
     $stmt->execute([$user_id]);
     $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    while ($stmt->nextRowset()) {} // clear extra result sets from CALL
 
-    // Add 'status' as 'accepted' directly here
     foreach ($result as &$conn) {
         $conn['status'] = 'accepted';
+
+        if (isset($conn['connected_user_id'])) {
+            $pic = $this->getUserProfilePicture((int)$conn['connected_user_id']);
+            // error_log("Raw profile picture path for user {$conn['connected_user_id']}: " . print_r($pic, true));
+
+            if ($pic) {
+                $conn['profile_picture'] = '/' . ltrim($pic, '/\\');
+            } else {
+                $conn['profile_picture'] = '/assets/img/dado_profile.webp';
+            }
+        } else {
+            $conn['profile_picture'] = '/assets/img/dado_profile.webp';
+        }
     }
 
     error_log("Accepted connections for user $user_id: " . print_r($result, true));
-
     return $result;
 }
 public function getAllConnections($user_id)
 {
+    // These methods already add profile_picture and status
     $pending = $this->getPendingRequests($user_id);
     $accepted = $this->getUserConnections($user_id);
+    return array_merge($pending, $accepted);
+}
 
-        // Tag status for each connection (already part of the result)
-        foreach ($pending as &$conn) {
-            $conn['status'] = 'pending';
-        }
-
-        foreach ($accepted as &$conn) {
-            $conn['status'] = 'accepted';
-        }
-
-        return array_merge($pending, $accepted);
-    }
 
     public function acceptConnection($user_one_id, $user_two_id)
     {

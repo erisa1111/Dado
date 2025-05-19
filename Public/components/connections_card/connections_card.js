@@ -62,10 +62,8 @@
 // ];
 
 // Base URL for connection actions
-const CONNECTIONS_AJAX_URL = '/connections-action.php';
 //const CONNECTIONS_AJAX_URL = '/App/Controllers/ConnectionsController/handleConnectionAction';
-
-
+const CONNECTIONS_AJAX_URL = '/connections-action.php';
 const CONNECTIONS_API_URL = '/App/Controllers/ConnectionsController/getConnectionsApi';
 
 
@@ -95,34 +93,34 @@ const loadConnections = async () => {
 };
 
 // Update UI with new connections
-const updateConnectionsUI = (connections) => {
-    const container = document.getElementById('center');
+// const updateConnectionsUI = (connections) => {
+//     const container = document.getElementById('center');
     
-    // Clear existing connections (except the hidden template)
-    document.querySelectorAll('#center .connection-card:not([style*="display: none"])').forEach(el => el.remove());
+//     // Clear existing connections (except the hidden template)
+//     document.querySelectorAll('#center .connection-card:not([style*="display: none"])').forEach(el => el.remove());
     
-    if (connections.length === 0) {
-        showEmptyState();
-        return;
-    }
+//     if (connections.length === 0) {
+//         showEmptyState();
+//         return;
+//     }
 
-    const template = document.querySelector('.connection-card[style*="display: none"]');
+//     const template = document.querySelector('.connection-card[style*="display: none"]');
     
-    connections.forEach(connection => {
-        const clone = template.cloneNode(true);
-        clone.style.display = 'flex';
-        clone.dataset.userId = connection.user_one_id;
+//     connections.forEach(connection => {
+//         const clone = template.cloneNode(true);
+//         clone.style.display = 'flex';
+//         clone.dataset.userId = connection.user_one_id;
         
-        // Update with actual data
-        const img = clone.querySelector('.connection-image');
-        img.src = getUserImage(connection.user_one_id);
-        img.alt = getUserName(connection.user_one_id) + ' profile';
+//         // Update with actual data
+//         const img = clone.querySelector('.connection-image');
+//         img.src = connection.profile_picture || '/default-profile.png'; // fallback image if none
+//         img.alt = connection.sender_name + ' ' + connection.sender_surname + ' profile';
         
-        clone.querySelector('.connection-username').textContent = getUserName(connection.user_one_id);
+//         clone.querySelector('.connection-username').textContent = connection.sender_name + ' ' + connection.sender_surname;
         
-        container.appendChild(clone);
-    });
-};
+//         container.appendChild(clone);
+//     });
+// };
 
 // Rest of your existing JavaScript (handleConnectionAction, setupEventListeners, etc.)
 // Render connections in the DOM
@@ -252,6 +250,39 @@ const showToast = (message, type = 'success') => {
     }, 3000);
 };
 
+const confirmModal = document.getElementById('confirm-modal');
+const confirmMessage = document.getElementById('confirm-message');
+const confirmYesBtn = document.getElementById('confirm-yes');
+const confirmNoBtn = document.getElementById('confirm-no');
+const modalCloseBtn = document.getElementById('modal-close');
+
+const showConfirmModal = (message) => {
+  return new Promise((resolve) => {
+    confirmMessage.textContent = message;
+    confirmModal.style.display = 'flex';
+
+    const cleanUp = () => {
+      confirmYesBtn.removeEventListener('click', onYes);
+      confirmNoBtn.removeEventListener('click', onNo);
+      modalCloseBtn.removeEventListener('click', onNo);
+      confirmModal.style.display = 'none';
+    };
+
+    const onYes = () => {
+      cleanUp();
+      resolve(true);
+    };
+
+    const onNo = () => {
+      cleanUp();
+      resolve(false);
+    };
+
+    confirmYesBtn.addEventListener('click', onYes);
+    confirmNoBtn.addEventListener('click', onNo);
+    modalCloseBtn.addEventListener('click', onNo);
+  });
+};
 // Set up event listeners
 const setupEventListeners = () => {
     document.addEventListener('click', (event) => {
@@ -280,9 +311,12 @@ const setupEventListeners = () => {
             } else if (declineBtn || removeBtn) {
                 const action = declineBtn ? 'decline' : 'remove';
                 console.log(`${action} connection between`, senderId, 'and', recipientId);
-                if (confirm(`Are you sure you want to ${action} this connection?`)) {
-                    handleConnectionAction('decline', senderId, recipientId, connectionCard);
-                }
+            showConfirmModal(`Are you sure you want to ${action} this connection?`)
+  .then((confirmed) => {
+    if (confirmed) {
+      handleConnectionAction('decline', senderId, recipientId, connectionCard);
+    }
+  });
             }
         }
     });

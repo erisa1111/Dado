@@ -270,12 +270,35 @@ main{
 
 
 .profile-buttons{
-  display: flex;
+   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-top: 20px;
-  /* justify-content:end; */
+  flex-wrap: wrap; /* Helps on smaller screens */
+}
+.profile-buttons > * {
+  display: flex;
+  align-items: center;
+}
+
+#connections-count {
+  font-size: 1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+/* Style the number specifically */
+#connections-number {
+  color: #e2687e; /* pink tone */
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+/* Style the link if needed */
+#connections-link {
+  text-decoration: none;
 }
 
 #edit_profile{
@@ -676,7 +699,7 @@ main{
   }
   
   .follow-btn {
-    margin-right:auto;
+    /*margin-right:auto;*/
     padding: 6px 12px;
     background-color: white;
     

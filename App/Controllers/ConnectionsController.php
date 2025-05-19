@@ -22,10 +22,16 @@ class ConnectionsController
 
     public function getConnectionsApi()
     {
-        // Ensure no output before this header call
-        header('Content-Type: application/json');
-        echo json_encode($this->getConnections());
-        exit;
+          header('Content-Type: application/json');
+
+    if (isset($_GET['user_id'])) {
+        $user_id = (int)$_GET['user_id'];
+        echo json_encode($this->getConnections($user_id));
+    } else {
+        echo json_encode(['error' => 'Missing user_id']);
+    }
+
+    exit;
     }
 
     public function getAllUserConnections($user_id)
