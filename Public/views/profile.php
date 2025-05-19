@@ -68,6 +68,9 @@ if ($userData['role_name'] === 'Nanny') {
     }
 }
 
+$suggestedUsers = $userModel->getSuggestedUsers($viewingUserId, null, 3); // or filter by role
+
+
 
 
 
@@ -417,53 +420,12 @@ if (!$userData) {
             </div>
             <div class="right_profile">
                 <div class="right-prof">
-                    <div class="recommend">
-                        <h2>Add to your feed</h2>
-    
-                        <div class="recommendation">
-                            <div class="logo">
-                                <img src="https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ="
-                                    alt="Nanny 1" />
-                            </div>
-                            <div class="rec">
-                                <div class="info">
-                                    <h3>Nanny 1</h3>
-                                    <p>Experienced caregiver</p>
-                                </div>
-                                <button class="follow-btn">+ Follow</button>
-                            </div>
-                        </div>
-    
-                        <div class="recommendation">
-                            <div class="logo">
-                                <img src="https://media.istockphoto.com/id/1386479313/photo/happy-millennial-afro-american-business-woman-posing-isolated-on-white.jpg?s=612x612&w=0&k=20&c=8ssXDNTp1XAPan8Bg6mJRwG7EXHshFO5o0v9SIj96nY="
-                                    alt="Parent 1" />
-                            </div>
-                            <div class="rec">
-                                <div class="info">
-                                    <h3>Parent 1</h3>
-                                    <p>Looking for a caring nanny</p>
-                                </div>
-                                <button class="follow-btn">+ Follow</button>
-                            </div>
-                        </div>
-    
-                        <div class="recommendation">
-                            <div class="logo">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&s"
-                                    alt="Nanny 2" />
-                            </div>
-                            <div class="rec">
-                                <div class="info">
-                                    <h3>Nanny 2</h3>
-                                    <p>Passionate about child development activities.</p>
-                                </div>
-                                <button class="follow-btn">+ Follow</button>
-                            </div>
-                        </div>
-    
-                        <a href="#" class="view-all">View all recommendations →</a>
-                    </div>
+                    <?php
+                        // You can fetch suggestions before including the partial
+                        $suggestedUsers = $userModel->getSuggestedUsers($viewingUserId);
+                        include '../components/recommend/recommendations.php';
+                    ?>
+
     
                     <div class="about">
                         <img src="../assets/img/find_dado.webp" alt="">

@@ -346,6 +346,44 @@ public function getNannyDetails(int $userId): ?array {
     return $details ?: null;
 }
 
+public function getSuggestedUsers(int $currentUserId, string $role = null, int $limit = 3): array {
+    $sql = "
+        SELECT 
+            u.id,
+            u.username,
+            u.name,
+            u.surname,
+            u.profile_picture,
+            r.name AS role_name
+        FROM 
+            users u
+        JOIN 
+            roles r ON u.role_id = r.id
+        WHERE 
+            u.id != :current_user_id
+    ";
+
+    if ($role) {
+        $sql .= " AND r.name = :role";
+    }
+
+    $sql .= " ORDER BY RAND() LIMIT :limit";
+
+    $stmt = $this->conn->prepare($sql);
+
+    // Bind parameters
+    $stmt->bindValue(':current_user_id', $currentUserId, PDO::PARAM_INT);
+    if ($role) {
+        $stmt->bindValue(':role', $role, PDO::PARAM_STR);
+    }
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
 
 
 
