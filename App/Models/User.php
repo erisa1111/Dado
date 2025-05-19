@@ -267,4 +267,124 @@ public function storeVerificationToken($userId, $token)
         return $this->lastId ?? 0;
     }
 
+
+    function getUserAverageRating(int $userId): ?array {
+        $sql = "
+            SELECT 
+                AVG(r.rating) AS average_rating,
+                COUNT(r.id) AS total_reviews
+            FROM 
+                ratings r
+            JOIN 
+                jobs j ON r.job_id = j.id
+            WHERE  
+                (j.nanny_id = :user_id AND r.reviewer_id = j.parent_id)
+                OR 
+                (j.parent_id = :user_id AND r.reviewer_id = j.nanny_id)
+
+        ";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['user_id' => $userId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result && $result['total_reviews'] > 0) {
+            return [
+                'average_rating' => round((float)$result['average_rating'], 2),
+                'total_reviews' => (int)$result['total_reviews']
+            ];
+        }
+
+        // No ratings yet
+        return null;
+    }
+
+    public function getUserReviews(int $userId): array {
+    $sql = "
+        SELECT 
+            r.id,
+            r.rating,
+            r.comment,
+            r.created_at,
+            u.username,
+            u.name,
+            u.surname
+        FROM 
+            ratings r
+        JOIN 
+            jobs j ON r.job_id = j.id
+        JOIN 
+            users u ON r.reviewer_id = u.id
+        WHERE  
+            (j.nanny_id = :user_id AND r.reviewer_id = j.parent_id)
+            OR 
+            (j.parent_id = :user_id AND r.reviewer_id = j.nanny_id)
+        ORDER BY 
+            r.created_at DESC
+    ";
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute(['user_id' => $userId]);
+    $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Format reviewer name: Prefer full name, fallback to username
+    foreach ($reviews as &$review) {
+        $fullName = trim($review['name'] . ' ' . $review['surname']);
+        $review['reviewer_name'] = $fullName !== '' ? $fullName : $review['username'];
+    }
+
+    return $reviews ?: [];
+}
+
+public function getNannyDetails(int $userId): ?array {
+    $sql = "SELECT * FROM nanny_details WHERE user_id = :user_id";
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute(['user_id' => $userId]);
+    $details = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $details ?: null;
+}
+
+public function getSuggestedUsers(int $currentUserId, string $role = null, int $limit = 3): array {
+    $sql = "
+        SELECT 
+            u.id,
+            u.username,
+            u.name,
+            u.surname,
+            u.profile_picture,
+            r.name AS role_name
+        FROM 
+            users u
+        JOIN 
+            roles r ON u.role_id = r.id
+        WHERE 
+            u.id != :current_user_id
+    ";
+
+    if ($role) {
+        $sql .= " AND r.name = :role";
+    }
+
+    $sql .= " ORDER BY RAND() LIMIT :limit";
+
+    $stmt = $this->conn->prepare($sql);
+
+    // Bind parameters
+    $stmt->bindValue(':current_user_id', $currentUserId, PDO::PARAM_INT);
+    if ($role) {
+        $stmt->bindValue(':role', $role, PDO::PARAM_STR);
+    }
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
+
+
+
 }
