@@ -16,6 +16,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
 $loggedInUserId = $_SESSION['user_id'];
 $viewingUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : $loggedInUserId;
 $isOwnProfile = ($loggedInUserId === $viewingUserId);
@@ -54,6 +55,24 @@ usort($allPosts, function ($a, $b) {
   return $b['sort_date'] - $a['sort_date'];
 });
 
+$ratingData = $userModel->getUserAverageRating($viewingUserId);
+$userData['reviews'] = $userModel->getUserReviews($viewingUserId);
+
+$average = $ratingData['average_rating'] ?? 0;
+$starWidth = ($average / 5) * 100;
+
+if ($userData['role_name'] === 'Nanny') {
+    $nannyDetails = $userModel->getNannyDetails($viewingUserId);
+    if ($nannyDetails) {
+        $userData = array_merge($userData, $nannyDetails);
+    }
+}
+
+$suggestedUsers = $userModel->getSuggestedUsers($viewingUserId, null, 3); // or filter by role
+
+
+
+
 
 if (!$userData) {
     echo "User not found.";
@@ -71,13 +90,13 @@ if (!$userData) {
     <title>Home Page</title>
     <link rel="stylesheet" href="/assets/css/profile.css">
     <link rel="stylesheet" href="../components/nav_home/nav_home.css">
-    <!-- <link rel="stylesheet" href="/assets/css/home.css"> -->
+    <link rel="stylesheet" href="/assets/css/home.css">
     <link rel="stylesheet" href="/assets/css/search_results.css">
     <link rel="stylesheet" href="/components/postcard/postcard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body style="display: block;">
 
     <header>
         <div id="nav-placeholder"></div>
@@ -101,8 +120,12 @@ if (!$userData) {
                     </div>
                     <div class="profile_info">
                         <div class="rating-container">
-                            <span class="review-rating">★★★★★</span>
-                            <span class="rating-number">5.0</span>
+                        <div class="star-rating">
+                            <div class="star-back">★★★★★</div>
+                            <div class="star-front" style="width: <?= $starWidth ?>%;">★★★★★</div>
+                        </div>
+
+                        <span class="rating-number"><?= $average ?></span>
                         </div>
     
                         <h5 id="username"> <?= htmlspecialchars($userData['username']) ?></h5>
@@ -139,19 +162,16 @@ if (!$userData) {
                             <?php endif; ?>
                             <button class="follow-btn">Share</button>
                            <?php if ($isOwnProfile): ?>
-    <div id="connections-count" data-user-id="<?php echo $loggedInUserId; ?>">
-        Connections: <a href="/views/connections.php" id="connections-link"><span id="connections-number">0</span></a>
-    </div>
-<?php else: ?>
-    <div id="connections-count" data-user-id="<?php echo $viewingUserId; ?>">
-        Connections: <span id="connections-number">0</span>
-    </div>
-<?php endif; ?>
+                                <div id="connections-count" data-user-id="<?php echo $loggedInUserId; ?>">
+                                    Connections: <a href="/views/connections.php" id="connections-link"><span id="connections-number">0</span></a>
+                                </div>
+                            <?php else: ?>
+                                <div id="connections-count" data-user-id="<?php echo $viewingUserId; ?>">
+                                    Connections: <span id="connections-number">0</span>
+                                </div>
+                            <?php endif; ?>
 
                         </div>
-
-                      
-    
                     </div>
                 </div>
 
@@ -166,18 +186,50 @@ if (!$userData) {
                             <li><a href="#" data-section="skills">Skills</a></li>
                             <li><a href="#" data-section="experience">Experience</a></li>
                             <?php endif; ?>
-                            <!-- <li><a href="#" data-section="reviews" onclick="showSection('reviews')">Reviews</a></li> -->
-    
+                            <li><a href="#" data-section="reviews">Reviews</a></li>
                         </ul>
+
                         <div id="content">
-                            <!-- My Story Section -->
-                            <div id="story" class="section">
+                            <!-- Sections -->
+                            <div id="story" class="section active">
                                 <p><?= htmlspecialchars($userData['bio']) ?></p>
                             </div>
-    
+
+                            <?php if ($userData['role_name'] === 'Nanny'): ?>
+                            <div id="skills" class="section" style="display:none;">
+                                <p>First Aid & CPR Certified: Trained to handle emergencies and ensure children's safety.</p>
+                                <p>Organizational Skills: Skilled in planning daily routines, activities, and meals.</p>
+                            </div>
+                            <div id="experience" class="section" style="display:none;">
+                                <p>Private Nanny for <?= htmlspecialchars($userData['experience']) ?></p>
+                                <p>My usual schedule is <?= htmlspecialchars($userData['schedule']) ?> </p>
+                                <p>My expected salary is around <?= htmlspecialchars($userData['expected_salary']) ?> Euros</p>
+                            </div>
+                            <?php endif; ?>
+
+                            <div id="reviews" class="section" style="display:none;">
+                                <?php if (!empty($userData['reviews'])): ?>
+                                    <?php foreach ($userData['reviews'] as $review): ?>
+                                        <div class="review">
+                                            <p>
+                                                <strong><?= htmlspecialchars($review['reviewer_name']) ?></strong> -
+                                                <span class="review-rating">
+                                                    <?= str_repeat('★', (int)$review['rating']) ?>
+                                                    <?= str_repeat('☆', 5 - (int)$review['rating']) ?>
+                                                </span>
+                                                <small style="color: gray;">on <?= date('F j, Y', strtotime($review['created_at'])) ?></small>
+                                            </p>
+                                            <p>"<?= nl2br(htmlspecialchars($review['comment'])) ?>"</p>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p>No reviews yet.</p>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
+
                 <!-- <div class="user_posts">
                     <h2>User Posts</h2>
                     <div id="posts-container">
@@ -367,54 +419,13 @@ if (!$userData) {
                 <!-- </div> -->
             </div>
             <div class="right_profile">
-                <div class="right">
-                    <div class="recommend">
-                        <h2>Add to your feed</h2>
-    
-                        <div class="recommendation">
-                            <div class="logo">
-                                <img src="https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ="
-                                    alt="Nanny 1" />
-                            </div>
-                            <div class="rec">
-                                <div class="info">
-                                    <h3>Nanny 1</h3>
-                                    <p>Experienced caregiver</p>
-                                </div>
-                                <button class="follow-btn">+ Follow</button>
-                            </div>
-                        </div>
-    
-                        <div class="recommendation">
-                            <div class="logo">
-                                <img src="https://media.istockphoto.com/id/1386479313/photo/happy-millennial-afro-american-business-woman-posing-isolated-on-white.jpg?s=612x612&w=0&k=20&c=8ssXDNTp1XAPan8Bg6mJRwG7EXHshFO5o0v9SIj96nY="
-                                    alt="Parent 1" />
-                            </div>
-                            <div class="rec">
-                                <div class="info">
-                                    <h3>Parent 1</h3>
-                                    <p>Looking for a caring nanny</p>
-                                </div>
-                                <button class="follow-btn">+ Follow</button>
-                            </div>
-                        </div>
-    
-                        <div class="recommendation">
-                            <div class="logo">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&s"
-                                    alt="Nanny 2" />
-                            </div>
-                            <div class="rec">
-                                <div class="info">
-                                    <h3>Nanny 2</h3>
-                                    <p>Passionate about child development activities.</p>
-                                </div>
-                                <button class="follow-btn">+ Follow</button>
-                            </div>
-                        </div>
-    
-                        <a href="#" class="view-all">View all recommendations →</a>
-                    </div>
+                <div class="right-prof">
+                    <?php
+                        // You can fetch suggestions before including the partial
+                        $suggestedUsers = $userModel->getSuggestedUsers($viewingUserId);
+                        include '../components/recommend/recommendations.php';
+                    ?>
+
     
                     <div class="about">
                         <img src="../assets/img/find_dado.webp" alt="">
