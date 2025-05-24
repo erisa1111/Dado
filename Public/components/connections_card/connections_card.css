@@ -1,16 +1,15 @@
 .connection-card {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 10px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    height: auto;
-    min-height: 60px; /* Reduced height */
+  justify-content: space-between; /* content left, buttons right */
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.connection-card:hover {
+    box-shadow: 0 4px 12px rgba(97, 96, 96, 0.2);
 }
 
 .connection_wrapper {
@@ -29,13 +28,13 @@
     min-width: 0;
 }
 
-.connection-image {
+/* .connection-image {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
-}
+} */
 
 .connection-details {
     display: flex;
@@ -146,6 +145,16 @@
     border-radius: 4px;
     padding: 8px 0;
 }
+.connection-image {
+  width: 50px;              /* match width */
+  height: 50px;             /* match height */
+  border-radius: 50%;       /* keep circular */
+  object-fit: cover;        /* keep cropping correct */
+  border: 2px solid #e2687e; /* add pink border */
+  margin-bottom: 8px;       /* same margin */
+  flex-shrink: 0;           /* same flex behavior */
+  aspect-ratio: 1 / 1;      /* keep ratio */
+}
 
 .connection-menu-content span {
     color: #333;
@@ -161,4 +170,18 @@
 
 .connection-menu:hover .connection-menu-content {
     display: block;
+}
+.connection-username-link {
+   color: #555;       /* Makes link text black */
+    text-decoration: none; /* Removes underline */
+    cursor: pointer;      /* Keeps pointer cursor for clickable feel */
+   /* font-size: 5px;*/
+  font-size: 13px;
+  color: #555;
+  margin: 0;
+}
+
+.connection-username-link:hover {
+   /* text-decoration: underline; *//* Optional: add underline on hover for feedback */
+    color:#e2687e
 }

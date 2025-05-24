@@ -1,19 +1,23 @@
 <?php
-session_start();
-$_SERVER['REQUEST_METHOD'] = 'POST';
-
-require_once __DIR__ . '/ConnectionsController.php';
-require_once __DIR__ . '/../../App/Models/Connections.php';
-require_once __DIR__ . '/../../Config/Database.php';
+require_once __DIR__ . '/../../App/Controllers/ConnectionsController.php';
 
 use App\Controllers\ConnectionsController;
 
+// Initialize the controller
 $controller = new ConnectionsController();
 
-echo "<h2>Testing getConnectionCount()</h2>";
+echo "<h2>Testing getConnections(92)</h2>";
+$result = $controller->getConnections(92); // returns array
+echo "<pre>";
+print_r($result);
+echo "</pre>";
+
+// To test getConnectionsApi, simulate a request like a browser:
+echo "<h2>Testing getConnectionsApi (simulated GET)</h2>";
+$_GET['user_id'] = 92;
 
 ob_start();
-$controller->getConnectionCount(90);  // This will echo JSON and exit
-$jsonOutput = ob_get_clean();
+$controller->getConnectionsApi(); // This will echo JSON and call exit
+$output = ob_get_clean();
 
-echo "<pre>$jsonOutput</pre>";
+echo "<pre>$output</pre>";

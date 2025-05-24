@@ -39,44 +39,61 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
+
 .modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  width: 300px;
-  text-align: center;
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 350px;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: center;
+    position: relative;
 }
+
+#modal-message {
+    color: #e2687e;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
 .modal-buttons {
-  margin-top: 15px;
-  display: flex;
-  justify-content: space-around;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
 }
-.btn-confirm {
-  background-color: #28a745;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.btn1 {
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    border: none;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
 }
-.btn-cancel {
-  background-color: #dc3545;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.btn1-confirm {
+     background-color: #e2687e;
+    color: white;
+}
+.btn1-confirm:hover {
+    background-color: #d2556d;
+}
+
+.btn1-cancel {
+   background-color: #ccc;
+    color: #333;
+}
+.btn1-cancel:hover {
+    background-color: #aaa;
 }
 .notification-user-link {
     color: inherit;
@@ -114,6 +131,52 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
 .notification-profile-link:hover .notification-profile-pic {
     transform: scale(1.05);
 }
+.empty-notifications-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.empty-notifications-container {
+     background: #f8f9fa;;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(161, 157, 157, 0.05);
+}
+
+.empty-notifications .empty-icon {
+    font-size: 40px;
+    color: #e2687e;
+    margin-bottom: 10px;
+}
+
+.empty-notifications h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.empty-notifications p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.explore-btn {
+    padding: 8px 16px;
+    background-color: #e2687e;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.explore-btn i {
+    margin-right: 6px;
+}
+
 </style>
 </head>
 <body>
@@ -139,7 +202,27 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
     </div>
 
     <div id="center">
+      <?php if (empty($allNotifications)): ?>
+    <!-- 🟣 Place your empty notification card here -->
+     <div class="empty-notifications-wrapper">
+    <div class="empty-notifications-container">
+        <div class="empty-notifications">
+            <div class="empty-icon">
+                <i class="fas fa-bell-slash"></i>
+            </div>
+            <h3>No notifications yet</h3>
+            <p>You're all caught up! Check back later for updates.</p>
+            <!-- <button class="explore-btn" onclick="window.location.href='search_results.php'">
+                <i class="fas fa-users"></i> Explore users
+            </button> -->
+        </div>
+    </div>
+</div>
+<?php else: ?>
+    <!-- Render the notification cards here -->
+
      <div id="notifications-container"></div>
+     <?php endif; ?>
     </div> 
 
     <div class="right">
@@ -165,8 +248,8 @@ $allNotifications = $notificationsModel->getAllNotifications($user_id);
   <div class="modal-content">
     <p id="modal-message">Are you sure?</p>
     <div class="modal-buttons">
-      <button id="confirm-button" class="btn btn-confirm">Yes</button>
-      <button id="cancel-button" class="btn btn-cancel">Cancel</button>
+      <button id="confirm-button" class="btn1 btn1-confirm">Yes</button>
+      <button id="cancel-button" class="btn1 btn1-cancel">No</button>
     </div>
   </div>
 </div>
@@ -221,6 +304,7 @@ if (data.notifications.length === 0) {
             userId = notification.commenter_id;
             message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
                         <strong>${notification.commenter_name} ${notification.commenter_surname}</strong>
+                        <br>
                       </a> commented on your post.`;
             commentPreview = `<div class="notification-preview">
                                 <p class="notification-preview-text">${notification.comment}</p>
@@ -233,6 +317,7 @@ if (data.notifications.length === 0) {
             userId = notification.liker_id;
             message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
                         <strong>${notification.liker_name} ${notification.liker_surname}</strong>
+                        <br>
                       </a> liked your post.`;
             break;
 
@@ -242,6 +327,7 @@ if (data.notifications.length === 0) {
             userId = notification.commenter_id;
             message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
                         <strong>${notification.commenter_name} ${notification.commenter_surname}</strong>
+                        <br>
                       </a> commented on your job post.`;
             commentPreview = `<div class="notification-preview">
                                 <p class="notification-preview-text">${notification.comment}</p>
@@ -254,6 +340,7 @@ if (data.notifications.length === 0) {
             userId = notification.liker_id;
             message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
                         <strong>${notification.liker_name} ${notification.liker_surname}</strong>
+                        <br>
                       </a> liked your job post.`;
             break;
 
@@ -263,6 +350,7 @@ if (data.notifications.length === 0) {
             userId = notification.applicant_id;
             message = `<a href="profile.php?user_id=${userId}" class="notification-user-link">
                         <strong>${notification.applicant_name} ${notification.applicant_surname}</strong>
+                        <br>
                       </a> applied for your job post.`;
             buttonsHTML = `
               <div class="notification-actions">
@@ -337,7 +425,7 @@ card.innerHTML = `
               .then(res => res.json())
               .then(data => {
                 if (data.success) {
-                  alert('Application accepted!');
+                 // alert('Application accepted!');
                   card.remove();
                 } else {
                   alert('Failed to accept application: ' + data.message);

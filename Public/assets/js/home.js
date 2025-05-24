@@ -110,7 +110,7 @@ document.getElementById('jobpost-form').addEventListener('submit', async functio
             throw new Error(data.message || "Job post creation failed.");
         }
 
-        alert('Job post created successfully!');
+        //alert('Job post created successfully!');
         toggleModalVisibility(false);  // Assuming same modal function
         window.location.reload(true); // The true forces a reload from server
 
@@ -1240,7 +1240,7 @@ document.querySelectorAll('.apply-btn').forEach(button => {
                 button.disabled = true;
                 button.style.backgroundColor = '#b6e1a3';
                 // Use a more user-friendly notification system
-                showNotification('Application submitted successfully!', 'success');
+               // showNotification('Application submitted successfully!', 'success');
             } else {
                 showNotification(data.message || 'Failed to submit application', 'error');
             }

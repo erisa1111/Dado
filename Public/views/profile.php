@@ -489,7 +489,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log('Sender ID:', senderId);
             console.log('Recipient ID:', recipientId);
             if (senderId === recipientId) {
-                alert('You cannot connect with yourself.');
+               // alert('You cannot connect with yourself.');
                 return;
             }
 
@@ -521,7 +521,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.log('Response status:', response.status);
 
                 if (data.success) {
-                    alert('Connection request sent successfully!');
+                   // alert('Connection request sent successfully!');
                     button.disabled = true;
                     button.innerHTML = 'Request Sent';
                 } else if (data.status === "pending") {
@@ -529,7 +529,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     alert('Failed to send connection request: ' + data.message);
                 } else if (data.status === "connected") {
                     button.innerHTML = 'Connected';
-                    alert('You are already connected with this user.');
+                    //alert('You are already connected with this user.');
                 }
             } catch (error) {
                 console.error('Error sending connection request:', error);
@@ -605,7 +605,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("Unfollow result:", result);
             if (result.success) {
                 e.target.innerHTML = 'Connect';  // Change the button back to "Connect"
-                alert('You have unfollowed the user.');
+               // alert('You have unfollowed the user.');
                 // Remove unfollow listener after success
                 e.target.removeEventListener('click', handleUnfollow);
                 checkConnectionStatus(senderId, recipientId, e.target);  // Refresh status
