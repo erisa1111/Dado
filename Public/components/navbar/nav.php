@@ -26,21 +26,18 @@
         <img src="/assets/img/dado.png" alt="icon" class="icon">
 
 
-        <ul class="right_nav ubuntu-medium">
-            <li><a href="./views/login.php" class="nav-item2">Log in</a></li>
-            <li><a href="#sign_up" class="nav-item2">Register today</a></li>
-            <li>
-                <a href="#" class="dropdown">
-                    <div class="dropdown-toggle">
-                        <span id="selected-language">English</span>
-                    </div>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-item" data-value="en">English</div>
-                        <div class="dropdown-item" data-value="sq">Albanian</div>
-                    </div>
-                </a>
-            </li>
-        </ul>
+       <ul class="right_nav ubuntu-medium">
+    <li><a href="./views/login.php" class="nav-item2">Log in</a></li>
+    <li><a href="#sign_up" class="nav-item2">Register today</a></li>
+    <li>
+        <a href="/../../assets/manual/user_manualpdf.pdf#page=2" class="nav-item2" target="_blank">
+            <div class="dropdown-toggle">
+                <span id="selected-language">Help</span>
+            </div>
+        </a>
+    </li>
+</ul>
+
     </nav>
 
 

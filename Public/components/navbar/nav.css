@@ -165,3 +165,6 @@ nav ul li a:before {
   background-color: #f9e4e7;
   color: #674d51;
 }
+.nav-item2{
+  cursor: pointer;
+}

@@ -104,7 +104,7 @@ $loggedInUserId = $_SESSION['user_id'] ?? null;
                         <div class="dropdown-content">
                             <a href="account_settings.html">Account Settings</a>
                             <a href="privacy.html">Privacy</a>
-                            <a href="help.html">Help</a>
+                            <a href="help.php">Help</a>
 
                         </div>
                     </div>
