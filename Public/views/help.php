@@ -66,9 +66,9 @@
         }
 
         .card:hover {
-            background-color: #eef;
+            background-color:rgb(247, 220, 231);
             transform: scale(1.03);
-            border-color: #aaa;
+            border-color: rgb(247, 220, 231);
         }
 
         .card-icon {
